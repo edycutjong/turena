@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-mono: var(--font-mono);
+  --font-sans: var(--font-sans);
+
+  --color-arena-bg: #0a0a0f;
+  --color-arena-surface: #0f0f1a;
+  --color-arena-border: #1e1e2e;
+  --color-arena-text: #e2e8f0;
+  --color-arena-muted: #64748b;
+
+  --color-arena-cyan: #06b6d4;
+  --color-arena-cyan-dim: #0e7490;
+  --color-arena-red: #ef4444;
+  --color-arena-red-dim: #991b1b;
+  --color-arena-green: #22c55e;
+  --color-arena-green-dim: #15803d;
+  --color-arena-purple: #a855f7;
+  --color-arena-purple-dim: #7e22ce;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-arena-bg);
+  color: var(--color-arena-text);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.font-terminal {
+  font-family: var(--font-mono), "Courier New", monospace;
+}

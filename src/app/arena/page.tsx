@@ -9,8 +9,10 @@ import { MarketChart } from "@/components/MarketChart";
 import { TradeHistory } from "@/components/TradeHistory";
 import { AgentProfile } from "@/components/AgentProfile";
 import { SelfCorrectionOverlay } from "@/components/SelfCorrectionOverlay";
+import { LiveChat } from "@/components/LiveChat";
 import { useActiveCycle } from "@/hooks/useActiveCycle";
 import { useCounterTrades } from "@/hooks/useCounterTrades";
+import Link from "next/link";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS;
 
@@ -67,6 +69,9 @@ export default function ArenaPage() {
           </span>
           <span className="text-arena-muted/40">|</span>
           <span>Mantle Testnet</span>
+          <span className="text-arena-muted/40">|</span>
+          <Link href="/leaderboard" className="hover:text-arena-cyan transition-colors">Leaderboard</Link>
+          <Link href="/replay" className="hover:text-arena-cyan transition-colors">Replay</Link>
         </div>
       </header>
 
@@ -103,9 +108,14 @@ export default function ArenaPage() {
           />
         </div>
 
-        {/* Right — CoT Terminal */}
-        <div className="flex flex-col flex-1">
-          <CoTTerminal cycleId={cycle?.id ?? null} />
+        {/* Right — CoT Terminal + Live Chat */}
+        <div className="flex flex-col flex-1 gap-2" style={{ minWidth: 0 }}>
+          <div className="flex-1 min-h-0">
+            <CoTTerminal cycleId={cycle?.id ?? null} />
+          </div>
+          <div className="h-48">
+            <LiveChat />
+          </div>
         </div>
       </div>
 

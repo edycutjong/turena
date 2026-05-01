@@ -33,11 +33,11 @@ async def lifespan(app: FastAPI):
         _auto_cycle_task.cancel()
 
 
-app = FastAPI(title="TuringArena Backend", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="Turena Backend", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://turingarena.xyz"],
+    allow_origins=["http://localhost:3000", "https://turena.xyz"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -45,7 +45,7 @@ app.add_middleware(
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "TuringArena Backend"}
+    return {"status": "ok", "service": "Turena Backend"}
 
 
 @app.post("/agent/run-cycle")

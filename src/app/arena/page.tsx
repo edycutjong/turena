@@ -12,22 +12,21 @@ import { SelfCorrectionOverlay } from "@/components/SelfCorrectionOverlay";
 import { LiveChat } from "@/components/LiveChat";
 import { useActiveCycle } from "@/hooks/useActiveCycle";
 import { useCounterTrades } from "@/hooks/useCounterTrades";
+import { useWallet } from "@/hooks/useWallet";
 import Link from "next/link";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS;
-
 const AGENT_ID = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS ?? "agent-0";
 const WINDOW_SECONDS = 15;
 
 export default function ArenaPage() {
   const cycle = useActiveCycle();
   const { totalPool, againstPool } = useCounterTrades(cycle?.id ?? null);
+  const { address: walletAddress, connected, connect } = useWallet();
 
   const [windowStartedAt, setWindowStartedAt] = useState<Date | null>(null);
   const [windowOpen, setWindowOpen] = useState(false);
 
-  // Timer starts when cycle moves to pending (backend fires it)
-  // For now wired manually — will be triggered by backend intent token
   const openWindow = useCallback(() => {
     setWindowStartedAt(new Date());
     setWindowOpen(true);
@@ -37,12 +36,10 @@ export default function ArenaPage() {
     setWindowOpen(false);
   }, []);
 
-  const handleBet = useCallback(() => {
-    // Full implementation in Task 6 / wallet integration
-    alert("Counter-trade placement — wallet integration coming in Task 11");
+  const handleBetSuccess = useCallback((txHash: string) => {
+    console.info("Bet placed:", txHash);
   }, []);
 
-  // Parse intent from latest intent token (set by CoT stream)
   const intent = cycle?.intent as {
     action: "long" | "short";
     asset: string;
@@ -72,6 +69,16 @@ export default function ArenaPage() {
           <span className="text-arena-muted/40">|</span>
           <Link href="/leaderboard" className="hover:text-arena-cyan transition-colors">Leaderboard</Link>
           <Link href="/replay" className="hover:text-arena-cyan transition-colors">Replay</Link>
+          <span className="text-arena-muted/40">|</span>
+          {connected && walletAddress ? (
+            <span className="text-arena-green">
+              {walletAddress.slice(0, 6)}…{walletAddress.slice(-4)}
+            </span>
+          ) : (
+            <button onClick={connect} className="text-arena-cyan hover:underline">
+              Connect Wallet
+            </button>
+          )}
         </div>
       </header>
 
@@ -83,7 +90,6 @@ export default function ArenaPage() {
           <div className="flex-1">
             <MarketChart />
           </div>
-          {/* Manual trigger for demo — will be removed in production */}
           <button
             onClick={openWindow}
             className="font-terminal text-xs text-arena-muted border border-arena-border rounded px-3 py-1.5 hover:border-arena-cyan hover:text-arena-cyan transition-colors"
@@ -104,7 +110,10 @@ export default function ArenaPage() {
             isOpen={windowOpen}
             totalPool={totalPool}
             againstPool={againstPool}
-            onBet={handleBet}
+            cycleNumber={cycle?.cycle_number ?? null}
+            walletAddress={walletAddress ?? null}
+            onConnect={connect}
+            onBetSuccess={handleBetSuccess}
           />
         </div>
 
@@ -124,7 +133,7 @@ export default function ArenaPage() {
         <TradeHistory />
       </div>
 
-      {/* Global self-correction overlay — fixed position, fires on any correction */}
+      {/* Global self-correction overlay */}
       <SelfCorrectionOverlay />
     </div>
   );

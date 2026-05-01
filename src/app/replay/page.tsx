@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Database } from "@/lib/database.types";
 import Link from "next/link";
+import { AppNav } from "@/components/AppNav";
 
 type TradeCycle = Database["public"]["Tables"]["trade_cycles"]["Row"];
 type CotToken = Database["public"]["Tables"]["cot_tokens"]["Row"];
@@ -35,12 +36,12 @@ export default function ReplayPage() {
   };
 
   return (
-    <div className="min-h-screen bg-arena-bg p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/" className="font-terminal text-xs text-arena-muted hover:text-arena-cyan">← Back</Link>
-          <h1 className="font-terminal text-2xl font-bold text-arena-text">Trade Replay</h1>
-        </div>
+    <div className="min-h-screen bg-arena-bg flex flex-col">
+      <AppNav right={
+        <Link href="/" className="hover:text-arena-cyan transition-colors">← Home</Link>
+      } />
+      <div className="max-w-6xl mx-auto w-full p-6">
+        <h1 className="font-terminal text-2xl font-bold text-arena-text mb-8">Trade Replay</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Cycle list */}

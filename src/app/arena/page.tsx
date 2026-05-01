@@ -15,6 +15,7 @@ import { useCounterTrades } from "@/hooks/useCounterTrades";
 import { useWallet } from "@/hooks/useWallet";
 import Link from "next/link";
 import { playWindowOpen } from "@/lib/sounds";
+import { AppNav } from "@/components/AppNav";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS;
 const AGENT_ID = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS ?? "agent-0";
@@ -50,39 +51,32 @@ export default function ArenaPage() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-arena-bg">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-arena-border bg-arena-surface/60 backdrop-blur">
-        <div className="flex items-center gap-3">
-          <span className="font-terminal text-arena-cyan font-bold text-lg tracking-tight">
-            TuringArena
-          </span>
-          <span className="font-terminal text-xs text-arena-muted">
-            {cycle ? `Cycle #${cycle.cycle_number}` : "Idle"}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-4 font-terminal text-xs text-arena-muted">
-          <span className={`flex items-center gap-1.5 ${cycle ? "text-arena-green" : "text-arena-muted"}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${cycle ? "bg-arena-green animate-pulse" : "bg-arena-muted"}`} />
-            {cycle ? "Live" : "Standby"}
-          </span>
-          <span className="text-arena-muted/40">|</span>
-          <span>Mantle Testnet</span>
-          <span className="text-arena-muted/40">|</span>
-          <Link href="/leaderboard" className="hover:text-arena-cyan transition-colors">Leaderboard</Link>
-          <Link href="/replay" className="hover:text-arena-cyan transition-colors">Replay</Link>
-          <span className="text-arena-muted/40">|</span>
-          {connected && walletAddress ? (
-            <span className="text-arena-green">
-              {walletAddress.slice(0, 6)}…{walletAddress.slice(-4)}
+      <AppNav
+        sub={cycle ? `· Cycle #${cycle.cycle_number}` : "· Idle"}
+        right={
+          <>
+            <span className={`flex items-center gap-1.5 ${cycle ? "text-arena-green" : "text-arena-muted"}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${cycle ? "bg-arena-green animate-pulse" : "bg-arena-muted"}`} />
+              {cycle ? "Live" : "Standby"}
             </span>
-          ) : (
-            <button onClick={connect} className="text-arena-cyan hover:underline">
-              Connect Wallet
-            </button>
-          )}
-        </div>
-      </header>
+            <span className="text-arena-muted/40">|</span>
+            <span>Mantle Testnet</span>
+            <span className="text-arena-muted/40">|</span>
+            <Link href="/leaderboard" className="hover:text-arena-cyan transition-colors">Leaderboard</Link>
+            <Link href="/replay" className="hover:text-arena-cyan transition-colors">Replay</Link>
+            <span className="text-arena-muted/40">|</span>
+            {connected && walletAddress ? (
+              <span className="text-arena-green">
+                {walletAddress.slice(0, 6)}…{walletAddress.slice(-4)}
+              </span>
+            ) : (
+              <button onClick={connect} className="text-arena-cyan hover:underline">
+                Connect Wallet
+              </button>
+            )}
+          </>
+        }
+      />
 
       {/* Main split layout */}
       <div className="flex flex-1 overflow-hidden gap-2 p-2 flex-col md:flex-row">

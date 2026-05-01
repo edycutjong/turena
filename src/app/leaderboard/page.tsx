@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import type { Database } from "@/lib/database.types";
 import Link from "next/link";
 import { CorrectionTimeline } from "@/components/CorrectionTimeline";
+import { AppNav } from "@/components/AppNav";
 
 type CounterTrade = Database["public"]["Tables"]["counter_trades"]["Row"];
 type AgentState = Database["public"]["Tables"]["agent_state"]["Row"];
@@ -74,12 +75,12 @@ export default function LeaderboardPage() {
   const humanWins = (agentState?.total_trades ?? 0) - agentWins;
 
   return (
-    <div className="min-h-screen bg-arena-bg p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center gap-4 mb-2">
-          <Link href="/" className="font-terminal text-xs text-arena-muted hover:text-arena-cyan">← Back</Link>
-          <h1 className="font-terminal text-2xl font-bold text-arena-text">Leaderboard</h1>
-        </div>
+    <div className="min-h-screen bg-arena-bg flex flex-col">
+      <AppNav right={
+        <Link href="/" className="hover:text-arena-cyan transition-colors">← Home</Link>
+      } />
+      <div className="max-w-4xl mx-auto w-full space-y-6 p-6">
+        <h1 className="font-terminal text-2xl font-bold text-arena-text">Leaderboard</h1>
 
         {/* AI vs Humans scoreboard */}
         <div className="glass rounded-xl p-6 grid grid-cols-2 gap-6">

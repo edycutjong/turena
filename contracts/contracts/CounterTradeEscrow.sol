@@ -21,8 +21,13 @@ contract CounterTradeEscrow is Ownable, ReentrancyGuard {
 
     uint256 public bankroll;
 
+    struct BetInfo {
+        uint256 amount;
+        bool forAI;
+    }
+
     mapping(uint256 => Cycle) public cycles;
-    mapping(uint256 => mapping(address => uint256)) public bets;
+    mapping(uint256 => mapping(address => BetInfo)) public bets;
 
     event BankrollFunded(uint256 amount, uint256 newBalance);
     event BetPlaced(uint256 indexed cycleId, address indexed bettor, uint256 amount, bool forAI);
@@ -42,11 +47,15 @@ contract CounterTradeEscrow is Ownable, ReentrancyGuard {
     function placeBet(uint256 cycleId, bool forAI) external payable nonReentrant {
         require(msg.value > 0, "Bet must be > 0");
         require(!cycles[cycleId].settled, "Cycle already settled");
-        require(bets[cycleId][msg.sender] == 0, "Already bet this cycle");
+        require(bets[cycleId][msg.sender].amount == 0, "Already bet this cycle");
         // Solvency: bankroll must be able to cover a payout if human wins
         require(bankroll >= msg.value, "Bankroll too low to accept bet");
 
-        bets[cycleId][msg.sender] = msg.value;
+        bets[cycleId][msg.sender] = BetInfo({
+            amount: msg.value,
+            forAI: forAI
+        });
+        
         if (forAI) {
             cycles[cycleId].forAI += msg.value;
         } else {
@@ -78,16 +87,15 @@ contract CounterTradeEscrow is Ownable, ReentrancyGuard {
     function claim(uint256 cycleId) external nonReentrant {
         Cycle storage c = cycles[cycleId];
         require(c.settled, "Cycle not settled");
-        uint256 bet = bets[cycleId][msg.sender];
-        require(bet > 0, "No bet found");
+        BetInfo memory betInfo = bets[cycleId][msg.sender];
+        require(betInfo.amount > 0, "No bet found");
 
-        bets[cycleId][msg.sender] = 0;
+        bets[cycleId][msg.sender].amount = 0;
 
         uint256 payout = 0;
-        if (!c.aiWon) {
-            // Only against-AI bettors get paid — but we track bet direction per address elsewhere
-            // Simplified: caller gets 2x if they bet against AI (checked via event log off-chain)
-            payout = bet * 2;
+        if (!c.aiWon && !betInfo.forAI) {
+            // Caller gets 2x if they bet against AI and AI lost
+            payout = betInfo.amount * 2;
         }
 
         if (payout > 0) {

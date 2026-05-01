@@ -8,6 +8,7 @@ import { IntentAnnouncement } from "@/components/IntentAnnouncement";
 import { MarketChart } from "@/components/MarketChart";
 import { TradeHistory } from "@/components/TradeHistory";
 import { AgentProfile } from "@/components/AgentProfile";
+import { SelfCorrectionOverlay } from "@/components/SelfCorrectionOverlay";
 import { useActiveCycle } from "@/hooks/useActiveCycle";
 import { useCounterTrades } from "@/hooks/useCounterTrades";
 
@@ -112,6 +113,9 @@ export default function ArenaPage() {
       <div className="px-2 pb-2">
         <TradeHistory />
       </div>
+
+      {/* Global self-correction overlay — fixed position, fires on any correction */}
+      <SelfCorrectionOverlay />
     </div>
   );
 }

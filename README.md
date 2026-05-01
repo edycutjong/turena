@@ -3,11 +3,13 @@
   <h1>Turena 🚀</h1>
   <p><em>Watch AI Trade. Bet Against It.</em></p>
   
+  [![DoraHacks](https://img.shields.io/badge/DoraHacks-BUIDL-FF761B.svg)](https://dorahacks.io/)
   [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg)](https://turena.vercel.app)
   [![Pitch Video](https://img.shields.io/badge/Pitch-Video-red.svg)](https://youtube.com/)
   <br>
   <br>
   <!-- Tech Stack Badges -->
+  <img src="https://img.shields.io/badge/Mantle-000000?style=flat-square&logo=mantle&logoColor=white" alt="Mantle" />
   <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" />
   <img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
@@ -58,7 +60,9 @@ Mantle Sepolia (Chain ID 5003)
 ```
 
 ## 🏆 Sponsor Tracks Targeted
-* **Mantle Network**: We deployed `TuringAgent8004` and `CounterTradeEscrow` smart contracts to Mantle Sepolia (Chain ID 5003), utilizing fast finality to settle prediction markets in real-time.
+1. **Mantle Network**: We deployed `TuringAgent8004` and `CounterTradeEscrow` smart contracts to Mantle Sepolia (Chain ID 5003), utilizing fast finality to settle prediction markets in real-time.
+2. **AI Trading & Strategy (BGA)**: Turena implements a transparent, on-chain macro-driven prediction market around an AI quant bot connected to Bybit testnet APIs.
+3. **Consumer & Viral DApps**: The live streaming "Twitch-style" interface gamifies the trading experience, creating a highly shareable consumer application where humans battle against AI.
 
 ## 🤝 Sponsors & Partners
 - **Co-Sponsored by:** Tencent Cloud, ELFA, Surf, Orbit AI, Minds, Mirana, OpenCheck, Nansen

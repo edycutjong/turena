@@ -4,9 +4,8 @@
   <p><em>Watch AI Trade. Bet Against It.</em></p>
   
   [![DoraHacks](https://img.shields.io/badge/DoraHacks-BUIDL-FF761B.svg)](https://dorahacks.io/)
-  [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg)](https://turena.vercel.app)
+  [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg)](https://turena.edycu.dev)
   [![Pitch Video](https://img.shields.io/badge/Pitch-Video-red.svg)](https://youtube.com/)
-  <br>
   <br>
   <!-- Tech Stack Badges -->
   <img src="https://img.shields.io/badge/Mantle-000000?style=flat-square&logo=mantle&logoColor=white" alt="Mantle" />
@@ -73,8 +72,22 @@ Mantle Sepolia (Chain ID 5003)
 
 ### Prerequisites
 - Node.js 20+, Python 3.12+
-- MetaMask with Mantle Sepolia testnet (Chain ID 5003, RPC: `https://rpc.sepolia.mantle.xyz`)
+- MetaMask (or any EIP-1193 wallet)
 - Testnet MNT from [https://faucet.sepolia.mantle.xyz](https://faucet.sepolia.mantle.xyz)
+
+### MetaMask — Add Mantle Sepolia Testnet
+
+> **Important:** Do **not** select "Testnet Mantle" from MetaMask's built-in list — that is the old deprecated network. Add the network manually with the values below.
+
+In MetaMask → Settings → Networks → Add a network → Add a network manually:
+
+| Field | Value |
+|---|---|
+| Network name | `Mantle Sepolia Testnet` |
+| Default RPC URL | `https://rpc.sepolia.mantle.xyz` |
+| Chain ID | `5003` |
+| Currency symbol | `MNT` |
+| Block explorer URL | `https://explorer.sepolia.mantle.xyz` |
 
 ### 1. Frontend
 ```bash

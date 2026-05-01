@@ -21,6 +21,18 @@ class MockOutcomeRequest(BaseModel):
     outcome: str = "loss"
 
 
+@router.get("/status")
+async def get_status():
+    """Return the currently active (pending) cycle ID, if any."""
+    pool = await get_pool()
+    row = await pool.fetchrow(
+        "SELECT id, cycle_number FROM trade_cycles WHERE result = 'pending' ORDER BY created_at DESC LIMIT 1"
+    )
+    if row:
+        return {"active_cycle_id": str(row["id"]), "cycle_number": row["cycle_number"]}
+    return {"active_cycle_id": None, "cycle_number": None}
+
+
 @router.get("/params")
 async def get_params():
     pool = await get_pool()

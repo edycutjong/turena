@@ -13,6 +13,7 @@ export function CountdownTimer({ durationSeconds, startedAt, onExpire }: Props) 
 
   useEffect(() => {
     if (!startedAt) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRemaining(durationSeconds);
       return;
     }

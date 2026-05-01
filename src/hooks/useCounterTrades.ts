@@ -11,6 +11,7 @@ export function useCounterTrades(cycleId: string | null) {
   useEffect(() => {
     if (!cycleId) return;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTrades([]);
 
     supabase

@@ -12,7 +12,9 @@ export function SelfCorrectionOverlay() {
 
   useEffect(() => {
     if (latest && latest.id !== shown) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShown(latest.id);
+       
       setVisible(true);
       const t = setTimeout(() => setVisible(false), 6000);
       return () => clearTimeout(t);

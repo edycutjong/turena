@@ -1,0 +1,5 @@
+export function Skeleton({ className = "" }: { className?: string }) {
+  return (
+    <div className={`skeleton bg-arena-border rounded ${className}`} />
+  );
+}

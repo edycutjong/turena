@@ -66,7 +66,7 @@ export function CoTTerminal({ cycleId }: Props) {
   }, [displayed]);
 
   return (
-    <div className="flex flex-col h-full bg-arena-surface border border-arena-border rounded-lg overflow-hidden">
+    <div className="flex flex-col h-full glass rounded-xl overflow-hidden scanlines relative glow-cyan transition-shadow duration-500">
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-arena-border bg-black/30">
         <span className="w-3 h-3 rounded-full bg-arena-red" />

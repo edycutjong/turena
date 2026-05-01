@@ -64,7 +64,7 @@ export function TradeHistory() {
             {trades.map((t) => {
               const intent = t.intent as { action?: string; asset?: string } | null;
               return (
-                <tr key={t.id} className="border-b border-arena-border/50 hover:bg-white/5">
+                <tr key={t.id} className={`border-b border-arena-border/50 hover:bg-white/5 transition-colors ${t.result === "win" ? "flash-win" : ""}`}>
                   <td className="px-4 py-2 text-arena-muted">#{t.cycle_number}</td>
                   <td className="px-4 py-2 uppercase">
                     {intent?.action ?? "—"}{" "}

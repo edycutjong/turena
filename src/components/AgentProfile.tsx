@@ -28,7 +28,7 @@ export function AgentProfile({ agentId, contractAddress }: Props) {
     : pnl >= 0 ? "text-arena-green" : "text-arena-red";
 
   return (
-    <div className="bg-arena-surface border border-arena-border rounded-lg overflow-hidden">
+    <div className="glass rounded-xl overflow-hidden glow-cyan transition-all duration-300">
       {/* NFT card header */}
       <div className="relative px-4 py-4 bg-gradient-to-br from-arena-purple/20 to-arena-cyan/10 border-b border-arena-border">
         <div className="flex items-center gap-3">

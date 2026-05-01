@@ -1,25 +1,33 @@
-# TuringArena
+<div align="center">
+  <img src="docs/readme_hero.png" alt="Turena Logo" width="800">
+  <h1>Turena 🚀</h1>
+  <p><em>Watch AI Trade. Bet Against It.</em></p>
+  
+  [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg)](https://turena.vercel.app)
+  [![Pitch Video](https://img.shields.io/badge/Pitch-Video-red.svg)](https://youtube.com/)
+</div>
 
-**Watch AI Trade. Bet Against It.**
+---
 
+## 📸 See it in Action
 A live Twitch-style prediction market where a DeepSeek R1 trading agent streams its raw Chain-of-Thought reasoning in real-time. You have 15 seconds to counter-trade its decision. Every outcome is permanently recorded on Mantle via ERC-8004.
 
-> DoraHacks Mantle Turing Test 2026 submission
+![App Demo](docs/readme_hero.png)
 
----
+## 💡 The Problem & Solution
+In today's world, algorithmic AI agents trade autonomously in the dark, and humans are left to guess their strategies. 
+**TuringArena** solves this by forcing the AI to "think out loud" on a live stream, letting humans front-run or counter-trade it before its final order hits the market. 
 
-## What it does
+**Key Features:**
+- ⚡ **AI Thinks Out Loud:** DeepSeek R1's `reasoning_content` tokens stream character-by-character as it analyzes live Bybit market data.
+- ⏱️ **15-Second Counter Window:** The moment the AI announces its decision, a countdown opens. Place a bet against it using testnet MNT via MetaMask.
+- 🔒 **On-Chain Provenance:** Every trade win/loss and self-correction is recorded on Mantle via `TuringAgent8004` (ERC-8004 dynamic NFT) and `CounterTradeEscrow`. Verify on Mantle Sepolia Explorer.
+- 🧠 **Self-Correction:** When the AI loses, it autonomously adjusts its risk parameters and broadcasts the change on-chain. The UI fires a full-screen overlay showing exactly what changed and why.
 
-1. **AI Thinks Out Loud** — DeepSeek R1's `reasoning_content` tokens stream character-by-character to all viewers as it analyzes live Bybit market data.
-2. **15-Second Counter Window** — The moment the AI announces its decision, a countdown opens. Place a bet against it using testnet MNT via MetaMask.
-3. **On-Chain Provenance** — Every trade win/loss and every self-correction is recorded on Mantle via `TuringAgent8004` (ERC-8004 dynamic NFT) and `CounterTradeEscrow`. Verify on Mantle Sepolia Explorer.
-4. **Self-Correction** — When the AI loses, it autonomously adjusts its risk parameters and broadcasts the change on-chain. The UI fires a full-screen overlay showing exactly what changed and why.
+## 🏗️ Architecture & Tech Stack
+We built the frontend using **Next.js 16** and **Tailwind CSS**, communicating with smart contracts via **viem**. The backend is powered by **FastAPI** streaming to **Supabase Realtime**. We integrated the **DeepSeek R1 API** for the core reasoning agent.
 
----
-
-## Architecture
-
-```
+```text
 Browser (Next.js 16)
   ├── CoT Terminal       ← Supabase Realtime postgres_changes on cot_tokens
   ├── CountdownTimer     ← Framer Motion SVG ring
@@ -40,26 +48,34 @@ Mantle Sepolia (Chain ID 5003)
   └── CounterTradeEscrow.sol — bankroll + placeBet/settle/claim
 ```
 
----
+## 🏆 Sponsor Tracks Targeted
+* **Mantle Network**: We deployed `TuringAgent8004` and `CounterTradeEscrow` smart contracts to Mantle Sepolia (Chain ID 5003), utilizing fast finality to settle prediction markets in real-time.
 
-## Local setup
+## 🚀 Run it Locally (For Judges)
 
 ### Prerequisites
 - Node.js 20+, Python 3.12+
 - MetaMask with Mantle Sepolia testnet (Chain ID 5003, RPC: `https://rpc.sepolia.mantle.xyz`)
 - Testnet MNT from [https://faucet.sepolia.mantle.xyz](https://faucet.sepolia.mantle.xyz)
 
-### Frontend
-
+### 1. Frontend
 ```bash
-cp .env.example .env.local
-# Fill in Supabase + contract addresses
+# Clone the repo (or navigate to directory)
+# Install dependencies
 npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Fill in NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_TURING_AGENT_ADDRESS, NEXT_PUBLIC_ESCROW_ADDRESS
+
+# Run the app
 npm run dev
 ```
 
-### Backend
+> **Note for Judges:** 
+> You can skip making an account! Connect your MetaMask to the Mantle Sepolia testnet.
 
+### 2. Backend
 ```bash
 cd backend
 cp ../.env.example .env
@@ -69,8 +85,7 @@ pip install -r requirements.txt
 AUTO_CYCLE=true uvicorn main:app --reload
 ```
 
-### Contracts
-
+### 3. Contracts
 ```bash
 cd contracts
 npm install
@@ -78,8 +93,7 @@ cp ../.env.example .env  # fill DEPLOYER_PRIVATE_KEY
 npx hardhat run scripts/deploy.ts --network mantleTestnet
 ```
 
-### Demo recording
-
+### 4. Demo Recording Mode
 ```bash
 # In one terminal: start backend with DEMO_MODE=true + AUTO_CYCLE=true
 DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
@@ -90,7 +104,7 @@ DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
 
 ---
 
-## Key env vars
+## 🛠️ Key Environment Variables
 
 | Variable | Where | Description |
 |---|---|---|
@@ -104,9 +118,3 @@ DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | backend | Supabase server-side |
 | `AUTO_CYCLE=true` | backend | Start trade loop automatically |
 | `DEMO_MODE=true` | backend | Enable `/agent/mock-outcome` endpoint |
-
----
-
-## Stack
-
-DeepSeek R1 · Next.js 16 · Supabase Realtime · Mantle Network · ERC-8004 · Bybit Testnet · viem · Framer Motion · Recharts · FastAPI · Hardhat 2

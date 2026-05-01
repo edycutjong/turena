@@ -18,6 +18,7 @@ describe("POST /api/agent/mock-outcome", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, "error").mockImplementation(() => {});
     process.env = { ...originalEnv, DEMO_MODE: "true" };
   });
 

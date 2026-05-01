@@ -15,6 +15,7 @@ describe("POST /api/agent/trade-loop", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.spyOn(console, "error").mockImplementation(() => {});
     process.env = { ...originalEnv, DEMO_MODE: "true" };
   });
 

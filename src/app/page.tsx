@@ -1,19 +1,20 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { AppNav } from "@/components/AppNav";
 
 export const metadata: Metadata = {
-  title: "TuringArena — Watch AI Trade. Bet Against It.",
+  title: "Turena — Watch AI Trade. Bet Against It.",
   description:
     "Stream a live AI trading agent's Chain-of-Thought reasoning and counter-trade its decisions in a 15-second window. Every decision recorded on Mantle.",
   openGraph: {
-    title: "TuringArena — Watch AI Trade. Bet Against It.",
+    title: "Turena — Watch AI Trade. Bet Against It.",
     description:
       "Stream a live AI trading agent's Chain-of-Thought reasoning and counter-trade its decisions in a 15-second window. Every decision recorded on Mantle.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "TuringArena — Watch AI Trade. Bet Against It.",
+    title: "Turena — Watch AI Trade. Bet Against It.",
     description:
       "Stream a live AI trading agent's Chain-of-Thought reasoning and counter-trade its decisions in a 15-second window.",
   },
@@ -55,25 +56,34 @@ const STACK = [
   { label: "viem", sub: "Wallet + contract calls" },
 ];
 
+const SPONSORS = {
+  cosponsors: [
+    "Tencent Cloud", "ELFA", "Surf", "Orbit AI",
+    "Minds", "Mirana", "OpenCheck", "Nansen",
+  ],
+  partners: [
+    "BU", "OT", "Decipher", "Imperial Blockchain & Fintech",
+    "Cornell Blockchain", "MU Shanghai", "Z.AI", "Orakle",
+    "HKUST Crypto-Fintech Lab", "Akindo", "KudasaiJP", "Rocketpunch",
+    "TradeGainTT", "Four Pillars", "Blockchain Valley",
+    "Zhejiang University", "Merchant Moe",
+  ],
+  supported: ["DoraHacks", "HackQuest"],
+};
+
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-arena-bg flex flex-col">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-4 border-b border-arena-border glass sticky top-0 z-20">
-        <span className="font-terminal text-arena-cyan font-bold text-lg tracking-tight">
-          TuringArena
-        </span>
-        <div className="flex items-center gap-4 font-terminal text-xs text-arena-muted">
+      <AppNav right={
+        <>
           <Link href="/leaderboard" className="hover:text-arena-cyan transition-colors">Leaderboard</Link>
           <Link href="/replay" className="hover:text-arena-cyan transition-colors">Replay</Link>
-          <Link
-            href="/arena"
-            className="px-4 py-1.5 rounded border border-arena-cyan text-arena-cyan hover:bg-arena-cyan/10 transition-colors"
-          >
+          <Link href="/arena" className="px-4 py-1.5 rounded border border-arena-cyan text-arena-cyan hover:bg-arena-cyan/10 transition-colors">
             Enter Arena →
           </Link>
-        </div>
-      </nav>
+        </>
+      } />
 
       {/* Hero */}
       <section className="flex flex-col items-center justify-center text-center px-6 pt-24 pb-16 relative overflow-hidden">
@@ -93,10 +103,13 @@ export default function Home() {
           <p className="font-terminal text-xs text-arena-cyan tracking-[0.3em] uppercase mb-4">
             Mantle Hackathon 2026 · ERC-8004
           </p>
-          <h1 className="font-terminal text-5xl md:text-7xl font-bold text-arena-text leading-tight mb-6">
+          <h1 className="font-terminal text-5xl md:text-7xl font-bold text-arena-text leading-tight mb-3">
             Watch AI Trade.{" "}
             <span className="text-arena-cyan">Bet Against It.</span>
           </h1>
+          <p className="font-terminal text-sm text-arena-muted/60 tracking-[0.2em] uppercase mb-6">
+            The Turing Arena
+          </p>
           <p className="text-arena-muted text-lg md:text-xl max-w-xl mx-auto mb-10 leading-relaxed">
             A live AI trading agent streams its chain-of-thought in real time.
             You get 15 seconds to counter-trade. Every decision is recorded
@@ -163,7 +176,7 @@ export default function Home() {
         <h2 className="font-terminal text-sm text-arena-muted text-center tracking-[0.3em] uppercase mb-8">
           Built with
         </h2>
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="grid grid-cols-3 gap-3 max-w-3xl mx-auto">
           {STACK.map((s) => (
             <div
               key={s.label}
@@ -175,6 +188,62 @@ export default function Home() {
               <p className="font-terminal text-xs text-arena-muted mt-0.5">{s.sub}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Sponsors & Partners */}
+      <section className="px-6 py-16 max-w-5xl mx-auto w-full border-t border-arena-border">
+        <div className="space-y-8">
+          {/* Co-Sponsored By */}
+          <div>
+            <p className="font-terminal text-xs text-arena-cyan tracking-widest uppercase text-center mb-4">
+              Co-Sponsored By
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {SPONSORS.cosponsors.map((name) => (
+                <span
+                  key={name}
+                  className="glass px-3 py-1.5 rounded border border-arena-cyan/20 font-terminal text-xs text-arena-text hover:border-arena-cyan/50 hover:text-arena-cyan transition-colors"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Community & AI Partners */}
+          <div>
+            <p className="font-terminal text-xs text-violet-400 tracking-widest uppercase text-center mb-4">
+              Community &amp; AI Partners
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {SPONSORS.partners.map((name) => (
+                <span
+                  key={name}
+                  className="glass px-3 py-1.5 rounded border border-arena-border font-terminal text-xs text-arena-text hover:border-arena-muted/60 transition-colors"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Co-Supported By */}
+          <div>
+            <p className="font-terminal text-xs text-arena-green tracking-widest uppercase text-center mb-4">
+              Co-Supported By
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {SPONSORS.supported.map((name) => (
+                <span
+                  key={name}
+                  className="glass px-3 py-1.5 rounded border border-arena-green/20 font-terminal text-xs text-arena-text hover:border-arena-green/50 hover:text-arena-green transition-colors"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -193,7 +262,7 @@ export default function Home() {
 
       <footer className="px-6 py-6 border-t border-arena-border text-center">
         <p className="font-terminal text-xs text-arena-muted">
-          TuringArena · Built on Mantle · Hackathon 2026
+          Turena · Built on Mantle · Hackathon 2026
         </p>
       </footer>
     </div>

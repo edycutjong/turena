@@ -15,19 +15,19 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000"),
-  title: "TuringArena — Watch AI Trade. Bet Against It.",
+  title: "Turena — Watch AI Trade. Bet Against It.",
   description:
     "Stream a live AI trading agent's Chain-of-Thought reasoning and counter-trade its decisions in a 15-second window. Every decision recorded on Mantle.",
   openGraph: {
-    title: "TuringArena — Watch AI Trade. Bet Against It.",
+    title: "Turena — Watch AI Trade. Bet Against It.",
     description: "Stream a live AI trading agent's Chain-of-Thought reasoning and counter-trade its decisions in a 15-second window. Every decision recorded on Mantle.",
-    siteName: "TuringArena",
+    siteName: "Turena",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "TuringArena — Watch AI Trade. Bet Against It.",
+    title: "Turena — Watch AI Trade. Bet Against It.",
     description: "Stream a live AI trading agent's Chain-of-Thought reasoning and counter-trade its decisions in a 15-second window.",
   },
 };
@@ -41,6 +41,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${jetbrainsMono.variable} ${inter.variable} h-full antialiased dark`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-arena-bg text-arena-text">
         {children}

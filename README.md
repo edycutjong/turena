@@ -41,12 +41,14 @@ In today's world, algorithmic AI agents trade autonomously in the dark, and huma
 | **Frontend** | Next.js 16 (App Router), React 19 | SSR for landing, client components for real-time UI |
 | **Styling** | Tailwind CSS v4 | Fast iteration, dark mode, responsive |
 | **Real-time** | Supabase Realtime | WebSocket channels for CoT streaming, bet updates — zero infra |
-| **Database** | Supabase PostgreSQL | Trade history, agent state, bet records |
+| **Database** | Supabase PostgreSQL | 5 tables — `trade_cycles`, `counter_trades`, `self_corrections`, `agent_state`, `cot_tokens`. [Full schema →](docs/DATABASE.md) |
 | **AI Backend** | Python (FastAPI) | **DeepSeek R1** (`deepseek-reasoner`) — the only reasoning model that exposes raw `reasoning_content` tokens via SSE streaming |
 | **Market Data** | Bybit API — **Testnet first** | Paper trading on testnet prevents real-money execution during demo |
 | **Smart Contracts** | Solidity 0.8.20 (Hardhat) | ERC-8004 Agent Identity + Counter-Trade Escrow on Mantle |
 | **Chain** | Mantle Testnet (5003) → Mainnet (5000) | Testnet contract address published and verifiable on Mantle Explorer |
 | **Deploy** | Vercel (Frontend) + Railway (Python) | Fast, reliable, free tier |
+
+> 📐 [Architecture](docs/ARCHITECTURE.md) · 🔌 [API Reference](docs/API.md) · 📜 [Smart Contracts](docs/CONTRACTS.md) · 🗄️ [Database Schema](docs/DATABASE.md)
 
 ### System Diagram
 
@@ -97,219 +99,25 @@ graph TB
     AGT -->|"Update Identity"| ERC
 ```
 
-### Deployment Architecture
-
-```text
-┌─────────────────────┐     ┌──────────────────────┐
-│  Vercel             │     │  Railway              │
-│  Next.js 16 Frontend│◄───►│  Python FastAPI       │
-│  + API Routes       │     │  + AI Agent Engine    │
-└────────┬────────────┘     └──────────┬───────────┘
-         │                             │
-         ▼                             ▼
-┌─────────────────────┐     ┌──────────────────────┐
-│  Supabase           │     │  Mantle Network      │
-│  PostgreSQL +       │     │  ERC-8004 NFT +      │
-│  Realtime Channels  │     │  Escrow Contract     │
-└─────────────────────┘     └──────────────────────┘
-```
-
-## 📊 Database Schema (Supabase PostgreSQL)
-
-<details>
-<summary><strong>trade_cycles</strong></summary>
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | `uuid` | Primary key |
-| `agent_id` | `text` | ERC-8004 token ID |
-| `cycle_number` | `integer` | Sequential trade cycle number |
-| `intent` | `jsonb` | `{action: "short", asset: "mETH", reason: "..."}` |
-| `cot_transcript` | `text` | Full Chain-of-Thought reasoning text |
-| `result` | `text` | `win` / `loss` / `pending` |
-| `pnl_mnt` | `numeric` | Profit/Loss in MNT |
-| `self_corrected` | `boolean` | Whether a correction was triggered |
-| `tx_hash` | `text` | Mantle transaction hash |
-| `created_at` | `timestamptz` | Timestamp |
-</details>
-
-<details>
-<summary><strong>counter_trades</strong></summary>
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | `uuid` | Primary key |
-| `cycle_id` | `uuid` | FK → `trade_cycles.id` |
-| `wallet_address` | `text` | Human counter-trader address |
-| `amount_mnt` | `numeric` | Amount wagered |
-| `position` | `text` | `for` / `against` the AI |
-| `result` | `text` | `win` / `loss` / `pending` |
-| `payout_mnt` | `numeric` | Payout amount |
-| `tx_hash` | `text` | Mantle escrow tx hash |
-| `created_at` | `timestamptz` | Timestamp |
-</details>
-
-<details>
-<summary><strong>self_corrections</strong></summary>
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | `uuid` | Primary key |
-| `cycle_id` | `uuid` | FK → `trade_cycles.id` |
-| `parameter_changed` | `text` | e.g. `slippage_tolerance`, `risk_weight` |
-| `old_value` | `numeric` | Previous parameter value |
-| `new_value` | `numeric` | Updated parameter value |
-| `regret_score` | `numeric` | Calculated opportunity cost |
-| `tx_hash` | `text` | Mantle SelfCorrection event tx |
-| `created_at` | `timestamptz` | Timestamp |
-</details>
-
-<details>
-<summary><strong>agent_state</strong></summary>
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | `uuid` | Primary key |
-| `agent_id` | `text` | ERC-8004 token ID |
-| `total_trades` | `integer` | Lifetime trade count |
-| `win_rate` | `numeric` | Current win percentage |
-| `total_pnl` | `numeric` | Cumulative P&L in MNT |
-| `self_corrections_count` | `integer` | Total corrections made |
-| `current_params` | `jsonb` | Active strategy parameters |
-| `elo_rating` | `integer` | Performance rating |
-| `updated_at` | `timestamptz` | Last updated |
-</details>
-
-<details>
-<summary><strong>cot_tokens</strong> (Realtime streaming bus)</summary>
-
-```sql
-CREATE TABLE cot_tokens (
-  id         bigserial PRIMARY KEY,
-  cycle_id   uuid REFERENCES trade_cycles(id),
-  token_text text NOT NULL,
-  token_type text DEFAULT 'reasoning', -- 'reasoning' | 'intent' | 'correction'
-  created_at timestamptz DEFAULT now()
-);
-```
-</details>
-
-## 🔌 API Endpoints
-
-### Next.js API Routes (Frontend)
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET` | `/api/agent/state` | Current agent stats + ERC-8004 metadata |
-| `GET` | `/api/trades` | Recent trade history with CoT transcripts |
-| `GET` | `/api/trades/[id]` | Single trade cycle detail |
-| `GET` | `/api/corrections` | Self-correction event log |
-| `GET` | `/api/leaderboard` | Human vs AI performance comparison |
-
-### Python FastAPI (Backend)
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| `POST` | `/agent/think` | Trigger new trade cycle (starts CoT stream via DeepSeek R1) |
-| `POST` | `/agent/execute` | Execute the trade after 15s window (Bybit Testnet) |
-| `POST` | `/agent/correct` | Trigger self-correction analysis |
-| `GET` | `/agent/params` | Current strategy parameters |
-| `GET` | `/market/price` | Latest Bybit price data |
-| `GET` | `/market/orderbook` | Order book snapshot |
-| `WS` | `/ws/cot` | WebSocket for raw CoT token stream |
-| `POST` | `/agent/mock-outcome` | **Demo only.** Force a result to guarantee self-correction. Gated by `DEMO_MODE=true`. |
-
-## 📡 Supabase Realtime Streaming Pattern
-
-Python inserts each CoT token as a row into `cot_tokens` → Supabase Realtime's `postgres_changes` fires on every `INSERT` → Next.js frontend subscribes and receives every token automatically. No broadcast client config needed.
-
-| Source | Mechanism | Payload |
-|--------|-----------|---------|
-| CoT token | `postgres_changes` on `cot_tokens INSERT` | `{token_text, token_type, cycle_id}` |
-| Trade intent | `cot_tokens` where `token_type='intent'` | `{action, asset, confidence}` |
-| Timer start | `trade_cycles INSERT` | `{id, cycle_number, created_at}` |
-| Trade executed | `trade_cycles UPDATE` | `{result, tx_hash, pnl_mnt}` |
-| Self-correction | `self_corrections INSERT` | `{parameter_changed, old_value, new_value, regret_score}` |
-| Bet placed | `counter_trades INSERT` | `{wallet_address, amount_mnt, position}` |
-| Bet settled | `counter_trades UPDATE` | `{result, payout_mnt}` |
-
 ## 📜 Smart Contracts (Mantle)
 
-### `TuringAgent8004.sol` — ERC-8004 Agent Identity
+Two contracts deployed on Mantle Sepolia (Chain ID `5003`). Full interfaces and Solidity source in [docs/CONTRACTS.md](docs/CONTRACTS.md).
 
-```solidity
-contract TuringAgent8004 is ERC721 {
-    struct AgentStats {
-        uint256 totalTrades;
-        uint256 wins;
-        uint256 losses;
-        uint256 selfCorrections;
-        uint256 eloRating;
-        string currentStrategy;
-    }
+**`TuringAgent8004.sol`** — ERC-8004 dynamic NFT. Records every trade (`TradeRecorded` event) and self-correction (`SelfCorrection` event) immutably on-chain. The agent's ELO, win rate, and strategy are readable via `agentStats(tokenId)`.
 
-    mapping(uint256 => AgentStats) public agentStats;
-
-    event TradeRecorded(uint256 indexed tokenId, bool win, int256 pnl);
-    event SelfCorrection(uint256 indexed tokenId, string param, uint256 oldVal, uint256 newVal, uint256 regretScore);
-
-    function recordTrade(uint256 tokenId, bool win, int256 pnl) external;
-    function recordSelfCorrection(uint256 tokenId, string memory param, uint256 oldVal, uint256 newVal, uint256 regretScore) external;
-}
-```
-
-### `CounterTradeEscrow.sol` — Betting Escrow with Bankroll
-
-The contract holds an **AI bankroll** — humans bet against the house (the AI's pool). If the AI wins, human stake adds to the bankroll. If the human wins, they are paid from the bankroll. `placeBet` reverts if the bankroll cannot cover the bet.
-
-```solidity
-contract CounterTradeEscrow {
-    uint256 public bankroll;
-
-    struct Cycle {
-        uint256 totalPool;
-        uint256 forAI;
-        uint256 againstAI;
-        bool settled;
-        bool aiWon;
-    }
-
-    event BetPlaced(uint256 indexed cycleId, address indexed bettor, uint256 amount, bool forAI);
-    event CycleSettled(uint256 indexed cycleId, bool aiWon, uint256 totalPayout);
-
-    constructor() payable { bankroll = msg.value; }
-    function placeBet(uint256 cycleId, bool forAI) external payable;
-    function settle(uint256 cycleId, bool aiWon) external;
-    function claim(uint256 cycleId) external;
-    receive() external payable { bankroll += msg.value; }
-}
-```
+**`CounterTradeEscrow.sol`** — Bankroll-backed betting escrow. Humans bet against the AI's pool. `placeBet` reverts if bankroll can't cover the bet. Settlement is on-chain — no server controls the outcome.
 
 ## 🔐 Why Mantle + ERC-8004 is Non-Replaceable
 
 > *"Could you swap Mantle out for a database?"* — **No.** Here's why:
 
-1. **`recordTrade()`** — Every trade result is an immutable on-chain event. A database record can be edited; a Mantle tx cannot. Radical Transparency is only credible if the record is tamper-proof.
-2. **`recordSelfCorrection()`** — The self-correction event emits a `SelfCorrection` log verifiable on Mantle Explorer by tx hash. The parameter change is public *before* the next trade — not retrospectively claimed.
+1. **`recordTrade()`** — Every trade result is an immutable on-chain event. A database record can be edited; a Mantle tx cannot.
+2. **`recordSelfCorrection()`** — The self-correction event emits a `SelfCorrection` log verifiable on Mantle Explorer by tx hash — public *before* the next trade.
 3. **Dynamic NFT metadata** — ERC-8004 allows token metadata to update after each cycle. The agent's ELO, win rate, and strategy are readable on-chain.
-4. **Counter-trade settlement** — `CounterTradeEscrow.settle()` is on-chain. Human payouts are provably fair — no server controls the outcome.
+4. **Counter-trade settlement** — `CounterTradeEscrow.settle()` is on-chain. Human payouts are provably fair.
 5. **Bankroll solvency** — The contract's `bankroll` is publicly readable. Bettors verify the AI's pool before placing a bet.
 
 > Remove Mantle and you'd need: a trusted settlement server + a mutable audit DB + a separate payout system + a trust model. The entire "Radical Transparency" claim collapses.
-
-## 📚 Key Libraries
-
-| Library | Purpose |
-|---------|---------|
-| `@supabase/supabase-js` | Database + Realtime `postgres_changes` subscriptions |
-| `recharts` | Market chart visualization |
-| `framer-motion` | Timer animations, pulse effects, transitions |
-| `viem` | Mantle contract interaction (lightweight) |
-| `openai` (Python) | DeepSeek R1 API — OpenAI-compatible, `model="deepseek-reasoner"` |
-| `ccxt` (Python) | Bybit API wrapper — `testnet=True` by default |
-| `fastapi` + `uvicorn` | Python backend server |
-| `asyncpg` (Python) | Direct Postgres for high-frequency `cot_tokens` inserts |
-| `hardhat` | Smart contract development + deployment |
 
 ## 🏆 Sponsor Tracks Targeted
 1. **Mantle Network**: We deployed `TuringAgent8004` and `CounterTradeEscrow` smart contracts to Mantle Sepolia (Chain ID 5003), utilizing fast finality to settle prediction markets in real-time.
@@ -344,15 +152,9 @@ In MetaMask → Settings → Networks → Add a network → Add a network manual
 
 ### 1. Frontend
 ```bash
-# Clone the repo (or navigate to directory)
-# Install dependencies
 npm install
-
-# Set up environment variables
 cp .env.example .env.local
 # Fill in NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_TURING_AGENT_ADDRESS, NEXT_PUBLIC_ESCROW_ADDRESS
-
-# Run the app
 npm run dev
 ```
 

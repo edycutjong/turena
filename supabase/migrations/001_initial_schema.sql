@@ -1,4 +1,4 @@
--- TuringArena initial schema
+-- Turena initial schema
 -- Run in Supabase SQL editor or via supabase db push
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

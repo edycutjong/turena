@@ -5,6 +5,15 @@
   
   [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg)](https://turena.vercel.app)
   [![Pitch Video](https://img.shields.io/badge/Pitch-Video-red.svg)](https://youtube.com/)
+  <br>
+  <br>
+  <!-- Tech Stack Badges -->
+  <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
 </div>
 
 ---
@@ -16,7 +25,7 @@ A live Twitch-style prediction market where a DeepSeek R1 trading agent streams 
 
 ## 💡 The Problem & Solution
 In today's world, algorithmic AI agents trade autonomously in the dark, and humans are left to guess their strategies. 
-**TuringArena** solves this by forcing the AI to "think out loud" on a live stream, letting humans front-run or counter-trade it before its final order hits the market. 
+**Turena** solves this by forcing the AI to "think out loud" on a live stream, letting humans front-run or counter-trade it before its final order hits the market. 
 
 **Key Features:**
 - ⚡ **AI Thinks Out Loud:** DeepSeek R1's `reasoning_content` tokens stream character-by-character as it analyzes live Bybit market data.
@@ -50,6 +59,11 @@ Mantle Sepolia (Chain ID 5003)
 
 ## 🏆 Sponsor Tracks Targeted
 * **Mantle Network**: We deployed `TuringAgent8004` and `CounterTradeEscrow` smart contracts to Mantle Sepolia (Chain ID 5003), utilizing fast finality to settle prediction markets in real-time.
+
+## 🤝 Sponsors & Partners
+- **Co-Sponsored by:** Tencent Cloud, ELFA, Surf, Orbit AI, Minds, Mirana, OpenCheck, Nansen
+- **Community & AI Partners:** BU, OT, Decipher, Imperial Blockchain & Fintech, Cornell Blockchain, MU Shanghai, Z.AI, Orakle, HKUST Crypto-Fintech Lab, Akindo, KudasaiJP, Rocketpunch, TradeGainTT, Four Pillars, Blockchain, Blockchain Valley, Zhejiang University (浙江大学), Merchant Moe, Cornell Blockchain
+- **Co-Supported by:** DoraHacks, HackQuest
 
 ## 🚀 Run it Locally (For Judges)
 

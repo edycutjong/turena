@@ -7,8 +7,11 @@ import { CounterTradeButton } from "@/components/CounterTradeButton";
 import { IntentAnnouncement } from "@/components/IntentAnnouncement";
 import { MarketChart } from "@/components/MarketChart";
 import { TradeHistory } from "@/components/TradeHistory";
+import { AgentProfile } from "@/components/AgentProfile";
 import { useActiveCycle } from "@/hooks/useActiveCycle";
 import { useCounterTrades } from "@/hooks/useCounterTrades";
+
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS;
 
 const AGENT_ID = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS ?? "agent-0";
 const WINDOW_SECONDS = 15;
@@ -68,8 +71,9 @@ export default function ArenaPage() {
 
       {/* Main split layout */}
       <div className="flex flex-1 overflow-hidden gap-2 p-2">
-        {/* Left — Market chart */}
+        {/* Left — Agent profile + Market chart */}
         <div className="flex flex-col w-[38%] gap-2">
+          <AgentProfile agentId={AGENT_ID} contractAddress={CONTRACT_ADDRESS} />
           <div className="flex-1">
             <MarketChart />
           </div>

@@ -22,6 +22,9 @@ describe("CountdownTimer", () => {
 
   it("renders with initial duration when not started", () => {
     const { getByText } = render(<CountdownTimer durationSeconds={60} startedAt={null} />);
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
     expect(getByText("60")).toBeInTheDocument();
     expect(getByText("waiting")).toBeInTheDocument();
   });

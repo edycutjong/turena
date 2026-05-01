@@ -1,23 +1,74 @@
 @import "tailwindcss";
 
+@import "./tokens.css";
+@import "./asset-utilities.css";
+
 @theme inline {
-  --font-mono: var(--font-mono);
+  /* Standard Design System Tokens */
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-primary-glow: var(--primary-glow);
+  --color-accent-glow: var(--accent-glow);
+  --color-bg-base: var(--bg-base);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-overlay: var(--bg-overlay);
+  --color-text-hi: var(--text-hi);
+  --color-text-mid: var(--text-mid);
+  --color-text-low: var(--text-low);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border-default);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
+  --color-info: var(--color-info);
+
+  /* Typography */
+  --font-display: var(--font-display);
   --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 
-  --color-arena-bg: #0a0a0f;
-  --color-arena-surface: #0f0f1a;
-  --color-arena-border: #1e1e2e;
-  --color-arena-text: #e2e8f0;
-  --color-arena-muted: #64748b;
+  /* Fluid Typography Scale */
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-3xl: var(--text-3xl);
+  --text-4xl: var(--text-4xl);
+  --text-5xl: var(--text-5xl);
 
-  --color-arena-cyan: #06b6d4;
-  --color-arena-cyan-dim: #0e7490;
-  --color-arena-red: #ef4444;
-  --color-arena-red-dim: #991b1b;
-  --color-arena-green: #22c55e;
-  --color-arena-green-dim: #15803d;
-  --color-arena-purple: #a855f7;
-  --color-arena-purple-dim: #7e22ce;
+  /* Border Radius */
+  --radius-sm: var(--radius-8);
+  --radius-md: var(--radius-16);
+  --radius-lg: var(--radius-20);
+  --radius-xl: var(--radius-24);
+  --radius-2xl: var(--radius-32);
+  --radius-full: var(--radius-full);
+  --radius: var(--radius-12);
+
+  /* Shadows */
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-glow: var(--shadow-glow);
+  --shadow: var(--shadow-md);
+
+  /* Legacy Arena Aliases */
+  --color-arena-bg: var(--bg-base);
+  --color-arena-surface: var(--bg-elevated);
+  --color-arena-border: var(--border-subtle);
+  --color-arena-text: var(--text-hi);
+  --color-arena-muted: var(--text-mid);
+
+  --color-arena-cyan: var(--primary);
+  --color-arena-cyan-dim: var(--primary-glow);
+  --color-arena-red: var(--color-error);
+  --color-arena-red-dim: var(--color-error-glow);
+  --color-arena-green: var(--color-success);
+  --color-arena-green-dim: var(--color-success-glow);
+  --color-arena-purple: var(--accent);
+  --color-arena-purple-dim: var(--accent-glow);
 
   /* Glassmorphism helpers */
   --color-glass: rgba(15, 15, 26, 0.7);

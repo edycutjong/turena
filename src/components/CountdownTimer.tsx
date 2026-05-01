@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { playTick, playUrgentTick } from "@/lib/sounds";
 
 interface Props {
   durationSeconds: number;
@@ -10,11 +11,12 @@ interface Props {
 
 export function CountdownTimer({ durationSeconds, startedAt, onExpire }: Props) {
   const [remaining, setRemaining] = useState(durationSeconds);
+  const lastTickRef = useRef<number>(-1);
 
   useEffect(() => {
     if (!startedAt) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRemaining(durationSeconds);
+      lastTickRef.current = -1;
       return;
     }
 
@@ -22,6 +24,14 @@ export function CountdownTimer({ durationSeconds, startedAt, onExpire }: Props) 
       const elapsed = (Date.now() - startedAt.getTime()) / 1000;
       const left = Math.max(0, durationSeconds - elapsed);
       setRemaining(left);
+
+      const second = Math.ceil(left);
+      if (second !== lastTickRef.current && left > 0) {
+        lastTickRef.current = second;
+        if (left <= 5) playUrgentTick();
+        else playTick();
+      }
+
       if (left <= 0) onExpire?.();
     };
 

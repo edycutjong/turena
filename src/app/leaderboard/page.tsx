@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Database } from "@/lib/database.types";
 import Link from "next/link";
+import { CorrectionTimeline } from "@/components/CorrectionTimeline";
 
 type CounterTrade = Database["public"]["Tables"]["counter_trades"]["Row"];
 type AgentState = Database["public"]["Tables"]["agent_state"]["Row"];
@@ -188,6 +189,9 @@ export default function LeaderboardPage() {
             </div>
           </div>
         )}
+
+        {/* Correction timeline */}
+        <CorrectionTimeline />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelfCorrections } from "@/hooks/useSelfCorrections";
+import { playCorrection } from "@/lib/sounds";
 
 const MANTLE_EXPLORER = "https://explorer.sepolia.mantle.xyz";
 
@@ -12,10 +13,9 @@ export function SelfCorrectionOverlay() {
 
   useEffect(() => {
     if (latest && latest.id !== shown) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShown(latest.id);
-       
       setVisible(true);
+      playCorrection();
       const t = setTimeout(() => setVisible(false), 6000);
       return () => clearTimeout(t);
     }

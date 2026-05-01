@@ -72,7 +72,7 @@ export interface Database {
           created_at: string;
         };
         Insert: Omit<Database["public"]["Tables"]["cot_tokens"]["Row"], "id" | "created_at">;
-        Update: never;
+        Update: Record<string, never>;
       };
     };
   };

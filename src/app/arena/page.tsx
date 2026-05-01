@@ -14,6 +14,7 @@ import { useActiveCycle } from "@/hooks/useActiveCycle";
 import { useCounterTrades } from "@/hooks/useCounterTrades";
 import { useWallet } from "@/hooks/useWallet";
 import Link from "next/link";
+import { playWindowOpen } from "@/lib/sounds";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS;
 const AGENT_ID = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS ?? "agent-0";
@@ -30,6 +31,7 @@ export default function ArenaPage() {
   const openWindow = useCallback(() => {
     setWindowStartedAt(new Date());
     setWindowOpen(true);
+    playWindowOpen();
   }, []);
 
   const handleExpire = useCallback(() => {
@@ -83,11 +85,11 @@ export default function ArenaPage() {
       </header>
 
       {/* Main split layout */}
-      <div className="flex flex-1 overflow-hidden gap-2 p-2">
+      <div className="flex flex-1 overflow-hidden gap-2 p-2 flex-col md:flex-row">
         {/* Left — Agent profile + Market chart */}
-        <div className="flex flex-col w-[38%] gap-2">
+        <div className="flex flex-col md:w-[38%] gap-2">
           <AgentProfile agentId={AGENT_ID} contractAddress={CONTRACT_ADDRESS} />
-          <div className="flex-1">
+          <div className="flex-1 min-h-48">
             <MarketChart />
           </div>
           <button
@@ -99,7 +101,7 @@ export default function ArenaPage() {
         </div>
 
         {/* Center — Timer + Intent + Bet button */}
-        <div className="flex flex-col items-center justify-center gap-5 w-[24%]">
+        <div className="flex flex-col items-center justify-center gap-5 md:w-[24%]">
           <CountdownTimer
             durationSeconds={WINDOW_SECONDS}
             startedAt={windowStartedAt}
@@ -118,7 +120,7 @@ export default function ArenaPage() {
         </div>
 
         {/* Right — CoT Terminal + Live Chat */}
-        <div className="flex flex-col flex-1 gap-2" style={{ minWidth: 0 }}>
+        <div className="flex flex-col flex-1 gap-2 min-h-[400px] md:min-h-0" style={{ minWidth: 0 }}>
           <div className="flex-1 min-h-0">
             <CoTTerminal cycleId={cycle?.id ?? null} />
           </div>

@@ -111,7 +111,7 @@ export default function DashboardLayout() {
 
         {/* Right Column (CoT Terminal) */}
         <div className="w-[450px] shrink-0">
-          <CoTTerminal activeCycleId={activeCycle?.id || null} />
+          <CoTTerminal cycleId={activeCycle?.id || null} />
         </div>
 
       </main>

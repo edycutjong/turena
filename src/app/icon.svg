@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Brand gradient with CSS var fallback for standalone rasterization -->
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--primary, #06B6D4)"/>
+      <stop offset="100%" stop-color="var(--accent, #A855F7)"/>
+    </linearGradient>
+
+    <!-- Inner glow filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Outer ambient glow -->
+    <filter id="ambientGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="24" result="ambient"/>
+      <feFlood flood-color="var(--primary, #06B6D4)" flood-opacity="0.3"/>
+      <feComposite in2="ambient" operator="in" result="coloredGlow"/>
+      <feMerge>
+        <feMergeNode in="coloredGlow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Mask for the inner cutout -->
+    <mask id="arenaSlots">
+      <rect width="512" height="512" fill="white"/>
+      <!-- Spectator slots — radial cutouts around the arena -->
+      <circle cx="256" cy="100" r="18" fill="black"/>
+      <circle cx="256" cy="412" r="18" fill="black"/>
+      <circle cx="100" cy="256" r="18" fill="black"/>
+      <circle cx="412" cy="256" r="18" fill="black"/>
+      <circle cx="146" cy="146" r="14" fill="black"/>
+      <circle cx="366" cy="146" r="14" fill="black"/>
+      <circle cx="146" cy="366" r="14" fill="black"/>
+      <circle cx="366" cy="366" r="14" fill="black"/>
+    </mask>
+  </defs>
+
+  <!-- Ambient glow background -->
+  <circle cx="256" cy="256" r="220" fill="url(#brandGrad)" opacity="0.12" filter="url(#ambientGlow)"/>
+
+  <!-- Outer arena ring -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="url(#brandGrad)" stroke-width="6" opacity="0.3"/>
+  <circle cx="256" cy="256" r="195" fill="none" stroke="url(#brandGrad)" stroke-width="2" opacity="0.15"/>
+
+  <!-- Main arena hexagonal shape -->
+  <g filter="url(#glow)" mask="url(#arenaSlots)">
+    <polygon
+      points="256,56 436,160 436,352 256,456 76,352 76,160"
+      fill="none"
+      stroke="url(#brandGrad)"
+      stroke-width="5"
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- Inner brain/AI node — central nexus -->
+  <circle cx="256" cy="256" r="52" fill="url(#brandGrad)" opacity="0.15"/>
+  <circle cx="256" cy="256" r="42" fill="none" stroke="url(#brandGrad)" stroke-width="3"/>
+  <circle cx="256" cy="256" r="16" fill="url(#brandGrad)"/>
+
+  <!-- Neural connections from center to arena vertices -->
+  <g stroke="url(#brandGrad)" stroke-width="1.5" opacity="0.4">
+    <line x1="256" y1="256" x2="256" y2="100"/>
+    <line x1="256" y1="256" x2="412" y2="256"/>
+    <line x1="256" y1="256" x2="256" y2="412"/>
+    <line x1="256" y1="256" x2="100" y2="256"/>
+    <line x1="256" y1="256" x2="366" y2="146"/>
+    <line x1="256" y1="256" x2="366" y2="366"/>
+    <line x1="256" y1="256" x2="146" y2="366"/>
+    <line x1="256" y1="256" x2="146" y2="146"/>
+  </g>
+
+  <!-- Spectator node dots (outer ring positions) -->
+  <g fill="url(#brandGrad)">
+    <circle cx="256" cy="100" r="8"/>
+    <circle cx="256" cy="412" r="8"/>
+    <circle cx="100" cy="256" r="8"/>
+    <circle cx="412" cy="256" r="8"/>
+    <circle cx="146" cy="146" r="6"/>
+    <circle cx="366" cy="146" r="6"/>
+    <circle cx="146" cy="366" r="6"/>
+    <circle cx="366" cy="366" r="6"/>
+  </g>
+
+  <!-- Counter-trade indicator — opposing arrows at 3 o'clock and 9 o'clock -->
+  <g stroke="url(#brandGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7">
+    <!-- Right arrow (AI direction) -->
+    <polyline points="300,240 320,256 300,272"/>
+    <!-- Left arrow (Human counter-trade) -->
+    <polyline points="212,240 192,256 212,272"/>
+  </g>
+
+  <!-- Timer arc — the 15-second countdown representation -->
+  <path
+    d="M 256 72 A 184 184 0 1 1 255.99 72"
+    fill="none"
+    stroke="url(#brandGrad)"
+    stroke-width="3"
+    stroke-dasharray="12 8"
+    opacity="0.25"
+  />
+</svg>

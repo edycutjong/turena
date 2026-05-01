@@ -1,8 +1,8 @@
 let ctx: AudioContext | null = null;
 
 function getCtx(): AudioContext | null {
-  if (typeof window === "undefined") return null;
-  if (!ctx) ctx = new AudioContext();
+  if (typeof window === "undefined" || typeof window.AudioContext === "undefined") return null;
+  if (!ctx) ctx = new window.AudioContext();
   return ctx;
 }
 

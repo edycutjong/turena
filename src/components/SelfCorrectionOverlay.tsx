@@ -8,16 +8,21 @@ const MANTLE_EXPLORER = "https://explorer.sepolia.mantle.xyz";
 
 export function SelfCorrectionOverlay() {
   const { latest } = useSelfCorrections();
-  const [visible, setVisible] = useState(false);
-  const [shown, setShown] = useState<string | null>(null);
+  const [visible, setVisible] = useState(() => false);
+  const [shown, setShown] = useState<string | null>(() => null);
 
   useEffect(() => {
     if (latest && latest.id !== shown) {
-      setShown(latest.id);
-      setVisible(true);
-      playCorrection();
-      const t = setTimeout(() => setVisible(false), 6000);
-      return () => clearTimeout(t);
+      const t1 = setTimeout(() => {
+        setShown(latest.id);
+        setVisible(true);
+        playCorrection();
+      }, 0);
+      const t2 = setTimeout(() => setVisible(false), 6000);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
     }
   }, [latest, shown]);
 

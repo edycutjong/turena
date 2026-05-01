@@ -10,14 +10,16 @@ interface Props {
 }
 
 export function CountdownTimer({ durationSeconds, startedAt, onExpire }: Props) {
-  const [remaining, setRemaining] = useState(durationSeconds);
+  const [remaining, setRemaining] = useState(() => durationSeconds);
   const lastTickRef = useRef<number>(-1);
 
   useEffect(() => {
     if (!startedAt) {
-      setRemaining(durationSeconds);
-      lastTickRef.current = -1;
-      return;
+      const timer = setTimeout(() => {
+        setRemaining(durationSeconds);
+        lastTickRef.current = -1;
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     const tick = () => {
@@ -61,6 +63,7 @@ export function CountdownTimer({ durationSeconds, startedAt, onExpire }: Props) 
             strokeLinecap="round"
             stroke={isUrgent ? "#ef4444" : "#06b6d4"}
             strokeDasharray={circ}
+            initial={{ strokeDashoffset: circ - dash }}
             animate={{ strokeDashoffset: circ - dash }}
             transition={{ duration: 0.1 }}
           />

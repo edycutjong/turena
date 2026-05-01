@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCoTStream } from "@/hooks/useCoTStream";
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 export function CoTTerminal({ cycleId }: Props) {
   const tokens = useCoTStream(cycleId);
   const endRef = useRef<HTMLDivElement>(null);
-  const seenIds = useRef<Set<number>>(new Set());
+  const [initialTokens] = useState(() => new Set(tokens.map(t => t.id)));
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -44,8 +44,7 @@ export function CoTTerminal({ cycleId }: Props) {
 
         <div className="whitespace-pre-wrap break-words">
           {tokens.map((token) => {
-            const isNew = !seenIds.current.has(token.id);
-            if (isNew) seenIds.current.add(token.id);
+            const isNew = !initialTokens.has(token.id);
             return (
               <span
                 key={token.id}

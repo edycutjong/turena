@@ -7,7 +7,7 @@ import asyncpg
 from .db import get_pool, insert_cot_token
 from .deepseek import stream_reasoning
 from .bybit import fetch_market_context, place_order, get_pnl
-from .mantle import record_trade, settle_cycle
+from .mantle import record_trade, record_emotional_state, settle_cycle
 from .correction import run_self_correction
 
 COUNTER_WINDOW = 15   # seconds humans have to counter-trade
@@ -88,10 +88,16 @@ async def run_cycle(manual: bool = False) -> dict:
     symbol = "MNTUSDT"
     bybit_side = "buy" if action == "long" else "sell"
 
-    # --- Step 5: Counter-trade window ---
+    # --- Step 5: Record emotional state on-chain (non-blocking, best-effort) ---
+    try:
+        await record_emotional_state(TOKEN_ID, current_emotion)
+    except Exception as e:
+        print(f"[emotional-state] on-chain record failed (non-fatal): {e}")
+
+    # --- Step 6: Counter-trade window ---
     await asyncio.sleep(COUNTER_WINDOW)
 
-    # --- Step 5: Execute order ---
+    # --- Step 7: Execute order ---
     order = await place_order(symbol, bybit_side)
     entry_price = order.get("price") or order.get("average") or 0
 
@@ -100,14 +106,14 @@ async def run_cycle(manual: bool = False) -> dict:
         json.dumps({**intent_data, "bybit_order_id": order.get("id")}), cycle_id,
     )
 
-    # --- Step 6: Wait for evaluation ---
+    # --- Step 8: Wait for evaluation ---
     await asyncio.sleep(EVAL_WINDOW)
 
-    # --- Step 7: Evaluate P&L ---
+    # --- Step 9: Evaluate P&L ---
     pnl = await get_pnl(order.get("id", ""), symbol, bybit_side, entry_price)
     win = pnl > 0
 
-    # --- Step 8: Record on Mantle ---
+    # --- Step 10: Record trade on Mantle ---
     tx_hash = await record_trade(TOKEN_ID, win, int(pnl * 1e18))
 
     await pool.execute(
@@ -129,7 +135,7 @@ async def run_cycle(manual: bool = False) -> dict:
         pnl, 1.0 if win else 0.0, current_emotion, consecutive_losses + (0 if win else 1),
     )
 
-    # --- Step 9: Self-correct on loss ---
+    # --- Step 11: Self-correct on loss ---
     correction = None
     if not win:
         params_row = await pool.fetchrow(
@@ -141,7 +147,7 @@ async def run_cycle(manual: bool = False) -> dict:
             "UPDATE trade_cycles SET self_corrected = true WHERE id = $1", cycle_id
         )
 
-    # --- Step 10: Settle escrow ---
+    # --- Step 12: Settle escrow ---
     try:
         await settle_cycle(cycle_number, win)
     except Exception:

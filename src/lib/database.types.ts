@@ -14,6 +14,8 @@ export interface Database {
           pnl_mnt: number | null;
           self_corrected: boolean;
           tx_hash: string | null;
+          phase: "PENDING" | "READING" | "SABOTAGE_WINDOW" | "VERDICT" | "SETTLED" | null;
+          sabotage_summary: string | null;
           created_at: string;
         };
         Insert: Omit<Database["public"]["Tables"]["trade_cycles"]["Row"], "id" | "created_at">;

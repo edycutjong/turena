@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/backend/:path*",
-      "destination": "https://YOUR_RAILWAY_URL/api/backend/:path*"
+      "destination": "https://turena-production.up.railway.app/:path*"
     }
   ]
 }

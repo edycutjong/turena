@@ -98,19 +98,7 @@ On-chain AI agents are black boxes. You send them capital, they trade, you pray.
 
 ### Data Flow
 
-```
-DeepSeek R1 → reasoning_content tokens
-     ↓ asyncpg INSERT
-Supabase cot_tokens table
-     ↓ postgres_changes WebSocket
-Next.js CoTTerminal component
-     ↓ user clicks Counter-Trade
-MetaMask → CounterTradeEscrow.placeBet() on Mantle
-     ↓ trade executes, result evaluated
-TuringAgent8004.recordTrade() on Mantle
-     ↓ if loss
-TuringAgent8004.recordSelfCorrection() on Mantle
-```
+<img src="docs/dataflow-diagram.svg" alt="Turena Data Flow" width="880">
 
 > Full diagram → [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · API → [docs/API.md](docs/API.md) · Contracts → [docs/CONTRACTS.md](docs/CONTRACTS.md) · Schema → [docs/DATABASE.md](docs/DATABASE.md)
 

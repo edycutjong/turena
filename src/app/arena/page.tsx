@@ -10,6 +10,8 @@ import { TradeHistory } from "@/components/TradeHistory";
 import { AgentProfile } from "@/components/AgentProfile";
 import { SelfCorrectionOverlay } from "@/components/SelfCorrectionOverlay";
 import { LiveChat } from "@/components/LiveChat";
+import { FudCardPanel } from "@/components/FudCardPanel";
+import { TugOfWarBar } from "@/components/TugOfWarBar";
 import { useActiveCycle } from "@/hooks/useActiveCycle";
 import { useCounterTrades } from "@/hooks/useCounterTrades";
 import { useWallet } from "@/hooks/useWallet";
@@ -151,6 +153,20 @@ export default function ArenaPage() {
           </div>
         </div>
       </div>
+
+      {/* FUD Cards — visible during SABOTAGE_WINDOW */}
+      {cycle?.phase === "SABOTAGE_WINDOW" && (
+        <div className="px-2 pb-0">
+          <FudCardPanel cycleId={cycle.id} isOpen={cycle.phase === "SABOTAGE_WINDOW"} />
+        </div>
+      )}
+
+      {/* Tug of War bar — visible during SABOTAGE_WINDOW and VERDICT */}
+      {(cycle?.phase === "SABOTAGE_WINDOW" || cycle?.phase === "VERDICT") && (
+        <div className="px-2 pb-0">
+          <TugOfWarBar cycleId={cycle.id} />
+        </div>
+      )}
 
       {/* Bottom — Trade history */}
       <div className="px-2 pb-2 arena-panel arena-panel-d5">

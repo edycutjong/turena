@@ -78,6 +78,19 @@ export interface Database {
         Insert: Omit<Database["public"]["Tables"]["cot_tokens"]["Row"], "id" | "created_at">;
         Update: Record<string, never>;
       };
+      sabotage_events: {
+        Row: {
+          id: string;
+          cycle_id: string;
+          card_type: string;
+          prompt_injection: string;
+          sender_address: string;
+          mnt_paid: number;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["sabotage_events"]["Row"], "id" | "created_at">;
+        Update: Record<string, never>;
+      };
     };
   };
 }

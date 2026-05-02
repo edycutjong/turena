@@ -145,6 +145,37 @@ async def _evaluate_later(pool, cycle_id: str, action: str, delay: int):
         )
 
 
+class SabotageRequest(BaseModel):
+    cycle_id: str
+    card_type: str
+    prompt_injection: str
+    sender_address: str
+    mnt_paid: float = 1.0
+
+
+@router.post("/sabotage")
+async def play_sabotage_card(body: SabotageRequest):
+    """Record a FUD card play during the SABOTAGE_WINDOW phase."""
+    pool = await get_pool()
+
+    # Verify the cycle is in SABOTAGE_WINDOW phase
+    row = await pool.fetchrow(
+        "SELECT phase FROM trade_cycles WHERE id = $1", body.cycle_id
+    )
+    if not row:
+        raise HTTPException(404, "Cycle not found")
+    if row["phase"] != "SABOTAGE_WINDOW":
+        raise HTTPException(400, f"Sabotage only allowed during SABOTAGE_WINDOW (current: {row['phase']})")
+
+    await pool.execute(
+        """INSERT INTO sabotage_events (cycle_id, card_type, prompt_injection, sender_address, mnt_paid)
+           VALUES ($1, $2, $3, $4, $5)""",
+        body.cycle_id, body.card_type, body.prompt_injection, body.sender_address, body.mnt_paid,
+    )
+
+    return {"status": "card played", "card_type": body.card_type, "cycle_id": body.cycle_id}
+
+
 @router.post("/mock-outcome")
 async def mock_outcome(body: MockOutcomeRequest):
     """Force an artificial trade result for demo recording. DEMO_MODE=true only."""

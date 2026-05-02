@@ -8,7 +8,7 @@ async def get_pool() -> asyncpg.Pool:
     global _pool
     if _pool is None:
         db_url = os.getenv("DATABASE_URL") or _build_url()
-        _pool = await asyncpg.create_pool(db_url, min_size=2, max_size=10)
+        _pool = await asyncpg.create_pool(db_url, min_size=2, max_size=10, ssl="require")
     return _pool
 
 

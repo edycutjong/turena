@@ -61,9 +61,14 @@ In today's world, algorithmic AI agents trade autonomously in the dark, and huma
 
 Two contracts deployed on Mantle Sepolia (Chain ID `5003`). Full interfaces and Solidity source in [docs/CONTRACTS.md](docs/CONTRACTS.md).
 
+| Contract | Address | Explorer |
+|---|---|---|
+| `TuringAgent8004` | `0x3f24Bc75B258d35a347C4A76d49F45020A3457ce` | [View on Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce) |
+| `CounterTradeEscrow` | `0x766F2485219D5977AE727E6B1738891310EC8f3d` | [View on Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x766F2485219D5977AE727E6B1738891310EC8f3d) |
+
 **`TuringAgent8004.sol`** — ERC-8004 dynamic NFT. Records every trade (`TradeRecorded` event) and self-correction (`SelfCorrection` event) immutably on-chain. The agent's ELO, win rate, and strategy are readable via `agentStats(tokenId)`.
 
-**`CounterTradeEscrow.sol`** — Bankroll-backed betting escrow. Humans bet against the AI's pool. `placeBet` reverts if bankroll can't cover the bet. Settlement is on-chain — no server controls the outcome.
+**`CounterTradeEscrow.sol`** — Bankroll-backed betting escrow. Humans bet against the AI's pool. `placeBet` reverts if bankroll can't cover the bet. Settlement is on-chain — no server controls the outcome. Deployed with 1,000 testnet MNT bankroll.
 
 ## 🔐 Why Mantle + ERC-8004 is Non-Replaceable
 
@@ -172,6 +177,7 @@ DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
 |---|---|
 | `SUPABASE_URL` | Supabase project URL (same value as `NEXT_PUBLIC_SUPABASE_URL`) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key |
+| `DATABASE_URL` | Direct asyncpg connection string. Format: `postgresql://postgres.<project-id>:<SUPABASE_SERVICE_ROLE_KEY>@aws-0-us-east-1.pooler.supabase.com:6543/postgres`. If blank, auto-built from `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` |
 | `DEEPSEEK_API_KEY` | DeepSeek API key |
 | `BYBIT_API_KEY` | Bybit testnet API key |
 | `BYBIT_API_SECRET` | Bybit testnet API secret |

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { AppNav } from "@/components/AppNav";
+import { ArenaLink } from "@/components/ArenaLink";
 
 export const metadata: Metadata = {
   title: "Turena — Watch AI Trade. Bet Against It.",
@@ -74,28 +75,32 @@ const SPONSORS = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-arena-bg flex flex-col">
+    <div className="min-h-screen bg-arena-bg flex flex-col relative">
+      {/* Full-page background grid */}
+      <div
+        className="fixed inset-0 opacity-[0.04] pointer-events-none z-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, #888 1px, transparent 1px), linear-gradient(to bottom, #888 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+      {/* Aurora color drift */}
+      <div className="bg-aurora" />
+      {/* Shimmer intersection dots */}
+      <div className="bg-shimmer-dots" />
       <AppNav right={
         <>
           <Link href="/leaderboard" className="hover:text-arena-cyan transition-colors">Leaderboard</Link>
           <Link href="/replay" className="hover:text-arena-cyan transition-colors">Replay</Link>
-          <Link href="/arena" className="px-4 py-1.5 rounded border border-arena-cyan text-arena-cyan hover:bg-arena-cyan/10 transition-colors">
+          <ArenaLink href="/arena" className="arena-cta px-4 py-1.5 rounded border border-arena-cyan text-arena-cyan font-terminal font-bold text-sm tracking-wider">
             Enter Arena →
-          </Link>
+          </ArenaLink>
         </>
       } />
 
       {/* Hero */}
       <section className="flex flex-col items-center justify-center text-center px-6 pt-24 pb-16 relative overflow-hidden">
-        {/* Background grid */}
-        <div
-          className="absolute inset-0 opacity-[0.04] pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, #888 1px, transparent 1px), linear-gradient(to bottom, #888 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
         {/* Radial glow */}
         <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(6,182,212,0.08),transparent)]" />
 
@@ -116,15 +121,15 @@ export default function Home() {
             on Mantle — verifiable by anyone.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
+            <ArenaLink
               href="/arena"
-              className="glass glow-cyan px-8 py-3 rounded-lg border border-arena-cyan text-arena-cyan font-terminal font-bold text-sm tracking-wider hover:bg-arena-cyan/10 transition-all duration-200"
+              className="arena-cta glass px-10 py-4 rounded-lg border border-arena-cyan text-arena-cyan font-terminal font-bold text-base tracking-wider"
             >
               Enter the Arena →
-            </Link>
+            </ArenaLink>
             <Link
               href="/leaderboard"
-              className="px-8 py-3 rounded-lg border border-arena-border text-arena-muted font-terminal text-sm tracking-wider hover:border-arena-muted/60 hover:text-arena-text transition-all duration-200"
+              className="px-10 py-4 rounded-lg border border-arena-border text-arena-muted font-terminal text-base tracking-wider hover:border-arena-muted/60 hover:text-arena-text transition-all duration-200"
             >
               View Leaderboard
             </Link>
@@ -220,7 +225,7 @@ export default function Home() {
               {SPONSORS.partners.map((name) => (
                 <span
                   key={name}
-                  className="glass px-3 py-1.5 rounded border border-arena-border font-terminal text-xs text-arena-text hover:border-arena-muted/60 transition-colors"
+                  className="glass px-3 py-1.5 rounded border border-violet-500/20 font-terminal text-xs text-arena-text hover:border-violet-400/50 hover:text-violet-400 transition-colors"
                 >
                   {name}
                 </span>
@@ -252,12 +257,12 @@ export default function Home() {
         <p className="font-terminal text-arena-muted text-sm mb-6">
           Every trade, every correction, every bet — on Mantle.
         </p>
-        <Link
+        <ArenaLink
           href="/arena"
-          className="glass glow-cyan inline-block px-10 py-4 rounded-lg border border-arena-cyan text-arena-cyan font-terminal font-bold text-base tracking-wider hover:bg-arena-cyan/10 transition-all duration-200"
+          className="arena-cta glass inline-block px-10 py-4 rounded-lg border border-arena-cyan text-arena-cyan font-terminal font-bold text-base tracking-wider"
         >
           Enter the Arena →
-        </Link>
+        </ArenaLink>
       </section>
 
       <footer className="px-6 py-6 border-t border-arena-border text-center">

@@ -36,16 +36,21 @@ export default function ReplayPage() {
   };
 
   return (
-    <div className="min-h-screen bg-arena-bg flex flex-col">
-      <AppNav right={
-        <Link href="/" className="hover:text-arena-cyan transition-colors">← Home</Link>
-      } />
-      <div className="max-w-6xl mx-auto w-full p-6">
-        <h1 className="font-terminal text-2xl font-bold text-arena-text mb-8">Trade Replay</h1>
+    <div className="min-h-screen bg-arena-bg flex flex-col relative overflow-hidden">
+      {/* Premium Background FX Layers */}
+      <div className="bg-aurora z-0" />
+      <div className="bg-shimmer-dots z-1" />
+
+      <div className="relative z-10 flex flex-col flex-1">
+        <AppNav right={
+          <Link href="/" className="hover:text-arena-cyan transition-colors font-terminal text-sm glow-hover">← Home</Link>
+        } />
+        <div className="max-w-6xl mx-auto w-full p-6 animate-fade-in-up">
+          <h1 className="font-terminal text-2xl font-bold text-arena-text mb-8 glow-text">Trade Replay</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Cycle list */}
-          <div className="glass rounded-xl overflow-hidden">
+          <div className="glass rounded-xl overflow-hidden arena-panel arena-panel-d1">
             <div className="px-4 py-2 border-b border-arena-border">
               <span className="font-terminal text-xs text-arena-muted uppercase tracking-widest">Cycles</span>
             </div>
@@ -56,18 +61,18 @@ export default function ReplayPage() {
                   <button
                     key={c.id}
                     onClick={() => loadReplay(c)}
-                    className={`w-full text-left px-4 py-3 border-b border-arena-border/40 hover:bg-white/5 transition-colors
-                      ${selected?.id === c.id ? "bg-arena-cyan/10" : ""}`}
+                    className={`w-full text-left px-4 py-3 border-b border-arena-border/40 hover:bg-white/5 transition-colors group
+                      ${selected?.id === c.id ? "bg-arena-cyan/10 border-l-2 border-l-arena-cyan" : "border-l-2 border-l-transparent"}`}
                   >
                     <div className="flex justify-between items-center">
-                      <span className="font-terminal text-xs text-arena-muted">#{c.cycle_number}</span>
+                      <span className="font-terminal text-xs text-arena-muted group-hover:text-arena-text transition-colors">#{c.cycle_number}</span>
                       <span className={`font-terminal text-xs font-bold
                         ${c.result === "win" ? "text-arena-green" : "text-arena-red"}`}>
                         {c.result.toUpperCase()}
                         {c.self_corrected && " ⚡"}
                       </span>
                     </div>
-                    <p className="font-terminal text-xs text-arena-text mt-0.5 truncate">
+                    <p className="font-terminal text-xs text-arena-text mt-0.5 truncate group-hover:glow-text transition-all">
                       {intent?.action?.toUpperCase()} {intent?.asset}
                     </p>
                   </button>
@@ -77,8 +82,8 @@ export default function ReplayPage() {
           </div>
 
           {/* CoT replay */}
-          <div className="md:col-span-2 glass rounded-xl overflow-hidden scanlines relative flex flex-col">
-            <div className="px-4 py-2 border-b border-arena-border">
+          <div className="md:col-span-2 glass rounded-xl overflow-hidden scanlines relative flex flex-col arena-panel arena-panel-d2 hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] transition-shadow duration-300">
+            <div className="px-4 py-2 border-b border-arena-border bg-black/20">
               <span className="font-terminal text-xs text-arena-muted uppercase tracking-widest">
                 {selected ? `Cycle #${selected.cycle_number} — ${selected.result.toUpperCase()}` : "Select a cycle"}
               </span>
@@ -101,6 +106,7 @@ export default function ReplayPage() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

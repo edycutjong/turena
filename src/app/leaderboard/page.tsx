@@ -75,18 +75,23 @@ export default function LeaderboardPage() {
   const humanWins = (agentState?.total_trades ?? 0) - agentWins;
 
   return (
-    <div className="min-h-screen bg-arena-bg flex flex-col">
-      <AppNav right={
-        <Link href="/" className="hover:text-arena-cyan transition-colors">← Home</Link>
-      } />
-      <div className="max-w-4xl mx-auto w-full space-y-6 p-6">
-        <h1 className="font-terminal text-2xl font-bold text-arena-text">Leaderboard</h1>
+    <div className="min-h-screen bg-arena-bg flex flex-col relative overflow-hidden">
+      {/* Premium Background FX Layers */}
+      <div className="bg-aurora z-0" />
+      <div className="bg-shimmer-dots z-1" />
+
+      <div className="relative z-10 flex flex-col flex-1">
+        <AppNav right={
+          <Link href="/" className="hover:text-arena-cyan transition-colors font-terminal text-sm glow-hover">← Home</Link>
+        } />
+        <div className="max-w-4xl mx-auto w-full space-y-6 p-6 animate-fade-in-up">
+          <h1 className="font-terminal text-2xl font-bold text-arena-text glow-text">Leaderboard</h1>
 
         {/* AI vs Humans scoreboard */}
-        <div className="glass rounded-xl p-6 grid grid-cols-2 gap-6">
+        <div className="glass rounded-xl p-6 grid grid-cols-2 gap-6 arena-panel arena-panel-d1 hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] transition-shadow duration-300">
           <div className="flex flex-col items-center gap-2">
             <span className="font-terminal text-xs text-arena-muted uppercase tracking-widest">AI Agent</span>
-            <span className="font-terminal text-5xl font-bold text-arena-cyan">{agentWins}</span>
+            <span className="font-terminal text-5xl font-bold text-arena-cyan glow-text">{agentWins}</span>
             <span className="font-terminal text-xs text-arena-muted">
               wins · {agentState ? `${(agentState.win_rate * 100).toFixed(1)}%` : "—"}
             </span>
@@ -96,7 +101,7 @@ export default function LeaderboardPage() {
           </div>
           <div className="flex flex-col items-center gap-2">
             <span className="font-terminal text-xs text-arena-muted uppercase tracking-widest">Humans</span>
-            <span className="font-terminal text-5xl font-bold text-arena-red">{humanWins}</span>
+            <span className="font-terminal text-5xl font-bold text-arena-red glow-text">{humanWins}</span>
             <span className="font-terminal text-xs text-arena-muted">
               wins ·{" "}
               {agentState?.total_trades
@@ -110,7 +115,7 @@ export default function LeaderboardPage() {
         </div>
 
         {/* Top counter-traders */}
-        <div className="glass rounded-xl overflow-hidden">
+        <div className="glass rounded-xl overflow-hidden arena-panel arena-panel-d2">
           <div className="px-4 py-2 border-b border-arena-border">
             <span className="font-terminal text-xs text-arena-muted uppercase tracking-widest">
               Top Counter-Traders
@@ -175,10 +180,10 @@ export default function LeaderboardPage() {
 
         {/* Self-correction count */}
         {agentState && (
-          <div className="glass rounded-xl p-4 flex items-center justify-between">
+          <div className="glass rounded-xl p-4 flex items-center justify-between arena-panel arena-panel-d3 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-shadow duration-300">
             <div>
               <p className="font-terminal text-xs text-arena-muted uppercase tracking-widest">Agent Self-Corrections</p>
-              <p className="font-terminal text-2xl font-bold text-arena-purple mt-1">
+              <p className="font-terminal text-2xl font-bold text-arena-purple mt-1 glow-text">
                 {agentState.self_corrections_count}
               </p>
             </div>
@@ -192,7 +197,10 @@ export default function LeaderboardPage() {
         )}
 
         {/* Correction timeline */}
-        <CorrectionTimeline />
+        <div className="arena-panel arena-panel-d4">
+          <CorrectionTimeline />
+        </div>
+      </div>
       </div>
     </div>
   );

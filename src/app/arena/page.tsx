@@ -92,7 +92,7 @@ export default function ArenaPage() {
       {/* Main split layout */}
       <div className="flex flex-1 overflow-hidden gap-2 p-2 flex-col md:flex-row">
         {/* Left — Agent profile + Market chart */}
-        <div className="flex flex-col md:w-[38%] gap-2">
+        <div className="flex flex-col md:w-[38%] gap-2 arena-panel arena-panel-d1">
           <AgentProfile agentId={AGENT_ID} contractAddress={CONTRACT_ADDRESS} />
           <div className="flex-1 min-h-48">
             <MarketChart />
@@ -115,7 +115,7 @@ export default function ArenaPage() {
         </div>
 
         {/* Center — Timer + Intent + Bet button */}
-        <div className="flex flex-col items-center justify-center gap-5 md:w-[24%]">
+        <div className="flex flex-col items-center justify-center gap-5 md:w-[24%] arena-panel arena-panel-d3">
           <CountdownTimer
             durationSeconds={WINDOW_SECONDS}
             startedAt={windowStartedAt}
@@ -134,7 +134,7 @@ export default function ArenaPage() {
         </div>
 
         {/* Right — CoT Terminal + Live Chat */}
-        <div className="flex flex-col flex-1 gap-2 min-h-[400px] md:min-h-0" style={{ minWidth: 0 }}>
+        <div className="flex flex-col flex-1 gap-2 min-h-[400px] md:min-h-0 arena-panel arena-panel-d2" style={{ minWidth: 0 }}>
           <div className="flex-1 min-h-0">
             <CoTTerminal cycleId={cycle?.id ?? null} />
           </div>
@@ -145,7 +145,7 @@ export default function ArenaPage() {
       </div>
 
       {/* Bottom — Trade history */}
-      <div className="px-2 pb-2">
+      <div className="px-2 pb-2 arena-panel arena-panel-d5">
         <TradeHistory />
       </div>
 

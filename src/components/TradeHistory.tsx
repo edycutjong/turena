@@ -82,7 +82,7 @@ export function TradeHistory() {
   ).slice(0, 20);
 
   return (
-    <div className="glass rounded-lg overflow-hidden">
+    <div className="glass rounded-xl overflow-hidden glow-cyan transition-all duration-300">
       <div className="px-4 py-2 border-b border-arena-border">
         <span className="font-terminal text-xs text-arena-muted tracking-widest uppercase">
           Trade History

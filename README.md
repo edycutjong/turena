@@ -51,57 +51,11 @@ In today's world, algorithmic AI agents trade autonomously in the dark, and huma
 
 > 📐 [Architecture](docs/ARCHITECTURE.md) · 🔌 [API Reference](docs/API.md) · 📜 [Smart Contracts](docs/CONTRACTS.md) · 🗄️ [Database Schema](docs/DATABASE.md)
 
-### System Diagram
+### System Overview
 
-```mermaid
-graph TB
-    subgraph Frontend["Next.js 16 Frontend (Vercel)"]
-        LP["Landing Page (SSR)"]
-        AD["Arena Dashboard (Client)"]
-        COT["CoT Terminal Component"]
-        TMR["15s Timer Component"]
-        CHT["Chart Component (Bybit)"]
-        BET["Counter-Trade Button"]
-        NFT["ERC-8004 Stats Panel"]
-    end
+**Vercel** serves the Next.js 16 frontend → subscribes to **Supabase Realtime** (`postgres_changes`) → renders CoT tokens, trades, and bets live. **Railway** runs the Python AI agent → streams reasoning to Supabase → executes trades on Bybit → records results on **Mantle** (ERC-8004 NFT + Escrow).
 
-    subgraph Backend["Python FastAPI (Railway)"]
-        AGT["AI Agent Engine"]
-        RSN["DeepSeek R1 (deepseek-reasoner)"]
-        BYB["Bybit API Client (Testnet)"]
-        SCE["Self-Correction Engine"]
-    end
-
-    subgraph Supabase["Supabase"]
-        DB["PostgreSQL"]
-        RT["Realtime Channels"]
-    end
-
-    subgraph Mantle["Mantle Network"]
-        ERC["ERC-8004 Identity NFT"]
-        ESC["Counter-Trade Escrow"]
-    end
-
-    AD --> RT
-    RT -->|"CoT Stream"| COT
-    RT -->|"Trade Events"| TMR
-    RT -->|"Bet Updates"| BET
-
-    AD -->|"Market Price (server-side proxy)"| CHT
-    CHT -->|"GET /api/market/price"| AGT
-
-    AGT -->|"Publish CoT"| RT
-    AGT --> RSN
-    AGT --> BYB
-    AGT --> SCE
-
-    SCE -->|"Update Params"| ERC
-    SCE -->|"Log Correction"| DB
-    BET -->|"Place Bet"| ESC
-    AGT -->|"Execute Trade"| BYB
-    AGT -->|"Record Result"| DB
-    AGT -->|"Update Identity"| ERC
-```
+> 📐 Full system diagram, deployment topology, and event reference → [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 ## 📜 Smart Contracts (Mantle)
 

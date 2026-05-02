@@ -24,7 +24,7 @@ async def _next_nonce(w3: AsyncWeb3, address: str) -> Nonce:
         return Nonce(nonce)
 
 # Minimal ABIs — only functions we call
-AGENT_ABI = json.loads('[{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"win","type":"bool"},{"name":"pnl","type":"int256"}],"name":"recordTrade","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"param","type":"string"},{"name":"oldVal","type":"uint256"},{"name":"newVal","type":"uint256"},{"name":"regretScore","type":"uint256"},{"name":"newStrategy","type":"string"}],"name":"recordSelfCorrection","outputs":[],"stateMutability":"nonpayable","type":"function"}]')
+AGENT_ABI = json.loads('[{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"win","type":"bool"},{"name":"pnl","type":"int256"}],"name":"recordTrade","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"param","type":"string"},{"name":"oldVal","type":"uint256"},{"name":"newVal","type":"uint256"},{"name":"regretScore","type":"uint256"},{"name":"newStrategy","type":"string"}],"name":"recordSelfCorrection","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"emotionState","type":"string"}],"name":"recordEmotionalState","outputs":[],"stateMutability":"nonpayable","type":"function"}]')
 ESCROW_ABI = json.loads('[{"inputs":[{"name":"cycleId","type":"uint256"},{"name":"aiWon","type":"bool"}],"name":"settle","outputs":[],"stateMutability":"nonpayable","type":"function"}]')
 
 
@@ -65,6 +65,20 @@ async def record_self_correction(
     tx = await contract.functions.recordSelfCorrection(
         token_id, param, old_val, new_val, regret_score, new_strategy
     ).build_transaction({
+        "from": account.address,
+        "nonce": await _next_nonce(w3, account.address),
+    })
+    signed = account.sign_transaction(tx)
+    tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)
+    return tx_hash.hex()
+
+
+async def record_emotional_state(token_id: int, emotion_state: str) -> str:
+    w3 = get_w3()
+    account = get_account(w3)
+    addr = AsyncWeb3.to_checksum_address(os.environ["TURING_AGENT_ADDRESS"])
+    contract = w3.eth.contract(address=addr, abi=AGENT_ABI)
+    tx = await contract.functions.recordEmotionalState(token_id, emotion_state).build_transaction({
         "from": account.address,
         "nonce": await _next_nonce(w3, account.address),
     })

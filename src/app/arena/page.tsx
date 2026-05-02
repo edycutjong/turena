@@ -1,7 +1,7 @@
 "use client";
 export const dynamic = "force-dynamic";
 import { useState, useCallback } from "react";
-import { CoTTerminal } from "@/components/CoTTerminal";
+import { CoTTerminal, type EmotionState } from "@/components/CoTTerminal";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { CounterTradeButton } from "@/components/CounterTradeButton";
 import { IntentAnnouncement } from "@/components/IntentAnnouncement";
@@ -30,6 +30,7 @@ export default function ArenaPage() {
   const [windowStartedAt, setWindowStartedAt] = useState<Date | null>(null);
   const [windowOpen, setWindowOpen] = useState(false);
   const [triggering, setTriggering] = useState(false);
+  const [emotion, setEmotion] = useState<EmotionState>("CONFIDENT");
 
   const triggerCycle = useCallback(async () => {
     setTriggering(true);
@@ -60,8 +61,14 @@ export default function ArenaPage() {
     confidence: number;
   } | null;
 
+  const isMeltdown = emotion === "MELTDOWN";
+  const isTilted   = emotion === "TILTED";
+
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-arena-bg">
+    <div className={`flex flex-col h-screen overflow-hidden transition-colors duration-500
+      ${isMeltdown ? "bg-red-950/30" : "bg-arena-bg"}
+      ${isTilted   ? "bg-orange-950/20" : ""}
+    `}>
       <AppNav
         sub={cycle ? `· Cycle #${cycle.cycle_number}` : "· Idle"}
         right={
@@ -136,7 +143,7 @@ export default function ArenaPage() {
         {/* Right — CoT Terminal + Live Chat */}
         <div className="flex flex-col flex-1 gap-2 min-h-[400px] md:min-h-0 arena-panel arena-panel-d2" style={{ minWidth: 0 }}>
           <div className="flex-1 min-h-0">
-            <CoTTerminal cycleId={cycle?.id ?? null} />
+            <CoTTerminal cycleId={cycle?.id ?? null} onEmotionChange={setEmotion} />
           </div>
           <div className="h-48">
             <LiveChat />

@@ -2,7 +2,7 @@
   <img src="docs/readme_hero.png" alt="Turena — The Turing Arena" width="800">
   <h1>TURENA</h1>
   <h3>⚔️ The Turing Arena</h3>
-  <p><em>Watch AI Trade. Bet Against It.</em></p>
+  <p><em>Watch AI Trade. Sabotage It. Bet Against Its Meltdown.</em></p>
 
   [![Live Demo](https://img.shields.io/badge/Live-turena.edycu.dev-brightgreen.svg)](https://turena.edycu.dev)
   [![DoraHacks](https://img.shields.io/badge/DoraHacks-BUIDL-FF761B.svg)](https://dorahacks.io/)
@@ -22,30 +22,60 @@
 
 ## 🎯 What is Turena?
 
-A live Twitch-style prediction market where a **DeepSeek R1** trading agent streams its raw Chain-of-Thought reasoning in real-time. You watch it think. You have **15 seconds** to bet against its decision. Every outcome — win, loss, and self-correction — is permanently recorded on **Mantle** via ERC-8004.
+A live **AI degen spectator sport** on Mantle. A **DeepSeek R1** trading agent streams its raw Chain-of-Thought reasoning in real-time — including its emotional state. The audience can **pay MNT to inject disinformation** into the AI's reasoning via FUD Cards, then **bet against its decision** before it executes. Every meltdown, self-correction, and payout is permanently recorded on Mantle via ERC-8004.
 
 > **Live now:** [turena.edycu.dev](https://turena.edycu.dev) — the agent is running continuously on Mantle Sepolia.
 
 ---
 
-## 🎬 How It Works
+## 🎬 How It Works — 3 Phases Per Cycle
 
 ```
-1. AI THINKS OUT LOUD
-   DeepSeek R1 analyzes live Bybit market data.
-   Every reasoning token streams to the terminal in real-time.
-   "...order book shows whale accumulation... confidence 87%... initiating LONG..."
+PHASE 1 — AI READING
+  DeepSeek R1 analyzes live Bybit market data.
+  Streams every reasoning token live — including emotional state.
+  "[EMOTION: ANXIOUS] ...RSI divergence is worrying me... volume looks thin..."
+  Ends with: "Awaiting crowd sentiment before final verdict..."
 
-2. 15-SECOND COUNTER-TRADE WINDOW
-   The AI announces its intent. A countdown opens.
-   Connect MetaMask → click Counter-Trade → bet MNT against the AI.
-   The bet is placed on-chain via CounterTradeEscrow.placeBet().
+PHASE 2 — SABOTAGE WINDOW (20 seconds)
+  FUD Card panel opens. Tug-of-War bar appears.
+  Pay 1–3 MNT to inject disinformation into the AI's reasoning:
+    🚨 "CEO Arrested" · 📺 "Jim Cramer Says BUY" · 🐋 "Whale Dumping"
+    💀 "Vitalik Sold" · 🦢 "Black Swan"
+  Counter-trade bets also open simultaneously.
+  All sabotage is batched and queued for Phase 3.
 
-3. ON-CHAIN SETTLEMENT + SELF-CORRECTION
-   Trade executes. Result recorded on Mantle via TuringAgent8004.recordTrade().
-   If the AI loses → SelfCorrection event fires on-chain.
-   Parameters adjust. NFT metadata updates. UI flashes the correction live.
+PHASE 3 — AI VERDICT
+  AI resumes with full sabotage context injected.
+  Visibly reacts — panics, spirals, or dismisses the crowd with arrogance.
+  Makes final trade decision. Trade executes on Bybit.
+
+SETTLEMENT
+  Result recorded on Mantle via TuringAgent8004.recordTrade().
+  If the AI loses → SelfCorrection event fires on-chain. "Public Breakdown & Recovery."
+  Emotional state (hubris/tilt levels) updated in ERC-8004 NFT metadata.
+  Counter-trade winners claim 2x payout from CounterTradeEscrow.
 ```
+
+---
+
+## 🧠 Emotional AI — 5 States
+
+The AI's emotional state escalates with consecutive losses and resets on wins. The entire state is recorded on-chain in the ERC-8004 NFT.
+
+| State | Trigger | Behavior | UI |
+|---|---|---|---|
+| `CONFIDENT` | Winning streak | Crisp, borderline arrogant | Cyan glow |
+| `CAUTIOUS` | 1 loss | Hedges more, mentions risk | Amber tint |
+| `ANXIOUS` | 2 losses | Rhetorical questions, uncertainty | Orange warnings |
+| `TILTED` | 3 losses | Second-guesses, shows frustration | Red flash, text jitter |
+| `MELTDOWN` | 4+ losses | Spirals, catastrophizes, then snaps back | Full red overlay, screen shake |
+
+**On-chain emotional metadata** — readable via any RPC or Mantlescan:
+- `hubrisLevel` (0–100): rises with wins, crashes on loss
+- `tiltLevel` (0–100): rises with consecutive losses, resets on win
+- `emotionState`: live string attribute in `tokenURI`
+- `EmotionalStateUpdated` event fires after each cycle
 
 ---
 
@@ -70,15 +100,18 @@ Both contracts deployed and **source-verified** on Mantle Sepolia (Chain ID `500
 
 ## 💡 The Problem & Solution
 
-On-chain AI agents are black boxes. You send them capital, they trade, you pray. The promise of "transparent AI" in crypto has been reduced to JSON logs that no human can parse in real-time.
+On-chain AI agents are black boxes. You send them capital, they trade, you pray.
 
-**Turena** forces the AI to think out loud — every hesitation, every calculation — streamed live before the trade executes. The 15-second window gives humans a genuine economic edge against the AI, creating the first **Human vs. AI prediction market** on Mantle.
+**Turena** makes the AI's reasoning — and its emotional collapse — a spectator sport. The crowd doesn't just watch: they pay to inject disinformation, then bet on whether the AI survives its own meltdown. Every decision, self-correction, and emotional state shift is permanently recorded on Mantle.
 
 **Key Features:**
-- ⚡ **AI Thinks Out Loud** — DeepSeek R1's `reasoning_content` tokens stream character-by-character in a hacker terminal UI
-- ⏱️ **15-Second Counter Window** — Bet MNT against the AI's position before it executes
-- 🔒 **Immutable On-Chain Record** — Every trade and self-correction recorded via ERC-8004 on Mantle
-- 🧠 **Live Self-Correction** — AI adjusts its own risk parameters on-chain when it loses; full-screen overlay shows exactly what changed
+- 🧠 **Emotional AI** — 5 states from CONFIDENT to MELTDOWN, escalating with losses. On-chain in ERC-8004 `tokenURI`.
+- 🃏 **FUD Cards** — Pay 1–3 MNT to inject preset disinformation into the AI's reasoning. No free-text (content safety).
+- ⚖️ **Tug-of-War Bar** — Live MNT totals: AI bankroll vs. human sabotage + bets.
+- 🔄 **3-Phase Cycle** — READING → SABOTAGE\_WINDOW → VERDICT. AI reacts visibly to crowd pressure.
+- ⏱️ **Counter-Trade Window** — Bet MNT against the AI's position before it executes.
+- 🔒 **Immutable On-Chain Record** — Every trade, correction, and emotional state recorded via ERC-8004 on Mantle.
+- 💥 **Public Breakdown & Recovery** — Self-correction reframed as a live on-chain confession with tx proof.
 
 ---
 
@@ -87,13 +120,13 @@ On-chain AI agents are black boxes. You send them capital, they trade, you pray.
 | Layer | Choice | Why |
 |-------|--------|-----|
 | **Frontend** | Next.js 16 (App Router), React 19 | SSR landing page, client components for real-time arena UI |
-| **Styling** | Tailwind CSS v4 | Dark mode, responsive, fast iteration |
-| **Real-time** | Supabase Realtime (`postgres_changes`) | WebSocket push for CoT tokens, bets, corrections — zero infra |
-| **Database** | Supabase PostgreSQL | 5 tables: `trade_cycles`, `cot_tokens`, `counter_trades`, `self_corrections`, `agent_state` |
-| **AI Backend** | Python FastAPI + DeepSeek R1 | `deepseek-reasoner` is the only model exposing raw `reasoning_content` via SSE |
-| **Market Data** | Bybit Testnet + CoinGecko fallback | Paper trading prevents real-money execution; CoinGecko covers region blocks |
-| **Smart Contracts** | Solidity 0.8.24, Hardhat, OpenZeppelin v5 | ERC-8004 identity NFT + bankroll-backed escrow |
-| **Chain** | Mantle Sepolia (5003) | Fast finality for 15-second settlement windows |
+| **Styling** | Tailwind CSS v4, Framer Motion | Dark mode, emotion-driven animations, screen shake on MELTDOWN |
+| **Real-time** | Supabase Realtime (`postgres_changes`) | WebSocket push for CoT tokens, sabotage events, bets — zero infra |
+| **Database** | Supabase PostgreSQL | 6 tables: `trade_cycles`, `cot_tokens`, `counter_trades`, `self_corrections`, `agent_state`, `sabotage_events` |
+| **AI Backend** | Python FastAPI + DeepSeek R1 | `deepseek-reasoner` exposes raw `reasoning_content`; 2-call split enables sabotage injection |
+| **Market Data** | Bybit Testnet + CoinGecko fallback | Paper trading; CoinGecko covers region blocks |
+| **Smart Contracts** | Solidity 0.8.24, Hardhat, OpenZeppelin v5 | ERC-8004 identity NFT with emotional metadata + bankroll-backed escrow |
+| **Chain** | Mantle Sepolia (5003) | Fast finality for real-time settlement windows |
 | **Deploy** | Vercel (frontend) + Railway (backend) | Global edge, auto-deploy on push |
 
 ### Data Flow
@@ -110,19 +143,20 @@ On-chain AI agents are black boxes. You send them capital, they trade, you pray.
 
 1. **`recordTrade()`** — Immutable on-chain event. A DB record can be edited; a Mantle tx cannot.
 2. **`recordSelfCorrection()`** — `SelfCorrection` log on Mantle Explorer is public *before* the next trade executes.
-3. **Dynamic NFT** — ERC-8004 metadata updates after each cycle. Agent ELO, win rate, strategy readable on-chain.
-4. **`settle()`** — Escrow settlement is on-chain. No server controls the payout.
-5. **`bankroll`** — Publicly readable. Bettors verify solvency before placing a bet.
+3. **`recordEmotionalState()`** — `EmotionalStateUpdated` event records hubris/tilt levels on-chain after every cycle.
+4. **Dynamic NFT** — ERC-8004 `tokenURI` returns live emotional state, ELO, win rate, and strategy — readable by anyone via RPC.
+5. **`settle()`** — Escrow settlement is on-chain. No server controls the payout.
+6. **`bankroll`** — Publicly readable. Bettors verify solvency before placing a bet.
 
 Remove Mantle and you need: a trusted settlement server + mutable audit DB + separate payout system + a trust model. The entire transparency claim collapses.
 
 ---
 
-## 🏆 Tracks Targeted
+## 🏆 Track Targeted
 
-1. **Mantle Network** — `TuringAgent8004` + `CounterTradeEscrow` on Mantle Sepolia; fast finality enables real-time 15-second settlement
-2. **AI Trading & Strategy (BGA)** — Autonomous quant agent with live Bybit integration and on-chain parameter tuning
-3. **Consumer & Viral DApps** — Twitch-style spectator UI; 15-second counter-trade windows create clip-worthy Human vs. AI moments
+**Track 4 — Consumer & Viral DApps**
+
+Turena is an AI entertainment product. The sabotage mechanic, emotional meltdowns, and tug-of-war dynamic create clip-worthy Human vs. AI moments designed for live streaming. Every cycle is a mini-game with real stakes.
 
 ---
 
@@ -145,7 +179,15 @@ Remove Mantle and you need: a trusted settlement server + mutable audit DB + sep
 | Currency symbol | `MNT` |
 | Block explorer | `https://sepolia.mantlescan.xyz` |
 
-### 1. Frontend
+### 1. Run DB Migrations
+Open Supabase SQL Editor and run in order:
+```
+db/migrations/002_emotional_state.sql
+db/migrations/003_three_phase_cycle.sql
+db/migrations/004_sabotage_events.sql
+```
+
+### 2. Frontend
 ```bash
 npm install
 cp .env.example .env.local
@@ -157,7 +199,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-### 2. Backend
+### 3. Backend
 ```bash
 cd backend
 cp .env.example .env
@@ -168,17 +210,18 @@ pip install -r requirements.txt
 AUTO_CYCLE=true uvicorn main:app --reload
 ```
 
-### 3. Contracts (already deployed — only if redeploying)
+### 4. Contracts (already deployed — only if redeploying)
 ```bash
 cd contracts
 npm install
 npx hardhat run scripts/deploy.ts --network mantleTestnet
 ```
 
-### 4. Trigger a cycle manually (demo)
+### 5. Trigger a cycle manually (demo)
 ```bash
 curl -X POST https://turena-production.up.railway.app/agent/run-cycle
-# Then open /arena and click [dev] open counter window to place a bet
+# Open /arena — watch phases: AI reading → sabotage window → AI verdict
+# Play a FUD card during the sabotage window, then place a counter-trade bet
 ```
 
 ---
@@ -209,6 +252,8 @@ curl -X POST https://turena-production.up.railway.app/agent/run-cycle
 | `BYBIT_API_KEY` / `BYBIT_API_SECRET` | Bybit testnet credentials |
 | `DEPLOYER_PRIVATE_KEY` | Mantle deployer wallet private key |
 | `TURING_AGENT_ADDRESS` / `ESCROW_ADDRESS` | Deployed contract addresses |
+| `MANTLE_RPC_URL` | Mantle Sepolia RPC (default: `https://rpc.sepolia.mantle.xyz`) |
+| `MANTLE_MAINNET_RPC_URL` | Mantle Mainnet RPC — set to premium provider before live stream |
 | `AUTO_CYCLE` | `true` runs trade cycles continuously on boot |
 | `DEMO_MODE` | `true` enables `/agent/mock-outcome`. **Never `true` in production** |
 

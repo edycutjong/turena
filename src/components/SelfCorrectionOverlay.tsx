@@ -40,21 +40,21 @@ export function SelfCorrectionOverlay() {
 
           {/* Overlay card */}
           <motion.div
-            className="fixed bottom-6 right-6 z-50 w-80 bg-arena-surface border border-arena-red rounded-xl shadow-2xl shadow-arena-red/20 overflow-hidden"
+            className="fixed bottom-6 right-6 z-50 w-80 bg-[#0f0f1a] border border-arena-red rounded-xl shadow-2xl shadow-arena-red/40 overflow-hidden"
             initial={{ x: 80, opacity: 0 }}
             animate={{ x: 0,  opacity: 1 }}
             exit={{    x: 80, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 22 }}
           >
             {/* Red header bar */}
-            <div className="flex items-center gap-2 px-4 py-2 bg-arena-red/20 border-b border-arena-red/30">
+            <div className="flex items-center gap-2 px-4 py-3 bg-arena-red/30 border-b border-arena-red/60">
               <span className="w-2 h-2 rounded-full bg-arena-red animate-pulse" />
               <span className="font-terminal text-xs text-arena-red font-bold tracking-widest uppercase">
                 Self-Correction Triggered
               </span>
             </div>
 
-            <div className="px-4 py-3 space-y-2">
+            <div className="px-4 py-3 space-y-2 bg-[#0f0f1a]">
               <div className="flex justify-between items-center">
                 <span className="font-terminal text-xs text-arena-muted">Parameter</span>
                 <span className="font-terminal text-sm text-arena-text font-bold">

@@ -58,6 +58,8 @@ export interface Database {
           self_corrections_count: number;
           current_params: Json;
           elo_rating: number;
+          emotion_state: "CONFIDENT" | "CAUTIOUS" | "ANXIOUS" | "TILTED" | "MELTDOWN" | null;
+          consecutive_losses: number | null;
           updated_at: string;
         };
         Insert: Omit<Database["public"]["Tables"]["agent_state"]["Row"], "id" | "updated_at">;
@@ -68,7 +70,7 @@ export interface Database {
           id: number;
           cycle_id: string;
           token_text: string;
-          token_type: "reasoning" | "intent" | "correction";
+          token_type: "reasoning" | "intent" | "correction" | "emotion";
           created_at: string;
         };
         Insert: Omit<Database["public"]["Tables"]["cot_tokens"]["Row"], "id" | "created_at">;

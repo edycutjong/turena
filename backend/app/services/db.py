@@ -26,10 +26,12 @@ def _build_params() -> dict:
             "password": unquote(p.password),
             "database": p.path.lstrip("/"),
         }
-    # Fallback: build from individual env vars
+    # Fallback: Transaction pooler — get the exact host from
+    # Supabase Dashboard → Project Settings → Database → Connection string (Transaction mode)
     project = os.environ["SUPABASE_URL"].split("//")[1].split(".")[0]
+    pooler_host = os.getenv("SUPABASE_POOLER_HOST", "aws-1-ap-southeast-2.pooler.supabase.com")
     return {
-        "host": "aws-0-us-east-1.pooler.supabase.com",
+        "host": pooler_host,
         "port": 6543,
         "user": f"postgres.{project}",
         "password": os.environ["SUPABASE_DB_PASSWORD"],

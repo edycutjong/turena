@@ -87,6 +87,9 @@ graph TB
     RT -->|"Trade Events"| TMR
     RT -->|"Bet Updates"| BET
 
+    AD -->|"Market Price (server-side proxy)"| CHT
+    CHT -->|"GET /api/market/price"| AGT
+
     AGT -->|"Publish CoT"| RT
     AGT --> RSN
     AGT --> BYB
@@ -155,7 +158,10 @@ In MetaMask → Settings → Networks → Add a network → Add a network manual
 ```bash
 npm install
 cp .env.example .env.local
-# Fill in NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_TURING_AGENT_ADDRESS, NEXT_PUBLIC_ESCROW_ADDRESS
+# Fill in: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+#          NEXT_PUBLIC_TURING_AGENT_ADDRESS, NEXT_PUBLIC_ESCROW_ADDRESS
+#          SUPABASE_SERVICE_ROLE_KEY
+#          BACKEND_URL=http://localhost:8000
 npm run dev
 ```
 
@@ -165,9 +171,10 @@ npm run dev
 ### 2. Backend
 ```bash
 cd backend
-cp ../.env.example .env
-# Fill in DEEPSEEK_API_KEY, BYBIT_API_KEY/SECRET, SUPABASE_URL/SERVICE_ROLE_KEY
-# DEPLOYER_PRIVATE_KEY, TURING_AGENT_ADDRESS, ESCROW_ADDRESS
+cp .env.example .env
+# Fill in: DEEPSEEK_API_KEY, BYBIT_API_KEY, BYBIT_API_SECRET
+#          SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+#          DEPLOYER_PRIVATE_KEY, TURING_AGENT_ADDRESS, ESCROW_ADDRESS
 pip install -r requirements.txt
 AUTO_CYCLE=true uvicorn main:app --reload
 ```
@@ -193,17 +200,19 @@ DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
 
 ## 🛠️ Key Environment Variables
 
-**Vercel (Frontend)**
+**Vercel (Frontend)** — see `.env.example`
 
 | Variable | Description |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (public) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (public, safe for browser) |
 | `NEXT_PUBLIC_TURING_AGENT_ADDRESS` | Deployed TuringAgent8004 contract address |
 | `NEXT_PUBLIC_ESCROW_ADDRESS` | Deployed CounterTradeEscrow contract address |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-side API routes only, never exposed to browser) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key — server-side API routes only, never exposed to browser |
+| `BACKEND_URL` | Railway backend URL — server-side only. Local: `http://localhost:8000` |
+| `DEMO_MODE` | `true` enables `/api/agent/trade-loop` and `/api/agent/mock-outcome` endpoints. Never `true` in production |
 
-**Railway (Backend)**
+**Railway (Backend)** — see `backend/.env.example`
 
 | Variable | Description |
 |---|---|
@@ -217,5 +226,14 @@ DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
 | `TURING_AGENT_ADDRESS` | Deployed TuringAgent8004 contract address |
 | `ESCROW_ADDRESS` | Deployed CounterTradeEscrow contract address |
 | `MANTLE_RPC_URL` | Mantle RPC URL (defaults to `https://rpc.sepolia.mantle.xyz`) |
-| `AUTO_CYCLE` | Set to `true` to start the trade loop automatically |
-| `DEMO_MODE` | Set to `true` to enable `/agent/mock-outcome` endpoint |
+| `AUTO_CYCLE` | `true` starts the trade loop automatically on server boot |
+| `DEMO_MODE` | `true` enables `/agent/mock-outcome` endpoint. Never `true` in production |
+
+**FE ↔ BE Communication**
+
+| Next.js Route | Talks To | How |
+|---|---|---|
+| `/api/market/price` | Python backend | Server-side proxy via `BACKEND_URL` |
+| `/api/agent/trade-loop` | Supabase directly | No backend involved (demo only) |
+| `/api/agent/mock-outcome` | Supabase directly | No backend involved (demo only) |
+| All real-time UI | Supabase Realtime | WebSocket — no backend involved |

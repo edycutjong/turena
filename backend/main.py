@@ -37,7 +37,11 @@ app = FastAPI(title="Turena Backend", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://turena.xyz"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://turena-app.vercel.app",
+        "https://turena.edycu.dev",
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )

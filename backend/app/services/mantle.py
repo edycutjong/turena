@@ -1,7 +1,25 @@
 import os
 import json
+import asyncio
 from web3 import AsyncWeb3
 from web3.middleware import ExtraDataToPOAMiddleware
+
+_nonce: int | None = None
+_nonce_lock = asyncio.Lock()
+
+
+async def _next_nonce(w3: AsyncWeb3, address: str) -> int:
+    global _nonce
+    async with _nonce_lock:
+        on_chain = max(
+            await w3.eth.get_transaction_count(address, "latest"),
+            await w3.eth.get_transaction_count(address, "pending"),
+        )
+        if _nonce is None or on_chain > _nonce:
+            _nonce = on_chain
+        nonce = _nonce
+        _nonce += 1
+        return nonce
 
 # Minimal ABIs — only functions we call
 AGENT_ABI = json.loads('[{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"win","type":"bool"},{"name":"pnl","type":"int256"}],"name":"recordTrade","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"param","type":"string"},{"name":"oldVal","type":"uint256"},{"name":"newVal","type":"uint256"},{"name":"regretScore","type":"uint256"},{"name":"newStrategy","type":"string"}],"name":"recordSelfCorrection","outputs":[],"stateMutability":"nonpayable","type":"function"}]')
@@ -27,10 +45,7 @@ async def record_trade(token_id: int, win: bool, pnl_wei: int) -> str:
     contract = w3.eth.contract(address=addr, abi=AGENT_ABI)
     tx = await contract.functions.recordTrade(token_id, win, pnl_wei).build_transaction({
         "from": account.address,
-        "nonce": max(
-            await w3.eth.get_transaction_count(account.address, "latest"),
-            await w3.eth.get_transaction_count(account.address, "pending"),
-        ),
+        "nonce": await _next_nonce(w3, account.address),
     })
     signed = account.sign_transaction(tx)
     tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)
@@ -49,10 +64,7 @@ async def record_self_correction(
         token_id, param, old_val, new_val, regret_score, new_strategy
     ).build_transaction({
         "from": account.address,
-        "nonce": max(
-            await w3.eth.get_transaction_count(account.address, "latest"),
-            await w3.eth.get_transaction_count(account.address, "pending"),
-        ),
+        "nonce": await _next_nonce(w3, account.address),
     })
     signed = account.sign_transaction(tx)
     tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)
@@ -66,10 +78,7 @@ async def settle_cycle(cycle_id: int, ai_won: bool) -> str:
     contract = w3.eth.contract(address=addr, abi=ESCROW_ABI)
     tx = await contract.functions.settle(cycle_id, ai_won).build_transaction({
         "from": account.address,
-        "nonce": max(
-            await w3.eth.get_transaction_count(account.address, "latest"),
-            await w3.eth.get_transaction_count(account.address, "pending"),
-        ),
+        "nonce": await _next_nonce(w3, account.address),
     })
     signed = account.sign_transaction(tx)
     tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)

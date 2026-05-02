@@ -1,9 +1,33 @@
 import hre from "hardhat";
-const { ethers } = hre;
+const { ethers, network } = hre;
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  const signers = await ethers.getSigners();
+  if (!signers.length) {
+    throw new Error(
+      "No deployer account found. Set DEPLOYER_PRIVATE_KEY in backend/.env"
+    );
+  }
+  const deployer = signers[0];
+  console.log("Network:       ", network.name);
   console.log("Deploying with:", deployer.address);
+
+  const balance = await ethers.provider.getBalance(deployer.address);
+  console.log("Wallet balance:", ethers.formatEther(balance), "MNT");
+
+  // Bankroll: 50 MNT on mainnet, 1000 MNT on testnet, overrideable via env
+  const isMainnet = network.name === "mantleMainnet";
+  const defaultBankroll = isMainnet ? "50" : "1000";
+  const bankrollMNT = ethers.parseEther(
+    process.env.DEPLOY_BANKROLL_MNT ?? defaultBankroll
+  );
+  console.log("Bankroll:      ", ethers.formatEther(bankrollMNT), "MNT");
+
+  if (balance < bankrollMNT) {
+    throw new Error(
+      `Insufficient balance. Need at least ${ethers.formatEther(bankrollMNT)} MNT, have ${ethers.formatEther(balance)} MNT`
+    );
+  }
 
   // Deploy TuringAgent8004
   const Agent = await ethers.getContractFactory("TuringAgent8004");
@@ -12,8 +36,7 @@ async function main() {
   const agentAddr = await agent.getAddress();
   console.log("TuringAgent8004:", agentAddr);
 
-  // Deploy CounterTradeEscrow with 1000 testnet MNT bankroll
-  const bankrollMNT = ethers.parseEther("1000");
+  // Deploy CounterTradeEscrow with initial bankroll
   const Escrow = await ethers.getContractFactory("CounterTradeEscrow");
   const escrow = await Escrow.deploy({ value: bankrollMNT });
   await escrow.waitForDeployment();

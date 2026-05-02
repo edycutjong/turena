@@ -2,7 +2,9 @@ import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from "dotenv";
 
+// Load root .env first, then backend/.env — backend/.env holds DEPLOYER_PRIVATE_KEY
 dotenv.config({ path: "../.env" });
+dotenv.config({ path: "../backend/.env" });
 
 const deployerKey = process.env.DEPLOYER_PRIVATE_KEY;
 

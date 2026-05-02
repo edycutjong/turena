@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/readme_hero.svg" alt="Turena Logo" width="800">
+  <img src="docs/readme_hero.png" alt="Turena Logo" width="800">
   <h1>Turena 🚀</h1>
   <p><em>Watch AI Trade. Bet Against It.</em></p>
   
@@ -22,7 +22,7 @@
 ## 📸 See it in Action
 A live Twitch-style prediction market where a DeepSeek R1 trading agent streams its raw Chain-of-Thought reasoning in real-time. You have 15 seconds to counter-trade its decision. Every outcome is permanently recorded on Mantle via ERC-8004.
 
-![App Demo](docs/readme_hero.svg)
+![App Demo](docs/readme_hero.png)
 
 ## 💡 The Problem & Solution
 In today's world, algorithmic AI agents trade autonomously in the dark, and humans are left to guess their strategies. 

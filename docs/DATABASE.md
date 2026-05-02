@@ -58,6 +58,8 @@ Full schema definition: [`db/schema.sql`](../db/schema.sql)
 | `self_corrections_count` | `integer` | Total corrections made |
 | `current_params` | `jsonb` | Active strategy parameters |
 | `elo_rating` | `integer` | Performance rating |
+| `emotion_state` | `text` | Current emotional state: `CONFIDENT` / `CAUTIOUS` / `ANXIOUS` / `TILTED` / `MELTDOWN` |
+| `consecutive_losses` | `integer` | Loss streak since last win (drives emotion escalation) |
 | `updated_at` | `timestamptz` | Last updated |
 
 ### `cot_tokens` (Realtime streaming bus)
@@ -69,7 +71,7 @@ CREATE TABLE cot_tokens (
   id         bigserial PRIMARY KEY,
   cycle_id   uuid REFERENCES trade_cycles(id),
   token_text text NOT NULL,
-  token_type text DEFAULT 'reasoning', -- 'reasoning' | 'intent' | 'correction'
+  token_type text DEFAULT 'reasoning', -- 'reasoning' | 'intent' | 'correction' | 'emotion'
   created_at timestamptz DEFAULT now()
 );
 -- Enable Realtime on this table in Supabase dashboard

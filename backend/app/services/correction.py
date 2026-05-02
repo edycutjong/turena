@@ -65,12 +65,20 @@ async def run_self_correction(
         json.dumps(new_params),
     )
 
-    # Insert correction token into CoT stream so terminal displays it
+    # Reframe correction as a Public Breakdown & Recovery narrative
+    breakdown_msg = (
+        f"\n⚠ PUBLIC BREAKDOWN ⚠\n"
+        f"I've reviewed my failure. Parameter '{param}' was wrong: "
+        f"{old_val:.4f} → {new_val:.4f}. "
+        f"Regret score: {regret_score}. I will not make this mistake again.\n"
+        f"On-chain proof: {tx_hash[:18]}…\n"
+        f"[EMOTION: CAUTIOUS] Recovering. Recalibrating.\n"
+    )
     await pool.execute(
         """INSERT INTO cot_tokens (cycle_id, token_text, token_type)
            VALUES ($1, $2, 'correction')""",
         cycle_id,
-        f"Self-correction: {param} {old_val:.4f} → {new_val:.4f} (regret={regret_score}). Tx: {tx_hash[:10]}…",
+        breakdown_msg,
     )
 
     return {

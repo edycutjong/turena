@@ -15,12 +15,27 @@ EVAL_WINDOW    = 30   # seconds after execution to evaluate P&L
 TOKEN_ID       = 0    # ERC-8004 agent token
 
 
+async def _get_consecutive_losses(pool: asyncpg.Pool) -> int:
+    """Count losses since the last win (determines emotional state)."""
+    row = await pool.fetchrow(
+        """WITH last_win AS (
+               SELECT created_at FROM trade_cycles
+               WHERE agent_id = 'agent-0' AND result = 'win'
+               ORDER BY created_at DESC LIMIT 1
+           )
+           SELECT COUNT(*) AS streak FROM trade_cycles
+           WHERE agent_id = 'agent-0' AND result = 'loss'
+           AND created_at > COALESCE((SELECT created_at FROM last_win), '1970-01-01'::timestamptz)"""
+    )
+    return int(row["streak"]) if row else 0
+
+
 async def run_cycle(manual: bool = False) -> dict:
     """
     Full trade cycle:
       1. Fetch market context from Bybit
-      2. Stream DeepSeek R1 CoT → cot_tokens inserts
-      3. Extract intent, update trade_cycles
+      2. Determine emotional state from loss streak
+      3. Stream DeepSeek R1 CoT (with emotion) → cot_tokens inserts
       4. Wait COUNTER_WINDOW seconds (betting window)
       5. Execute Bybit order
       6. Wait EVAL_WINDOW seconds
@@ -46,9 +61,17 @@ async def run_cycle(manual: bool = False) -> dict:
         cycle_id, cycle_number,
     )
 
-    # --- Step 3: Stream CoT ---
+    # --- Step 3: Determine emotional state ---
+    consecutive_losses = await _get_consecutive_losses(pool)
+
+    # --- Step 4: Stream CoT ---
     intent_data: dict = {}
-    async for token_type, text in stream_reasoning(market_ctx):
+    current_emotion: str = "CONFIDENT"
+    async for token_type, text in stream_reasoning(market_ctx, consecutive_losses):
+        if token_type == "emotion":
+            current_emotion = text
+            await insert_cot_token(pool, cycle_id, text, "emotion")
+            continue
         # "content" is not a valid token_type in the DB — map it to "reasoning"
         db_token_type = token_type if token_type in ("reasoning", "intent", "correction") else "reasoning"
         await insert_cot_token(pool, cycle_id, text, db_token_type)
@@ -65,7 +88,7 @@ async def run_cycle(manual: bool = False) -> dict:
     symbol = "MNTUSDT"
     bybit_side = "buy" if action == "long" else "sell"
 
-    # --- Step 4: Counter-trade window (non-blocking) ---
+    # --- Step 5: Counter-trade window ---
     await asyncio.sleep(COUNTER_WINDOW)
 
     # --- Step 5: Execute order ---
@@ -94,14 +117,16 @@ async def run_cycle(manual: bool = False) -> dict:
 
     # Upsert agent_state — creates row on first cycle, updates on subsequent ones
     await pool.execute(
-        """INSERT INTO agent_state (agent_id, total_trades, total_pnl, win_rate, current_params)
-           VALUES ('agent-0', 1, $1, $2, '{}')
+        """INSERT INTO agent_state (agent_id, total_trades, total_pnl, win_rate, current_params, emotion_state, consecutive_losses)
+           VALUES ('agent-0', 1, $1, $2, '{}', $3, $4)
            ON CONFLICT (agent_id) DO UPDATE SET
-               total_trades = agent_state.total_trades + 1,
-               total_pnl    = agent_state.total_pnl + $1,
-               win_rate     = ((agent_state.win_rate * agent_state.total_trades) + $2) / (agent_state.total_trades + 1),
-               updated_at   = now()""",
-        pnl, 1.0 if win else 0.0,
+               total_trades       = agent_state.total_trades + 1,
+               total_pnl          = agent_state.total_pnl + $1,
+               win_rate           = ((agent_state.win_rate * agent_state.total_trades) + $2) / (agent_state.total_trades + 1),
+               emotion_state      = $3,
+               consecutive_losses = $4,
+               updated_at         = now()""",
+        pnl, 1.0 if win else 0.0, current_emotion, consecutive_losses + (0 if win else 1),
     )
 
     # --- Step 9: Self-correct on loss ---

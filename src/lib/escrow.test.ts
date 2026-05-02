@@ -82,7 +82,7 @@ describe('escrow.ts', () => {
         address: mockContractAddress,
         abi: expect.any(Array),
         functionName: 'placeBet',
-        args: [1n, false],
+        args: [BigInt(1), false],
         value: viem.parseEther('10'),
         account: '0xAccount',
       });

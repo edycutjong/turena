@@ -50,7 +50,7 @@ describe("useWallet", () => {
   it("handles accountsChanged event", async () => {
     mockRequest.mockResolvedValue([]);
     let accountsChangedCb: any;
-    mockOn.mockImplementation((event, cb) => {
+    mockOn.mockImplementation((event: string, cb: any) => {
       if (event === "accountsChanged") accountsChangedCb = cb;
     });
 

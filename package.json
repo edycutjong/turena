@@ -8,9 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix .",
+    "typecheck": "tsc --noEmit",
     "test": "vitest --passWithNoTests",
     "test:coverage": "vitest run --coverage --passWithNoTests",
-    "ci": "npm run lint && npm run build && npm run test:coverage"
+    "ci": "npm run lint && npm run typecheck && npm run build && npm run test:coverage"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",

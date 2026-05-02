@@ -51,20 +51,7 @@ graph TB
 
 ## Deployment Architecture
 
-```text
-┌─────────────────────┐     ┌──────────────────────┐
-│  Vercel             │     │  Railway              │
-│  Next.js 16 Frontend│◄───►│  Python FastAPI       │
-│  + API Routes       │     │  + AI Agent Engine    │
-└────────┬────────────┘     └──────────┬───────────┘
-         │                             │
-         ▼                             ▼
-┌─────────────────────┐     ┌──────────────────────┐
-│  Supabase           │     │  Mantle Network      │
-│  PostgreSQL +       │     │  ERC-8004 NFT +      │
-│  Realtime Channels  │     │  Escrow Contract     │
-└─────────────────────┘     └──────────────────────┘
-```
+![Deployment Architecture](./architecture-diagram.svg)
 
 ## Supabase Realtime Streaming Pattern
 

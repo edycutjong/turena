@@ -226,4 +226,4 @@ curl -X POST https://turena-production.up.railway.app/agent/run-cycle
 
 ## 📄 License
 
-MIT
+Copyright © 2026 Edy Cu. This project is licensed under the [MIT License](LICENSE) — see the [LICENSE](LICENSE) file for details.

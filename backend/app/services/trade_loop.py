@@ -49,7 +49,9 @@ async def run_cycle(manual: bool = False) -> dict:
     # --- Step 3: Stream CoT ---
     intent_data: dict = {}
     async for token_type, text in stream_reasoning(market_ctx):
-        await insert_cot_token(pool, cycle_id, text, token_type)
+        # "content" is not a valid token_type in the DB — map it to "reasoning"
+        db_token_type = token_type if token_type in ("reasoning", "intent", "correction") else "reasoning"
+        await insert_cot_token(pool, cycle_id, text, db_token_type)
         if token_type == "intent":
             intent_data = json.loads(text)
             await pool.execute(

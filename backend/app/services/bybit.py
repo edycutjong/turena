@@ -19,12 +19,21 @@ def _exchange() -> ccxt.bybit:
     })
 
 
+_cg_cache: tuple[float, float] = (0.0, 0.0)  # (price, timestamp)
+
 async def _coingecko_price() -> float:
+    import time
+    global _cg_cache
+    price, ts = _cg_cache
+    if price and (time.time() - ts) < 60:  # cache for 60 seconds
+        return price
     url = "https://api.coingecko.com/api/v3/simple/price?ids=mantle&vs_currencies=usd"
     async with httpx.AsyncClient(timeout=8) as client:
         r = await client.get(url)
         r.raise_for_status()
-        return r.json().get("mantle", {}).get("usd", 0.63)
+        price = r.json().get("mantle", {}).get("usd", 0.63)
+        _cg_cache = (price, time.time())
+        return price
 
 
 # ---------------------------------------------------------------------------

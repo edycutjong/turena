@@ -13,21 +13,8 @@ async def get_pool() -> asyncpg.Pool:
 
 
 def _build_params() -> dict:
-    # If DATABASE_URL is set, parse it manually to avoid URL-encoding issues
-    # with special characters in the password (e.g. @, $, #).
-    db_url = os.getenv("DATABASE_URL")
-    if db_url:
-        from urllib.parse import urlparse, unquote
-        p = urlparse(db_url)
-        return {
-            "host": p.hostname,
-            "port": p.port or 6543,
-            "user": p.username,
-            "password": unquote(p.password),
-            "database": p.path.lstrip("/"),
-        }
-    # Fallback: Transaction pooler — get the exact host from
-    # Supabase Dashboard → Project Settings → Database → Connection string (Transaction mode)
+    # Always use individual env vars to avoid URL-parsing issues with
+    # special characters in the password (e.g. @, $).
     project = os.environ["SUPABASE_URL"].split("//")[1].split(".")[0]
     pooler_host = os.getenv("SUPABASE_POOLER_HOST", "aws-1-ap-southeast-2.pooler.supabase.com")
     return {

@@ -1,6 +1,6 @@
 <div align="center">
   <img src="docs/readme_hero.png" alt="Turena Logo" width="800">
-  <h1>TURENA 🚀</h1>
+  <h1>TURENA</h1>
   <h3>⚔️ The Turing Arena</h3>
   <p><em>Watch AI Trade. Bet Against It.</em></p>
   
@@ -21,13 +21,13 @@
 ---
 
 ## 📸 See it in Action
+
 A live Twitch-style prediction market where a DeepSeek R1 trading agent streams its raw Chain-of-Thought reasoning in real-time. You have 15 seconds to counter-trade its decision. Every outcome is permanently recorded on Mantle via ERC-8004.
 
-![App Demo](docs/readme_hero.png)
-
 ## 💡 The Problem & Solution
-In today's world, algorithmic AI agents trade autonomously in the dark, and humans are left to guess their strategies. 
-**Turena** solves this by forcing the AI to "think out loud" on a live stream, letting humans front-run or counter-trade it before its final order hits the market. 
+
+In today's world, algorithmic AI agents trade autonomously in the dark, and humans are left to guess their strategies.
+**Turena** solves this by forcing the AI to "think out loud" on a live stream, letting humans front-run or counter-trade it before its final order hits the market.
 
 **Key Features:**
 - ⚡ **AI Thinks Out Loud:** DeepSeek R1's `reasoning_content` tokens stream character-by-character as it analyzes live Bybit market data.
@@ -45,9 +45,9 @@ In today's world, algorithmic AI agents trade autonomously in the dark, and huma
 | **Database** | Supabase PostgreSQL | 5 tables — `trade_cycles`, `counter_trades`, `self_corrections`, `agent_state`, `cot_tokens`. [Full schema →](docs/DATABASE.md) |
 | **AI Backend** | Python (FastAPI) | **DeepSeek R1** (`deepseek-reasoner`) — the only reasoning model that exposes raw `reasoning_content` tokens via SSE streaming |
 | **Market Data** | Bybit API — **Testnet first** | Paper trading on testnet prevents real-money execution during demo |
-| **Smart Contracts** | Solidity 0.8.20 (Hardhat) | ERC-8004 Agent Identity + Counter-Trade Escrow on Mantle |
+| **Smart Contracts** | Solidity 0.8.24 (Hardhat) | ERC-8004 Agent Identity + Counter-Trade Escrow on Mantle |
 | **Chain** | Mantle Testnet (5003) → Mainnet (5000) | Testnet contract address published and verifiable on Mantle Explorer |
-| **Deploy** | Vercel (Frontend) + Railway (Python) | Fast, reliable, free tier |
+| **Deploy** | Vercel (Frontend) + Railway (Python) | Fast, reliable, global edge |
 
 > 📐 [Architecture](docs/ARCHITECTURE.md) · 🔌 [API Reference](docs/API.md) · 📜 [Smart Contracts](docs/CONTRACTS.md) · 🗄️ [Database Schema](docs/DATABASE.md)
 
@@ -59,12 +59,16 @@ In today's world, algorithmic AI agents trade autonomously in the dark, and huma
 
 ## 📜 Smart Contracts (Mantle)
 
-Two contracts deployed on Mantle Sepolia (Chain ID `5003`). Full interfaces and Solidity source in [docs/CONTRACTS.md](docs/CONTRACTS.md).
+Two contracts deployed and **verified** on Mantle Sepolia (Chain ID `5003`). Full interfaces and Solidity source in [docs/CONTRACTS.md](docs/CONTRACTS.md).
 
-| Contract | Address | Explorer |
-|---|---|---|
-| `TuringAgent8004` | `0x3f24Bc75B258d35a347C4A76d49F45020A3457ce` | [View on Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce) |
-| `CounterTradeEscrow` | `0x766F2485219D5977AE727E6B1738891310EC8f3d` | [View on Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x766F2485219D5977AE727E6B1738891310EC8f3d) |
+| Contract | Address | Explorer | Source |
+|---|---|---|---|
+| `TuringAgent8004` | `0x3f24Bc75B258d35a347C4A76d49F45020A3457ce` | [Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce) | [Sourcify ✅](https://repo.sourcify.dev/contracts/full_match/5003/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce/) |
+| `CounterTradeEscrow` | `0x766F2485219D5977AE727E6B1738891310EC8f3d` | [Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x766F2485219D5977AE727E6B1738891310EC8f3d) | [Sourcify ✅](https://repo.sourcify.dev/contracts/full_match/5003/0x766F2485219D5977AE727E6B1738891310EC8f3d/) |
+
+**Proof of live activity:**
+- `recordTrade` + `recordSelfCorrection` — 30+ confirmed txs on Mantle Sepolia
+- `placeBet` (human counter-trade) — tx `0x3d37eed3…e0bc26` ✅
 
 **`TuringAgent8004.sol`** — ERC-8004 dynamic NFT. Records every trade (`TradeRecorded` event) and self-correction (`SelfCorrection` event) immutably on-chain. The agent's ELO, win rate, and strategy are readable via `agentStats(tokenId)`.
 
@@ -111,7 +115,7 @@ In MetaMask → Settings → Networks → Add a network → Add a network manual
 | Default RPC URL | `https://rpc.sepolia.mantle.xyz` |
 | Chain ID | `5003` |
 | Currency symbol | `MNT` |
-| Block explorer URL | `https://explorer.sepolia.mantle.xyz` |
+| Block explorer URL | `https://sepolia.mantlescan.xyz` |
 
 ### 1. Frontend
 ```bash
@@ -121,37 +125,35 @@ cp .env.example .env.local
 #          NEXT_PUBLIC_TURING_AGENT_ADDRESS, NEXT_PUBLIC_ESCROW_ADDRESS
 #          SUPABASE_SERVICE_ROLE_KEY
 #          BACKEND_URL=http://localhost:8000
+#          NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 npm run dev
 ```
-
-> **Note for Judges:** 
-> You can skip making an account! Connect your MetaMask to the Mantle Sepolia testnet.
 
 ### 2. Backend
 ```bash
 cd backend
 cp .env.example .env
 # Fill in: DEEPSEEK_API_KEY, BYBIT_API_KEY, BYBIT_API_SECRET
-#          SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+#          SUPABASE_URL, SUPABASE_DB_PASSWORD, SUPABASE_SERVICE_ROLE_KEY
 #          DEPLOYER_PRIVATE_KEY, TURING_AGENT_ADDRESS, ESCROW_ADDRESS
 pip install -r requirements.txt
 AUTO_CYCLE=true uvicorn main:app --reload
 ```
 
-### 3. Contracts
+### 3. Contracts (already deployed — only needed to redeploy)
 ```bash
 cd contracts
 npm install
-cp ../.env.example .env  # fill DEPLOYER_PRIVATE_KEY
+# Fill DEPLOYER_PRIVATE_KEY in ../.env
 npx hardhat run scripts/deploy.ts --network mantleTestnet
 ```
 
 ### 4. Demo Recording Mode
 ```bash
-# In one terminal: start backend with DEMO_MODE=true + AUTO_CYCLE=true
+# Start backend with DEMO_MODE=true
 DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
 
-# In another terminal: trigger loss + self-correction at the right moment
+# Force a loss + self-correction at the right moment
 ./scripts/demo-trigger.sh
 ```
 
@@ -167,18 +169,19 @@ DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (public, safe for browser) |
 | `NEXT_PUBLIC_TURING_AGENT_ADDRESS` | Deployed TuringAgent8004 contract address |
 | `NEXT_PUBLIC_ESCROW_ADDRESS` | Deployed CounterTradeEscrow contract address |
+| `NEXT_PUBLIC_BACKEND_URL` | Railway backend URL — used client-side for manual cycle trigger. Local: `http://localhost:8000` |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key — server-side API routes only, never exposed to browser |
-| `BACKEND_URL` | Railway backend URL — server-side only. Local: `http://localhost:8000` |
-| `DEMO_MODE` | `true` enables `/api/agent/trade-loop` and `/api/agent/mock-outcome` endpoints. Never `true` in production |
+| `BACKEND_URL` | Railway backend URL — server-side proxy only. Local: `http://localhost:8000` |
+| `DEMO_MODE` | `true` enables `/agent/mock-outcome` endpoint. **Never `true` in production** |
 
 **Railway (Backend)** — see `backend/.env.example`
 
 | Variable | Description |
 |---|---|
 | `SUPABASE_URL` | Supabase project URL (same value as `NEXT_PUBLIC_SUPABASE_URL`) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key |
-| `SUPABASE_DB_PASSWORD` | Actual database password — **not** the JWT service role key. Get from Supabase Dashboard → Project Settings → Database → Database Password. Avoid passwords with `@`, `$`, `#` |
-| `SUPABASE_POOLER_HOST` | Optional. Supabase Transaction pooler host for your region. Find in Supabase Dashboard → Project Settings → Database → Connection string (Transaction mode). Defaults to `aws-1-ap-southeast-2.pooler.supabase.com` |
+| `SUPABASE_DB_PASSWORD` | Actual database password — **not** the JWT service role key. Get from Supabase Dashboard → Project Settings → Database → Database Password |
+| `SUPABASE_POOLER_HOST` | Optional. Transaction pooler host for your region. Defaults to `aws-1-ap-southeast-2.pooler.supabase.com` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (used for admin operations) |
 | `DEEPSEEK_API_KEY` | DeepSeek API key |
 | `BYBIT_API_KEY` | Bybit testnet API key |
 | `BYBIT_API_SECRET` | Bybit testnet API secret |
@@ -188,13 +191,15 @@ DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
 | `ESCROW_ADDRESS` | Deployed CounterTradeEscrow contract address |
 | `MANTLE_RPC_URL` | Mantle RPC URL (defaults to `https://rpc.sepolia.mantle.xyz`) |
 | `AUTO_CYCLE` | `true` starts the trade loop automatically on server boot |
-| `DEMO_MODE` | `true` enables `/agent/mock-outcome` endpoint. Never `true` in production |
+| `DEMO_MODE` | `true` enables `/agent/mock-outcome` endpoint. **Never `true` in production** |
 
 **FE ↔ BE Communication**
 
-| Next.js Route | Talks To | How |
+| What | Route | How |
 |---|---|---|
-| `/api/market/price` | Python backend | Server-side proxy via `BACKEND_URL` |
-| `/api/agent/trade-loop` | Supabase directly | No backend involved (demo only) |
-| `/api/agent/mock-outcome` | Supabase directly | No backend involved (demo only) |
-| All real-time UI | Supabase Realtime | WebSocket — no backend involved |
+| Live price chart | `/api/market/price` | Next.js server route proxies to Railway via `BACKEND_URL` |
+| Manual cycle trigger | `POST /agent/run-cycle` | Arena page calls Railway directly via `NEXT_PUBLIC_BACKEND_URL` |
+| CoT token stream | Supabase Realtime | `postgres_changes` on `cot_tokens` — no backend involved |
+| Trade cycle updates | Supabase Realtime | `postgres_changes` on `trade_cycles` — no backend involved |
+| Self-correction alerts | Supabase Realtime | `postgres_changes` on `self_corrections` — no backend involved |
+| Counter-trade bets | MetaMask → Mantle | `placeBet()` on `CounterTradeEscrow` — no backend involved |

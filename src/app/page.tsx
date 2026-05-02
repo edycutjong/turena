@@ -4,44 +4,44 @@ import { AppNav } from "@/components/AppNav";
 import { ArenaLink } from "@/components/ArenaLink";
 
 export const metadata: Metadata = {
-  title: "Turena — Watch AI Trade. Bet Against It.",
+  title: "Turena — Watch AI Trade. Sabotage It. Bet Against Its Meltdown.",
   description:
-    "Stream a live AI trading agent's Chain-of-Thought reasoning and counter-trade its decisions in a 15-second window. Every decision recorded on Mantle.",
+    "A live AI degen spectator sport on Mantle. Pay MNT to inject disinformation via FUD Cards, then bet against the AI before it executes. Every meltdown recorded on-chain via ERC-8004.",
   openGraph: {
-    title: "Turena — Watch AI Trade. Bet Against It.",
+    title: "Turena — Watch AI Trade. Sabotage It. Bet Against Its Meltdown.",
     description:
-      "Stream a live AI trading agent's Chain-of-Thought reasoning and counter-trade its decisions in a 15-second window. Every decision recorded on Mantle.",
+      "A live AI degen spectator sport on Mantle. Pay MNT to inject disinformation via FUD Cards, then bet against the AI before it executes. Every meltdown recorded on-chain via ERC-8004.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Turena — Watch AI Trade. Bet Against It.",
+    title: "Turena — Watch AI Trade. Sabotage It. Bet Against Its Meltdown.",
     description:
-      "Stream a live AI trading agent's Chain-of-Thought reasoning and counter-trade its decisions in a 15-second window.",
+      "A live AI degen spectator sport on Mantle. Pay MNT to inject disinformation via FUD Cards, then bet against the AI before it executes.",
   },
 };
 
 const STEPS = [
   {
     n: "01",
-    title: "AI Reasons Out Loud",
-    body: "DeepSeek R1's chain-of-thought streams live to your screen — every token, every doubt, every confidence score.",
+    title: "AI Reads the Market",
+    body: "DeepSeek R1 streams its raw reasoning live — every doubt, every emotional state shift. Ends without a final verdict: \"Awaiting crowd sentiment...\"",
     color: "text-arena-cyan",
     border: "border-arena-cyan/30",
     glow: "glow-cyan",
   },
   {
     n: "02",
-    title: "15-Second Window Opens",
-    body: "The moment the agent announces its trade intent, a 15-second countdown begins. Counter-trade or watch.",
+    title: "Sabotage Window (20s)",
+    body: "Pay 1–3 MNT to inject a FUD Card: \"CEO Arrested\", \"Jim Cramer Says BUY\", \"Black Swan\". Bet against its position. The tug-of-war bar fills in real time.",
     color: "text-arena-red",
     border: "border-arena-red/30",
     glow: "glow-red",
   },
   {
     n: "03",
-    title: "Everything On-Chain",
-    body: "Trade results, self-corrections, and counter-trade bets are recorded on Mantle via ERC-8004. Judges can verify.",
+    title: "AI Verdict + On-Chain Record",
+    body: "The AI resumes with all sabotage injected — visibly panics or dismisses the crowd. Final trade executes. Every meltdown and self-correction recorded on Mantle via ERC-8004.",
     color: "text-arena-green",
     border: "border-arena-green/30",
     glow: "glow-green",
@@ -116,15 +116,15 @@ export default function Home() {
           </p>
           <h1 className="font-terminal text-5xl md:text-7xl font-bold text-arena-text leading-tight mb-3">
             Watch AI Trade.{" "}
-            <span className="text-arena-cyan">Bet Against It.</span>
+            <span className="text-arena-cyan">Sabotage It.</span>
           </h1>
           <p className="font-terminal text-sm text-arena-muted/60 tracking-[0.2em] uppercase mb-6">
-            The Turing Arena
+            The Turing Arena · ERC-8004 on Mantle
           </p>
           <p className="text-arena-muted text-lg md:text-xl max-w-xl mx-auto mb-10 leading-relaxed">
-            A live AI trading agent streams its chain-of-thought in real time.
-            You get 15 seconds to counter-trade. Every decision is recorded
-            on Mantle — verifiable by anyone.
+            A live AI degen spectator sport. Pay MNT to inject FUD Cards into
+            the AI&apos;s reasoning. Bet against its meltdown. Every emotional
+            state shift and self-correction recorded on-chain — verifiable by anyone.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <ArenaLink
@@ -149,15 +149,17 @@ export default function Home() {
             <div className="w-3 h-3 rounded-full bg-yellow-500" />
             <div className="w-3 h-3 rounded-full bg-green-500" />
             <span className="ml-2 font-terminal text-xs text-arena-muted tracking-widest">
-              Turena OS // CoT Stream — Live
+              Turena OS // Phase 1: READING
             </span>
             <span className="ml-auto font-terminal text-xs text-arena-cyan animate-pulse">● LIVE</span>
           </div>
           <div className="px-6 py-5 font-terminal text-sm text-left space-y-1">
             <p className="text-slate-500">{">"} Fetching MNTUSDT market context...</p>
-            <p className="text-slate-400">{">"} <span className="text-cyan-300">[reasoning]</span> The 4h RSI is sitting at 61, not yet overbought but momentum is clearly to the upside. Volume profile shows strong support at 0.94...</p>
-            <p className="text-slate-400">{">"} <span className="text-cyan-300">[reasoning]</span> However the 1h shows a potential double-top forming. Risk/reward tilts short if price rejects 0.99...</p>
-            <p className="text-cyan-300 font-bold">{">"} <span className="bg-cyan-900/30 px-1 rounded">[intent]</span> {"{"} action: &quot;SHORT&quot;, asset: &quot;MNTUSDT&quot;, confidence: 0.72 {"}"}</p>
+            <p className="text-orange-400">{">"} <span className="bg-orange-900/30 px-1 rounded">[emotion]</span> ANXIOUS — 2 consecutive losses</p>
+            <p className="text-slate-400">{">"} <span className="text-cyan-300">[reasoning]</span> RSI divergence is worrying me... volume looks thin at this level. Last two trades I got stopped out exactly here.</p>
+            <p className="text-slate-400">{">"} <span className="text-cyan-300">[reasoning]</span> Awaiting crowd sentiment before final verdict...</p>
+            <p className="text-red-400">{">"} <span className="bg-red-900/30 px-1 rounded">[FUD]</span> 🚨 CEO Arrested · 🐋 Whale Dumping · 2.0 MNT injected</p>
+            <p className="text-cyan-300 font-bold">{">"} <span className="bg-cyan-900/30 px-1 rounded">[intent]</span> {"{"} action: &quot;SHORT&quot;, asset: &quot;MNTUSDT&quot;, confidence: 0.61 {"}"}</p>
             <p className="text-slate-600 animate-pulse">▋</p>
           </div>
         </div>
@@ -278,7 +280,7 @@ export default function Home() {
       {/* Footer CTA */}
       <section className="px-6 py-20 text-center border-t border-arena-border">
         <p className="font-terminal text-arena-muted text-sm mb-6">
-          Every trade, every correction, every bet — on Mantle.
+          Every trade, every meltdown, every bet — on Mantle.
         </p>
         <ArenaLink
           href="/arena"

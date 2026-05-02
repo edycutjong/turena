@@ -58,16 +58,22 @@ const STACK = [
 ];
 
 const SPONSORS = {
+  organizers: [
+    "Mantle", "Bybit", "Byreal", "Blockchain Good Alliance",
+  ],
   cosponsors: [
     "Tencent Cloud", "ELFA", "Surf", "Orbit AI",
     "Minds", "Mirana", "OpenCheck", "Nansen",
   ],
   partners: [
     "BU", "OT", "Decipher", "Imperial Blockchain & Fintech",
-    "Cornell Blockchain", "MU Shanghai", "Z.AI", "Orakle",
-    "HKUST Crypto-Fintech Lab", "Akindo", "KudasaiJP", "Rocketpunch",
-    "TradeGainTT", "Four Pillars", "Blockchain Valley",
+    "Cornell Blockchain", "MU Shanghai", "Z.AI",
+    "HKUST Crypto-Fintech Lab", "AKINDO", "KudasaiJP", "TradeCoinVN",
+    "Blockchain at Berkeley", "Four Pillars", "Rocketpunch",
+    "Localhost HKBS", "Blockchain Valley",
+    "ORAKLE – KAIST Blockchain Research Society",
     "Zhejiang University", "Merchant Moe",
+    "CoinNess", "경향게임스", "Decenter", "Bloomingbit", "Blockstreet",
   ],
   supported: ["DoraHacks", "HackQuest"],
 };
@@ -199,6 +205,23 @@ export default function Home() {
       {/* Sponsors & Partners */}
       <section className="px-6 py-16 max-w-5xl mx-auto w-full border-t border-arena-border">
         <div className="space-y-8">
+          {/* Main Organizers */}
+          <div>
+            <p className="font-terminal text-xs text-amber-400 tracking-widest uppercase text-center mb-4">
+              Organized By
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {SPONSORS.organizers.map((name) => (
+                <span
+                  key={name}
+                  className="glass px-4 py-2 rounded border border-amber-400/30 font-terminal text-sm font-bold text-arena-text hover:border-amber-400/60 hover:text-amber-400 transition-colors"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
+          </div>
+
           {/* Co-Sponsored By */}
           <div>
             <p className="font-terminal text-xs text-arena-cyan tracking-widest uppercase text-center mb-4">

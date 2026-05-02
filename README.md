@@ -216,9 +216,11 @@ curl -X POST https://turena-production.up.railway.app/agent/run-cycle
 
 ## 🤝 Sponsors & Partners
 
+**Organized by:** Mantle, Bybit, Byreal, Blockchain Good Alliance
+
 **Co-Sponsored by:** Tencent Cloud, ELFA, Surf, Orbit AI, Minds, Mirana, OpenCheck, Nansen
 
-**Community Partners:** BU, OT, Decipher, Imperial Blockchain & Fintech, Cornell Blockchain, MU Shanghai, Z.AI, Orakle, HKUST Crypto-Fintech Lab, Akindo, KudasaiJP, Rocketpunch, TradeGainTT, Four Pillars, Blockchain Valley, Zhejiang University, Merchant Moe
+**Community & Media Partners:** BU, OT, Decipher, Imperial Blockchain & Fintech, Cornell Blockchain, MU Shanghai, Z.AI, HKUST Crypto-Fintech Lab, AKINDO, KudasaiJP, TradeCoinVN, Blockchain at Berkeley, Four Pillars, Rocketpunch, Localhost HKBS, Blockchain Valley, ORAKLE – KAIST Blockchain Research Society, Zhejiang University, Merchant Moe, CoinNess, 경향게임스, Decenter, Bloomingbit, Blockstreet
 
 **Co-Supported by:** DoraHacks, HackQuest
 

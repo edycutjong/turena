@@ -27,7 +27,10 @@ async def record_trade(token_id: int, win: bool, pnl_wei: int) -> str:
     contract = w3.eth.contract(address=addr, abi=AGENT_ABI)
     tx = await contract.functions.recordTrade(token_id, win, pnl_wei).build_transaction({
         "from": account.address,
-        "nonce": await w3.eth.get_transaction_count(account.address, "pending"),
+        "nonce": max(
+            await w3.eth.get_transaction_count(account.address, "latest"),
+            await w3.eth.get_transaction_count(account.address, "pending"),
+        ),
     })
     signed = account.sign_transaction(tx)
     tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)
@@ -46,7 +49,10 @@ async def record_self_correction(
         token_id, param, old_val, new_val, regret_score, new_strategy
     ).build_transaction({
         "from": account.address,
-        "nonce": await w3.eth.get_transaction_count(account.address, "pending"),
+        "nonce": max(
+            await w3.eth.get_transaction_count(account.address, "latest"),
+            await w3.eth.get_transaction_count(account.address, "pending"),
+        ),
     })
     signed = account.sign_transaction(tx)
     tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)
@@ -60,7 +66,10 @@ async def settle_cycle(cycle_id: int, ai_won: bool) -> str:
     contract = w3.eth.contract(address=addr, abi=ESCROW_ABI)
     tx = await contract.functions.settle(cycle_id, ai_won).build_transaction({
         "from": account.address,
-        "nonce": await w3.eth.get_transaction_count(account.address, "pending"),
+        "nonce": max(
+            await w3.eth.get_transaction_count(account.address, "latest"),
+            await w3.eth.get_transaction_count(account.address, "pending"),
+        ),
     })
     signed = account.sign_transaction(tx)
     tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)

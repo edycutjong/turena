@@ -1,6 +1,7 @@
 <div align="center">
   <img src="docs/readme_hero.png" alt="Turena Logo" width="800">
-  <h1>Turena 🚀</h1>
+  <h1>TURENA 🚀</h1>
+  <h3>⚔️ The Turing Arena</h3>
   <p><em>Watch AI Trade. Bet Against It.</em></p>
   
   [![DoraHacks](https://img.shields.io/badge/DoraHacks-BUIDL-FF761B.svg)](https://dorahacks.io/)

@@ -2,3 +2,10 @@
 __pycache__/
 *.pyc
 .env
+
+# testing
+.coverage
+.coverage.*
+.pytest_cache/
+htmlcov/
+coverage.xml

@@ -177,7 +177,8 @@ DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
 |---|---|
 | `SUPABASE_URL` | Supabase project URL (same value as `NEXT_PUBLIC_SUPABASE_URL`) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key |
-| `DATABASE_URL` | Direct asyncpg connection string. Format: `postgresql://postgres.<project-id>:<SUPABASE_SERVICE_ROLE_KEY>@aws-0-us-east-1.pooler.supabase.com:6543/postgres`. If blank, auto-built from `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` |
+| `SUPABASE_DB_PASSWORD` | Actual database password — **not** the JWT service role key. Get from Supabase Dashboard → Project Settings → Database → Database Password. Avoid passwords with `@`, `$`, `#` |
+| `SUPABASE_POOLER_HOST` | Optional. Supabase Transaction pooler host for your region. Find in Supabase Dashboard → Project Settings → Database → Connection string (Transaction mode). Defaults to `aws-1-ap-southeast-2.pooler.supabase.com` |
 | `DEEPSEEK_API_KEY` | DeepSeek API key |
 | `BYBIT_API_KEY` | Bybit testnet API key |
 | `BYBIT_API_SECRET` | Bybit testnet API secret |

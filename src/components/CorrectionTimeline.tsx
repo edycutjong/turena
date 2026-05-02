@@ -17,6 +17,21 @@ function formatDate(iso: string) {
   return d.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
+import { motion } from "framer-motion";
+
+function AnimatedProgressBar({ value, improved }: { value: number; improved: boolean }) {
+  return (
+    <motion.div
+      initial={{ width: 0 }}
+      animate={{ width: `${Math.min(100, Math.abs(value) * 100)}%` }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className={`h-full rounded-full ${
+        improved ? "bg-arena-green" : "bg-arena-red"
+      }`}
+    />
+  );
+}
+
 export function CorrectionTimeline() {
   const [corrections, setCorrections] = useState<SelfCorrection[]>([]);
 
@@ -74,9 +89,15 @@ export function CorrectionTimeline() {
               : true;
 
             return (
-              <div key={c.id} className="flex gap-4 relative">
+              <motion.div
+                key={c.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.05, ease: "easeOut" }}
+                className="flex gap-4 relative"
+              >
                 {/* Timeline dot */}
-                <div className="relative flex-shrink-0 w-8 flex items-center justify-center">
+                <div className="relative shrink-0 w-8 flex items-center justify-center">
                   <div
                     className={`w-3 h-3 rounded-full border-2 z-10 ${
                       i === 0
@@ -103,14 +124,7 @@ export function CorrectionTimeline() {
                       {Number(c.old_value).toFixed(4)}
                     </span>
                     <div className="flex-1 h-1.5 bg-arena-border rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          improved ? "bg-arena-green" : "bg-arena-red"
-                        }`}
-                        style={{
-                          width: `${Math.min(100, Math.abs(Number(c.new_value)) * 100)}%`,
-                        }}
-                      />
+                      <AnimatedProgressBar value={Number(c.new_value)} improved={improved} />
                     </div>
                     <span className="font-terminal text-xs text-arena-green tabular-nums w-16">
                       {Number(c.new_value).toFixed(4)}
@@ -133,7 +147,7 @@ export function CorrectionTimeline() {
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

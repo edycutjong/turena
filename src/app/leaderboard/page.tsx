@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Database } from "@/lib/database.types";
 import Link from "next/link";
+import { motion, animate } from "framer-motion";
 import { CorrectionTimeline } from "@/components/CorrectionTimeline";
 import { AppNav } from "@/components/AppNav";
 
@@ -20,6 +21,23 @@ interface TraderStat {
 
 function shortAddr(addr: string) {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+}
+
+function AnimatedNumber({ value }: { value: number }) {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    const controls = animate(0, value, {
+      duration: 0.8,
+      ease: "easeOut",
+      onUpdate(v) {
+        setDisplayValue(Math.floor(v));
+      }
+    });
+    return controls.stop;
+  }, [value]);
+
+  return <>{displayValue}</>;
 }
 
 export default function LeaderboardPage() {
@@ -91,7 +109,9 @@ export default function LeaderboardPage() {
         <div className="glass rounded-xl p-6 grid grid-cols-2 gap-6 arena-panel arena-panel-d1 hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] transition-shadow duration-300">
           <div className="flex flex-col items-center gap-2">
             <span className="font-terminal text-xs text-arena-muted uppercase tracking-widest">AI Agent</span>
-            <span className="font-terminal text-5xl font-bold text-arena-cyan glow-text">{agentWins}</span>
+            <span className="font-terminal text-5xl font-bold text-arena-cyan glow-text">
+              <AnimatedNumber value={agentWins} />
+            </span>
             <span className="font-terminal text-xs text-arena-muted">
               wins · {agentState ? `${(agentState.win_rate * 100).toFixed(1)}%` : "—"}
             </span>
@@ -101,7 +121,9 @@ export default function LeaderboardPage() {
           </div>
           <div className="flex flex-col items-center gap-2">
             <span className="font-terminal text-xs text-arena-muted uppercase tracking-widest">Humans</span>
-            <span className="font-terminal text-5xl font-bold text-arena-red glow-text">{humanWins}</span>
+            <span className="font-terminal text-5xl font-bold text-arena-red glow-text">
+              <AnimatedNumber value={humanWins} />
+            </span>
             <span className="font-terminal text-xs text-arena-muted">
               wins ·{" "}
               {agentState?.total_trades
@@ -151,7 +173,13 @@ export default function LeaderboardPage() {
                   const net = t.totalPayout - t.totalWagered;
                   const winPct = t.trades > 0 ? ((t.wins / t.trades) * 100).toFixed(1) : "0.0";
                   return (
-                    <tr key={t.wallet} className="border-b border-arena-border/50 hover:bg-white/5 transition-colors">
+                    <motion.tr 
+                      key={t.wallet} 
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: i * 0.05, ease: "easeOut" }}
+                      className="border-b border-arena-border/50 hover:bg-white/5 transition-colors"
+                    >
                       <td className="px-4 py-2 text-arena-muted">
                         {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}
                       </td>
@@ -170,7 +198,7 @@ export default function LeaderboardPage() {
                       <td className={`px-4 py-2 text-right tabular-nums font-bold ${net >= 0 ? "text-arena-green" : "text-arena-red"}`}>
                         {net >= 0 ? "+" : ""}{net.toFixed(2)}
                       </td>
-                    </tr>
+                    </motion.tr>
                   );
                 })}
               </tbody>
@@ -184,7 +212,7 @@ export default function LeaderboardPage() {
             <div>
               <p className="font-terminal text-xs text-arena-muted uppercase tracking-widest">Agent Self-Corrections</p>
               <p className="font-terminal text-2xl font-bold text-arena-purple mt-1 glow-text">
-                {agentState.self_corrections_count}
+                <AnimatedNumber value={agentState.self_corrections_count} />
               </p>
             </div>
             <div className="text-right">

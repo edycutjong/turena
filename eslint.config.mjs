@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Generated files:
     "coverage/**",
+    // Backend files:
+    "backend/**",
   ]),
   {
     files: ["**/*.test.ts", "**/*.test.tsx"],

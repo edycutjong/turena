@@ -121,7 +121,7 @@ class TestAgentExecute:
         mock_pool.execute = AsyncMock()
 
         with patch("app.routers.agent.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
-             patch("app.routers.agent.asyncio.create_task") as mock_task:
+             patch("app.routers.agent.asyncio.create_task", side_effect=lambda c: c.close()):
             from main import app
             transport = ASGITransport(app=app)
             async with AsyncClient(transport=transport, base_url="http://test") as client:
@@ -157,7 +157,7 @@ class TestAgentExecute:
         mock_pool.execute = AsyncMock()
 
         with patch("app.routers.agent.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
-             patch("app.routers.agent.asyncio.create_task"):
+             patch("app.routers.agent.asyncio.create_task", side_effect=lambda c: c.close()):
             from main import app
             transport = ASGITransport(app=app)
             async with AsyncClient(transport=transport, base_url="http://test") as client:

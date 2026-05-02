@@ -29,7 +29,9 @@ ESCROW_ABI = json.loads('[{"inputs":[{"name":"cycleId","type":"uint256"},{"name"
 
 
 def get_w3() -> AsyncWeb3:
-    rpc = os.getenv("MANTLE_RPC_URL", "https://rpc.sepolia.mantle.xyz")
+    # MANTLE_MAINNET_RPC_URL used in production; fall back to testnet for local dev.
+    # Set MANTLE_MAINNET_RPC_URL to a premium Alchemy/NodeReal endpoint before the live stream.
+    rpc = os.getenv("MANTLE_MAINNET_RPC_URL") or os.getenv("MANTLE_RPC_URL", "https://rpc.sepolia.mantle.xyz")
     w3 = AsyncWeb3(AsyncWeb3.AsyncHTTPProvider(rpc))
     w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
     return w3

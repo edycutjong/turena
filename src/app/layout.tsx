@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Inter } from "next/font/google";
 import "./globals.css";
+import { DisclaimerModal } from "@/components/DisclaimerModal";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
@@ -44,6 +45,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-arena-bg text-arena-text">
+        <DisclaimerModal />
         {children}
       </body>
     </html>

@@ -18,14 +18,18 @@ const config: HardhatUserConfig = {
       accounts: deployerKey ? [deployerKey] : [],
     },
     mantleMainnet: {
-      url: "https://rpc.mantle.xyz",
+      // Use MANTLE_MAINNET_RPC_URL for premium RPC (Alchemy/NodeReal) — public endpoint will
+      // choke under 20 concurrent users during the live bounty stream.
+      url: process.env.MANTLE_MAINNET_RPC_URL ?? "https://rpc.mantle.xyz",
       chainId: 5000,
       accounts: deployerKey ? [deployerKey] : [],
+      gasMultiplier: 1.2,
     },
   },
   etherscan: {
     apiKey: {
       mantleTestnet: process.env.MANTLESCAN_API_KEY ?? "any",
+      mantleMainnet: process.env.MANTLESCAN_API_KEY ?? "any",
     },
     customChains: [
       {
@@ -34,6 +38,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api.etherscan.io/v2/api?chainid=5003",
           browserURL: "https://sepolia.mantlescan.xyz",
+        },
+      },
+      {
+        network: "mantleMainnet",
+        chainId: 5000,
+        urls: {
+          apiURL: "https://api.etherscan.io/v2/api?chainid=5000",
+          browserURL: "https://mantlescan.xyz",
         },
       },
     ],

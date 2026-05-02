@@ -23,14 +23,23 @@ class MockOutcomeRequest(BaseModel):
 
 @router.get("/status")
 async def get_status():
-    """Return the currently active (pending) cycle ID, if any."""
+    """Return the currently active cycle with phase, emotion state, and agent stats."""
     pool = await get_pool()
-    row = await pool.fetchrow(
-        "SELECT id, cycle_number FROM trade_cycles WHERE result = 'pending' ORDER BY created_at DESC LIMIT 1"
+    cycle = await pool.fetchrow(
+        "SELECT id, cycle_number, phase, intent FROM trade_cycles WHERE result = 'pending' ORDER BY created_at DESC LIMIT 1"
     )
-    if row:
-        return {"active_cycle_id": str(row["id"]), "cycle_number": row["cycle_number"]}
-    return {"active_cycle_id": None, "cycle_number": None}
+    agent = await pool.fetchrow(
+        "SELECT emotion_state, consecutive_losses, win_rate, total_trades FROM agent_state WHERE agent_id = 'agent-0'"
+    )
+    return {
+        "active_cycle_id":    str(cycle["id"]) if cycle else None,
+        "cycle_number":       cycle["cycle_number"] if cycle else None,
+        "phase":              cycle["phase"] if cycle else None,
+        "emotion_state":      agent["emotion_state"] if agent else None,
+        "consecutive_losses": agent["consecutive_losses"] if agent else 0,
+        "win_rate":           round(float(agent["win_rate"]) * 100, 1) if agent else None,
+        "total_trades":       agent["total_trades"] if agent else 0,
+    }
 
 
 @router.get("/params")

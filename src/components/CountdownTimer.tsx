@@ -3,13 +3,24 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { playTick, playUrgentTick } from "@/lib/sounds";
 
+type CyclePhase = "PENDING" | "READING" | "SABOTAGE_WINDOW" | "VERDICT" | "SETTLED" | null;
+
+const PHASE_LABELS: Record<NonNullable<CyclePhase>, string> = {
+  PENDING:         "waiting",
+  READING:         "AI reading",
+  SABOTAGE_WINDOW: "sabotage window",
+  VERDICT:         "AI verdict",
+  SETTLED:         "settled",
+};
+
 interface Props {
   durationSeconds: number;
   startedAt: Date | null;
   onExpire?: () => void;
+  phase?: CyclePhase;
 }
 
-export function CountdownTimer({ durationSeconds, startedAt, onExpire }: Props) {
+export function CountdownTimer({ durationSeconds, startedAt, onExpire, phase }: Props) {
   const [remaining, setRemaining] = useState(() => durationSeconds);
   const lastTickRef = useRef<number>(-1);
 
@@ -89,8 +100,18 @@ export function CountdownTimer({ durationSeconds, startedAt, onExpire }: Props) 
 
       <span className={`font-terminal text-xs tracking-widest uppercase
         ${isUrgent ? "text-arena-red animate-pulse" : "text-arena-muted"}`}>
-        {startedAt ? (remaining > 0 ? "counter window open" : "window closed") : "waiting"}
+        {phase
+          ? PHASE_LABELS[phase]
+          : startedAt
+            ? (remaining > 0 ? "counter window open" : "window closed")
+            : "waiting"
+        }
       </span>
+      {phase === "SABOTAGE_WINDOW" && (
+        <span className="font-terminal text-[10px] text-orange-400 uppercase tracking-widest animate-pulse">
+          ▶ sabotage the AI now
+        </span>
+      )}
     </div>
   );
 }

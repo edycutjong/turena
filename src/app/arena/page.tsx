@@ -127,6 +127,7 @@ export default function ArenaPage() {
             durationSeconds={WINDOW_SECONDS}
             startedAt={windowStartedAt}
             onExpire={handleExpire}
+            phase={cycle?.phase ?? null}
           />
           <IntentAnnouncement intent={intent} visible={windowOpen} />
           <CounterTradeButton

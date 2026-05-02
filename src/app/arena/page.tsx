@@ -19,6 +19,7 @@ import { AppNav } from "@/components/AppNav";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS;
 const AGENT_ID = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS ?? "agent-0";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://turena-production.up.railway.app";
 const WINDOW_SECONDS = 15;
 
 export default function ArenaPage() {
@@ -28,6 +29,16 @@ export default function ArenaPage() {
 
   const [windowStartedAt, setWindowStartedAt] = useState<Date | null>(null);
   const [windowOpen, setWindowOpen] = useState(false);
+  const [triggering, setTriggering] = useState(false);
+
+  const triggerCycle = useCallback(async () => {
+    setTriggering(true);
+    try {
+      await fetch(`${BACKEND_URL}/agent/run-cycle`, { method: "POST" });
+    } finally {
+      setTriggering(false);
+    }
+  }, []);
 
   const openWindow = useCallback(() => {
     setWindowStartedAt(new Date());
@@ -86,12 +97,21 @@ export default function ArenaPage() {
           <div className="flex-1 min-h-48">
             <MarketChart />
           </div>
-          <button
-            onClick={openWindow}
-            className="font-terminal text-xs text-arena-muted border border-arena-border rounded px-3 py-1.5 hover:border-arena-cyan hover:text-arena-cyan transition-colors"
-          >
-            [dev] open counter window
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={triggerCycle}
+              disabled={triggering}
+              className="flex-1 font-terminal text-xs text-arena-muted border border-arena-border rounded px-3 py-1.5 hover:border-arena-green hover:text-arena-green transition-colors disabled:opacity-40"
+            >
+              {triggering ? "[dev] starting…" : "[dev] trigger cycle"}
+            </button>
+            <button
+              onClick={openWindow}
+              className="flex-1 font-terminal text-xs text-arena-muted border border-arena-border rounded px-3 py-1.5 hover:border-arena-cyan hover:text-arena-cyan transition-colors"
+            >
+              [dev] open counter window
+            </button>
+          </div>
         </div>
 
         {/* Center — Timer + Intent + Bet button */}

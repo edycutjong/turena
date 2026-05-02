@@ -193,15 +193,29 @@ DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
 
 ## 🛠️ Key Environment Variables
 
-| Variable | Where | Description |
-|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | frontend | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | frontend | Supabase anon key |
-| `NEXT_PUBLIC_TURING_AGENT_ADDRESS` | frontend | Deployed TuringAgent8004 address |
-| `NEXT_PUBLIC_ESCROW_ADDRESS` | frontend | Deployed CounterTradeEscrow address |
-| `DEEPSEEK_API_KEY` | backend | DeepSeek API key |
-| `BYBIT_API_KEY` / `BYBIT_API_SECRET` | backend | Bybit testnet credentials |
-| `DEPLOYER_PRIVATE_KEY` | backend + contracts | Mantle deployer wallet |
-| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | backend | Supabase server-side |
-| `AUTO_CYCLE=true` | backend | Start trade loop automatically |
-| `DEMO_MODE=true` | backend | Enable `/agent/mock-outcome` endpoint |
+**Vercel (Frontend)**
+
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (public) |
+| `NEXT_PUBLIC_TURING_AGENT_ADDRESS` | Deployed TuringAgent8004 contract address |
+| `NEXT_PUBLIC_ESCROW_ADDRESS` | Deployed CounterTradeEscrow contract address |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-side API routes only, never exposed to browser) |
+
+**Railway (Backend)**
+
+| Variable | Description |
+|---|---|
+| `SUPABASE_URL` | Supabase project URL (same value as `NEXT_PUBLIC_SUPABASE_URL`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key |
+| `DEEPSEEK_API_KEY` | DeepSeek API key |
+| `BYBIT_API_KEY` | Bybit testnet API key |
+| `BYBIT_API_SECRET` | Bybit testnet API secret |
+| `BYBIT_TESTNET` | Set to `true` for testnet |
+| `DEPLOYER_PRIVATE_KEY` | Mantle deployer wallet private key |
+| `TURING_AGENT_ADDRESS` | Deployed TuringAgent8004 contract address |
+| `ESCROW_ADDRESS` | Deployed CounterTradeEscrow contract address |
+| `MANTLE_RPC_URL` | Mantle RPC URL (defaults to `https://rpc.sepolia.mantle.xyz`) |
+| `AUTO_CYCLE` | Set to `true` to start the trade loop automatically |
+| `DEMO_MODE` | Set to `true` to enable `/agent/mock-outcome` endpoint |

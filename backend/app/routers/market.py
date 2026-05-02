@@ -17,10 +17,8 @@ def _bybit():
 
 
 async def _coingecko_price() -> float:
-    url = "https://api.coingecko.com/api/v3/simple/price?ids=mantle&vs_currencies=usd"
-    async with httpx.AsyncClient(timeout=8) as client:
-        r = await client.get(url)
-        return r.json().get("mantle", {}).get("usd", 0.63)
+    from app.services.bybit import _coingecko_price as _cached
+    return await _cached()
 
 
 @router.get("/price")

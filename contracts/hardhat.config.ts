@@ -4,7 +4,7 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ path: "../.env" });
 
-const deployerKey = process.env.DEPLOYER_PRIVATE_KEY ?? "0x" + "0".repeat(64);
+const deployerKey = process.env.DEPLOYER_PRIVATE_KEY;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -15,13 +15,31 @@ const config: HardhatUserConfig = {
     mantleTestnet: {
       url: process.env.MANTLE_RPC_URL ?? "https://rpc.sepolia.mantle.xyz",
       chainId: 5003,
-      accounts: [deployerKey],
+      accounts: deployerKey ? [deployerKey] : [],
     },
     mantleMainnet: {
       url: "https://rpc.mantle.xyz",
       chainId: 5000,
-      accounts: [deployerKey],
+      accounts: deployerKey ? [deployerKey] : [],
     },
+  },
+  etherscan: {
+    apiKey: {
+      mantleTestnet: process.env.MANTLESCAN_API_KEY ?? "any",
+    },
+    customChains: [
+      {
+        network: "mantleTestnet",
+        chainId: 5003,
+        urls: {
+          apiURL: "https://api.etherscan.io/v2/api?chainid=5003",
+          browserURL: "https://sepolia.mantlescan.xyz",
+        },
+      },
+    ],
+  },
+  sourcify: {
+    enabled: true,
   },
 };
 

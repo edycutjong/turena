@@ -23,11 +23,11 @@ def get_account(w3: AsyncWeb3):
 async def record_trade(token_id: int, win: bool, pnl_wei: int) -> str:
     w3 = get_w3()
     account = get_account(w3)
-    addr = os.environ["TURING_AGENT_ADDRESS"]
+    addr = AsyncWeb3.to_checksum_address(os.environ["TURING_AGENT_ADDRESS"])
     contract = w3.eth.contract(address=addr, abi=AGENT_ABI)
     tx = await contract.functions.recordTrade(token_id, win, pnl_wei).build_transaction({
         "from": account.address,
-        "nonce": await w3.eth.get_transaction_count(account.address),
+        "nonce": await w3.eth.get_transaction_count(account.address, "pending"),
     })
     signed = account.sign_transaction(tx)
     tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)
@@ -40,13 +40,13 @@ async def record_self_correction(
 ) -> str:
     w3 = get_w3()
     account = get_account(w3)
-    addr = os.environ["TURING_AGENT_ADDRESS"]
+    addr = AsyncWeb3.to_checksum_address(os.environ["TURING_AGENT_ADDRESS"])
     contract = w3.eth.contract(address=addr, abi=AGENT_ABI)
     tx = await contract.functions.recordSelfCorrection(
         token_id, param, old_val, new_val, regret_score, new_strategy
     ).build_transaction({
         "from": account.address,
-        "nonce": await w3.eth.get_transaction_count(account.address),
+        "nonce": await w3.eth.get_transaction_count(account.address, "pending"),
     })
     signed = account.sign_transaction(tx)
     tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)
@@ -56,11 +56,11 @@ async def record_self_correction(
 async def settle_cycle(cycle_id: int, ai_won: bool) -> str:
     w3 = get_w3()
     account = get_account(w3)
-    addr = os.environ["ESCROW_ADDRESS"]
+    addr = AsyncWeb3.to_checksum_address(os.environ["ESCROW_ADDRESS"])
     contract = w3.eth.contract(address=addr, abi=ESCROW_ABI)
     tx = await contract.functions.settle(cycle_id, ai_won).build_transaction({
         "from": account.address,
-        "nonce": await w3.eth.get_transaction_count(account.address),
+        "nonce": await w3.eth.get_transaction_count(account.address, "pending"),
     })
     signed = account.sign_transaction(tx)
     tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)

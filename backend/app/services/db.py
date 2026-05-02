@@ -8,7 +8,7 @@ async def get_pool() -> asyncpg.Pool:
     global _pool
     if _pool is None:
         params = _build_params()
-        _pool = await asyncpg.create_pool(**params, min_size=2, max_size=10, ssl="require")
+        _pool = await asyncpg.create_pool(**params, min_size=2, max_size=10, ssl="require", statement_cache_size=0)
     return _pool
 
 

@@ -17,7 +17,7 @@ export function CoTTerminal({ cycleId }: Props) {
   }, [tokens]);
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 text-cyan-400 font-mono p-4 rounded-xl border border-arena-border shadow-2xl overflow-hidden relative scanlines">
+    <div className="flex flex-col h-full bg-slate-950 text-cyan-400 font-mono p-4 rounded-xl border border-arena-border glow-cyan overflow-hidden relative scanlines">
       {/* Terminal title bar */}
       <div className="flex items-center justify-between mb-4 pb-2 border-b border-arena-border/50">
         <div className="flex items-center gap-2">

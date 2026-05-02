@@ -101,15 +101,15 @@ export default function ArenaPage() {
             <button
               onClick={triggerCycle}
               disabled={triggering}
-              className="flex-1 font-terminal text-xs text-arena-muted border border-arena-border rounded px-3 py-1.5 hover:border-arena-green hover:text-arena-green transition-colors disabled:opacity-40"
+              className="flex-1 font-terminal text-xs text-arena-green border border-arena-green/40 rounded px-3 py-1.5 hover:bg-arena-green/10 transition-colors disabled:opacity-40"
             >
               {triggering ? "[dev] starting…" : "[dev] trigger cycle"}
             </button>
             <button
               onClick={openWindow}
-              className="flex-1 font-terminal text-xs text-arena-muted border border-arena-border rounded px-3 py-1.5 hover:border-arena-cyan hover:text-arena-cyan transition-colors"
+              className="flex-1 font-terminal text-xs text-arena-cyan border border-arena-cyan/40 rounded px-3 py-1.5 hover:bg-arena-cyan/10 transition-colors"
             >
-              [dev] open counter window
+              [dev] open window
             </button>
           </div>
         </div>

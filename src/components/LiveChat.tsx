@@ -54,9 +54,9 @@ export function LiveChat() {
   };
 
   return (
-    <div className="flex flex-col h-full glass rounded-xl overflow-hidden">
+    <div className="flex flex-col h-full glass rounded-xl overflow-hidden glow-purple transition-all duration-300">
       <div className="px-4 py-2 border-b border-arena-border">
-        <span className="font-terminal text-xs text-arena-muted tracking-widest uppercase">Live Chat</span>
+        <span className="font-terminal text-xs text-arena-purple tracking-widest uppercase">Live Chat</span>
       </div>
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {messages.length === 0 && (
@@ -81,7 +81,7 @@ export function LiveChat() {
         />
         <button
           onClick={send}
-          className="px-3 py-2 font-terminal text-xs text-arena-cyan hover:text-white transition-colors"
+          className="px-4 py-2 font-terminal text-xs text-arena-bg bg-arena-purple hover:bg-purple-500 transition-colors font-bold"
         >
           Send
         </button>

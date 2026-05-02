@@ -52,9 +52,9 @@ export function MarketChart({ symbol = "MNTUSDT" }: Props) {
   const isUp = lastPrice >= firstPrice;
 
   return (
-    <div className="flex flex-col h-full bg-arena-surface border border-arena-border rounded-lg overflow-hidden">
+    <div className="flex flex-col h-full glass rounded-xl overflow-hidden glow-green transition-all duration-300">
       <div className="flex items-center justify-between px-4 py-2 border-b border-arena-border">
-        <span className="font-terminal text-xs text-arena-muted tracking-widest uppercase">
+        <span className="font-terminal text-xs text-arena-green tracking-widest uppercase">
           MNT/USD
         </span>
         <div className="flex items-center gap-3">

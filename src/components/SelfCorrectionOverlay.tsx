@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelfCorrections } from "@/hooks/useSelfCorrections";
 import { playCorrection } from "@/lib/sounds";
@@ -8,23 +8,17 @@ const MANTLE_EXPLORER = "https://explorer.sepolia.mantle.xyz";
 
 export function SelfCorrectionOverlay() {
   const { latest } = useSelfCorrections();
-  const [visible, setVisible] = useState(() => false);
-  const [shown, setShown] = useState<string | null>(() => null);
+  const [visible, setVisible] = useState(false);
+  const shownId = useRef<string | null>(null);
 
   useEffect(() => {
-    if (latest && latest.id !== shown) {
-      const t1 = setTimeout(() => {
-        setShown(latest.id);
-        setVisible(true);
-        playCorrection();
-      }, 0);
-      const t2 = setTimeout(() => setVisible(false), 6000);
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-      };
-    }
-  }, [latest, shown]);
+    if (!latest || latest.id === shownId.current) return;
+    shownId.current = latest.id;
+    setVisible(true);
+    playCorrection();
+    const t = setTimeout(() => setVisible(false), 6000);
+    return () => clearTimeout(t);
+  }, [latest]);
 
   return (
     <AnimatePresence>
@@ -47,11 +41,19 @@ export function SelfCorrectionOverlay() {
             transition={{ type: "spring", stiffness: 260, damping: 22 }}
           >
             {/* Red header bar */}
-            <div className="flex items-center gap-2 px-4 py-3 bg-arena-red/30 border-b border-arena-red/60">
-              <span className="w-2 h-2 rounded-full bg-arena-red animate-pulse" />
-              <span className="font-terminal text-xs text-arena-red font-bold tracking-widest uppercase">
-                Self-Correction Triggered
-              </span>
+            <div className="flex items-center justify-between px-4 py-3 bg-arena-red/30 border-b border-arena-red/60">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-arena-red animate-pulse" />
+                <span className="font-terminal text-xs text-arena-red font-bold tracking-widest uppercase">
+                  Self-Correction Triggered
+                </span>
+              </div>
+              <button
+                onClick={() => setVisible(false)}
+                className="font-terminal text-xs text-arena-red/60 hover:text-arena-red transition-colors leading-none"
+              >
+                ✕
+              </button>
             </div>
 
             <div className="px-4 py-3 space-y-2 bg-[#0f0f1a]">

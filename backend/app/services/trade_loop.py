@@ -92,15 +92,16 @@ async def run_cycle(manual: bool = False) -> dict:
         "win" if win else "loss", pnl, tx_hash, cycle_id,
     )
 
-    # Update agent_state
+    # Upsert agent_state — creates row on first cycle, updates on subsequent ones
     await pool.execute(
-        """UPDATE agent_state SET
-           total_trades = total_trades + 1,
-           total_pnl    = total_pnl + $1,
-           win_rate     = (wins::float / GREATEST(total_trades, 1)),
-           updated_at   = now()
-           WHERE agent_id = 'agent-0'""",
-        pnl,
+        """INSERT INTO agent_state (agent_id, total_trades, total_pnl, win_rate, current_params)
+           VALUES ('agent-0', 1, $1, $2, '{}')
+           ON CONFLICT (agent_id) DO UPDATE SET
+               total_trades = agent_state.total_trades + 1,
+               total_pnl    = agent_state.total_pnl + $1,
+               win_rate     = ((agent_state.win_rate * agent_state.total_trades) + $2) / (agent_state.total_trades + 1),
+               updated_at   = now()""",
+        pnl, 1.0 if win else 0.0,
     )
 
     # --- Step 9: Self-correct on loss ---

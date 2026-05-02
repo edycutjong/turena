@@ -1,5 +1,4 @@
 """Tests for app/services/correction.py — 100% coverage."""
-import json
 import pytest
 from unittest.mock import AsyncMock, patch
 

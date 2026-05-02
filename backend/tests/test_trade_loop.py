@@ -1,7 +1,6 @@
 """Tests for app/services/trade_loop.py — 100% coverage."""
-import json
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import app.services.trade_loop as tl_mod
 

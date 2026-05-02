@@ -1,7 +1,7 @@
 """Tests for app/services/db.py — 100% coverage."""
 import os
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, patch
 
 import app.services.db as db_mod
 

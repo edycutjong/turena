@@ -1,8 +1,7 @@
 """Shared fixtures for Turena backend tests."""
 import os
-import asyncio
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 # Set required env vars BEFORE any app imports
 os.environ.setdefault("SUPABASE_URL", "https://testproject.supabase.co")

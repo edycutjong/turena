@@ -1,6 +1,5 @@
 """Tests for app/services/mantle.py — 100% coverage."""
 import os
-import asyncio
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 

@@ -23,7 +23,7 @@ class TestHealthEndpoint:
 class TestRunCycleManual:
     @pytest.mark.asyncio
     async def test_run_cycle_manual(self):
-        with patch("main.asyncio.create_task", side_effect=lambda c: c.close()) as mock_task:
+        with patch("main.asyncio.create_task", side_effect=lambda c: c.close()) as _mock_task:
             from main import app
             transport = ASGITransport(app=app)
             async with AsyncClient(transport=transport, base_url="http://test") as client:
@@ -39,7 +39,7 @@ class TestLifespan:
         original_task = main_mod._auto_cycle_task
 
         with patch.dict(os.environ, {"AUTO_CYCLE": "true"}), \
-             patch("main._auto_cycle_loop", new_callable=AsyncMock) as mock_loop:
+             patch("main._auto_cycle_loop", new_callable=AsyncMock) as _mock_loop:
             # Create a mock task
             mock_task = MagicMock()
             mock_task.cancel = MagicMock()

@@ -1,7 +1,7 @@
 """Tests for app/routers/market.py — 100% coverage."""
 import os
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 from httpx import AsyncClient, ASGITransport
 

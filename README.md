@@ -1,131 +1,171 @@
 <div align="center">
-  <img src="docs/readme_hero.png" alt="Turena Logo" width="800">
+  <img src="docs/readme_hero.png" alt="Turena — The Turing Arena" width="800">
   <h1>TURENA</h1>
   <h3>⚔️ The Turing Arena</h3>
   <p><em>Watch AI Trade. Bet Against It.</em></p>
-  
+
+  [![Live Demo](https://img.shields.io/badge/Live-turena.edycu.dev-brightgreen.svg)](https://turena.edycu.dev)
   [![DoraHacks](https://img.shields.io/badge/DoraHacks-BUIDL-FF761B.svg)](https://dorahacks.io/)
-  [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg)](https://turena.edycu.dev)
   [![Pitch Video](https://img.shields.io/badge/Pitch-Video-red.svg)](https://youtube.com/)
-  <br>
-  <!-- Tech Stack Badges -->
+  [![Mantle Sepolia](https://img.shields.io/badge/Chain-Mantle%20Sepolia-000000.svg)](https://sepolia.mantlescan.xyz)
+  <br><br>
   <img src="https://img.shields.io/badge/Mantle-000000?style=flat-square&logo=mantle&logoColor=white" alt="Mantle" />
   <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" />
   <img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase" />
-  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/DeepSeek-4D6BFE?style=flat-square&logoColor=white" alt="DeepSeek" />
 </div>
 
 ---
 
-## 📸 See it in Action
+## 🎯 What is Turena?
 
-A live Twitch-style prediction market where a DeepSeek R1 trading agent streams its raw Chain-of-Thought reasoning in real-time. You have 15 seconds to counter-trade its decision. Every outcome is permanently recorded on Mantle via ERC-8004.
+A live Twitch-style prediction market where a **DeepSeek R1** trading agent streams its raw Chain-of-Thought reasoning in real-time. You watch it think. You have **15 seconds** to bet against its decision. Every outcome — win, loss, and self-correction — is permanently recorded on **Mantle** via ERC-8004.
+
+> **Live now:** [turena.edycu.dev](https://turena.edycu.dev) — the agent is running continuously on Mantle Sepolia.
+
+---
+
+## 🎬 How It Works
+
+```
+1. AI THINKS OUT LOUD
+   DeepSeek R1 analyzes live Bybit market data.
+   Every reasoning token streams to the terminal in real-time.
+   "...order book shows whale accumulation... confidence 87%... initiating LONG..."
+
+2. 15-SECOND COUNTER-TRADE WINDOW
+   The AI announces its intent. A countdown opens.
+   Connect MetaMask → click Counter-Trade → bet MNT against the AI.
+   The bet is placed on-chain via CounterTradeEscrow.placeBet().
+
+3. ON-CHAIN SETTLEMENT + SELF-CORRECTION
+   Trade executes. Result recorded on Mantle via TuringAgent8004.recordTrade().
+   If the AI loses → SelfCorrection event fires on-chain.
+   Parameters adjust. NFT metadata updates. UI flashes the correction live.
+```
+
+---
+
+## 📜 Smart Contracts (Mantle Sepolia)
+
+Both contracts deployed and **source-verified** on Mantle Sepolia (Chain ID `5003`).
+
+| Contract | Address | Explorer | Verified Source |
+|---|---|---|---|
+| `TuringAgent8004` | `0x3f24Bc75B258d35a347C4A76d49F45020A3457ce` | [Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce) | [Sourcify ✅](https://repo.sourcify.dev/contracts/full_match/5003/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce/) |
+| `CounterTradeEscrow` | `0x766F2485219D5977AE727E6B1738891310EC8f3d` | [Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x766F2485219D5977AE727E6B1738891310EC8f3d) | [Sourcify ✅](https://repo.sourcify.dev/contracts/full_match/5003/0x766F2485219D5977AE727E6B1738891310EC8f3d/) |
+
+**On-chain proof of live activity (verifiable by judges):**
+
+| Event | Tx Hash | What it proves |
+|---|---|---|
+| `SelfCorrection` fired | [`0x13cc6958…`](https://sepolia.mantlescan.xyz/tx/0x13cc6958f0d66e7f52aba0ccc4fe1aeaffc8c56e1bf6f1e0cfc28f50cd9c70be) | AI adjusted `confidence_threshold` 0.7 → 0.75 on-chain |
+| `placeBet` (human) | [`0x3d37eed3…`](https://sepolia.mantlescan.xyz/tx/0x3d37eed32f926c410b2fcda68019ca88c68d68a8b0488adbdecbbd09e5e0bc26) | Real human bet placed against AI during live session |
+| 30+ `recordTrade` txs | [TuringAgent history ↗](https://sepolia.mantlescan.xyz/address/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce) | Continuous autonomous trading on Mantle Sepolia |
+
+---
 
 ## 💡 The Problem & Solution
 
-In today's world, algorithmic AI agents trade autonomously in the dark, and humans are left to guess their strategies.
-**Turena** solves this by forcing the AI to "think out loud" on a live stream, letting humans front-run or counter-trade it before its final order hits the market.
+On-chain AI agents are black boxes. You send them capital, they trade, you pray. The promise of "transparent AI" in crypto has been reduced to JSON logs that no human can parse in real-time.
+
+**Turena** forces the AI to think out loud — every hesitation, every calculation — streamed live before the trade executes. The 15-second window gives humans a genuine economic edge against the AI, creating the first **Human vs. AI prediction market** on Mantle.
 
 **Key Features:**
-- ⚡ **AI Thinks Out Loud:** DeepSeek R1's `reasoning_content` tokens stream character-by-character as it analyzes live Bybit market data.
-- ⏱️ **15-Second Counter Window:** The moment the AI announces its decision, a countdown opens. Place a bet against it using testnet MNT via MetaMask.
-- 🔒 **On-Chain Provenance:** Every trade win/loss and self-correction is recorded on Mantle via `TuringAgent8004` (ERC-8004 dynamic NFT) and `CounterTradeEscrow`. Verify on Mantle Sepolia Explorer.
-- 🧠 **Self-Correction:** When the AI loses, it autonomously adjusts its risk parameters and broadcasts the change on-chain. The UI fires a full-screen overlay showing exactly what changed and why.
+- ⚡ **AI Thinks Out Loud** — DeepSeek R1's `reasoning_content` tokens stream character-by-character in a hacker terminal UI
+- ⏱️ **15-Second Counter Window** — Bet MNT against the AI's position before it executes
+- 🔒 **Immutable On-Chain Record** — Every trade and self-correction recorded via ERC-8004 on Mantle
+- 🧠 **Live Self-Correction** — AI adjusts its own risk parameters on-chain when it loses; full-screen overlay shows exactly what changed
+
+---
 
 ## 🏗️ Architecture & Tech Stack
 
 | Layer | Choice | Why |
 |-------|--------|-----|
-| **Frontend** | Next.js 16 (App Router), React 19 | SSR for landing, client components for real-time UI |
-| **Styling** | Tailwind CSS v4 | Fast iteration, dark mode, responsive |
-| **Real-time** | Supabase Realtime | WebSocket channels for CoT streaming, bet updates — zero infra |
-| **Database** | Supabase PostgreSQL | 5 tables — `trade_cycles`, `counter_trades`, `self_corrections`, `agent_state`, `cot_tokens`. [Full schema →](docs/DATABASE.md) |
-| **AI Backend** | Python (FastAPI) | **DeepSeek R1** (`deepseek-reasoner`) — the only reasoning model that exposes raw `reasoning_content` tokens via SSE streaming |
-| **Market Data** | Bybit API — **Testnet first** | Paper trading on testnet prevents real-money execution during demo |
-| **Smart Contracts** | Solidity 0.8.24 (Hardhat) | ERC-8004 Agent Identity + Counter-Trade Escrow on Mantle |
-| **Chain** | Mantle Testnet (5003) → Mainnet (5000) | Testnet contract address published and verifiable on Mantle Explorer |
-| **Deploy** | Vercel (Frontend) + Railway (Python) | Fast, reliable, global edge |
+| **Frontend** | Next.js 16 (App Router), React 19 | SSR landing page, client components for real-time arena UI |
+| **Styling** | Tailwind CSS v4 | Dark mode, responsive, fast iteration |
+| **Real-time** | Supabase Realtime (`postgres_changes`) | WebSocket push for CoT tokens, bets, corrections — zero infra |
+| **Database** | Supabase PostgreSQL | 5 tables: `trade_cycles`, `cot_tokens`, `counter_trades`, `self_corrections`, `agent_state` |
+| **AI Backend** | Python FastAPI + DeepSeek R1 | `deepseek-reasoner` is the only model exposing raw `reasoning_content` via SSE |
+| **Market Data** | Bybit Testnet + CoinGecko fallback | Paper trading prevents real-money execution; CoinGecko covers region blocks |
+| **Smart Contracts** | Solidity 0.8.24, Hardhat, OpenZeppelin v5 | ERC-8004 identity NFT + bankroll-backed escrow |
+| **Chain** | Mantle Sepolia (5003) | Fast finality for 15-second settlement windows |
+| **Deploy** | Vercel (frontend) + Railway (backend) | Global edge, auto-deploy on push |
 
-> 📐 [Architecture](docs/ARCHITECTURE.md) · 🔌 [API Reference](docs/API.md) · 📜 [Smart Contracts](docs/CONTRACTS.md) · 🗄️ [Database Schema](docs/DATABASE.md)
+### Data Flow
 
-### System Overview
+```
+DeepSeek R1 → reasoning_content tokens
+     ↓ asyncpg INSERT
+Supabase cot_tokens table
+     ↓ postgres_changes WebSocket
+Next.js CoTTerminal component
+     ↓ user clicks Counter-Trade
+MetaMask → CounterTradeEscrow.placeBet() on Mantle
+     ↓ trade executes, result evaluated
+TuringAgent8004.recordTrade() on Mantle
+     ↓ if loss
+TuringAgent8004.recordSelfCorrection() on Mantle
+```
 
-**Vercel** serves the Next.js 16 frontend → subscribes to **Supabase Realtime** (`postgres_changes`) → renders CoT tokens, trades, and bets live. **Railway** runs the Python AI agent → streams reasoning to Supabase → executes trades on Bybit → records results on **Mantle** (ERC-8004 NFT + Escrow).
+> Full diagram → [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · API → [docs/API.md](docs/API.md) · Contracts → [docs/CONTRACTS.md](docs/CONTRACTS.md) · Schema → [docs/DATABASE.md](docs/DATABASE.md)
 
-> 📐 Full system diagram, deployment topology, and event reference → [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-
-## 📜 Smart Contracts (Mantle)
-
-Two contracts deployed and **verified** on Mantle Sepolia (Chain ID `5003`). Full interfaces and Solidity source in [docs/CONTRACTS.md](docs/CONTRACTS.md).
-
-| Contract | Address | Explorer | Source |
-|---|---|---|---|
-| `TuringAgent8004` | `0x3f24Bc75B258d35a347C4A76d49F45020A3457ce` | [Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce) | [Sourcify ✅](https://repo.sourcify.dev/contracts/full_match/5003/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce/) |
-| `CounterTradeEscrow` | `0x766F2485219D5977AE727E6B1738891310EC8f3d` | [Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x766F2485219D5977AE727E6B1738891310EC8f3d) | [Sourcify ✅](https://repo.sourcify.dev/contracts/full_match/5003/0x766F2485219D5977AE727E6B1738891310EC8f3d/) |
-
-**Proof of live activity:**
-- `recordTrade` + `recordSelfCorrection` — 30+ confirmed txs on Mantle Sepolia
-- `placeBet` (human counter-trade) — tx `0x3d37eed3…e0bc26` ✅
-
-**`TuringAgent8004.sol`** — ERC-8004 dynamic NFT. Records every trade (`TradeRecorded` event) and self-correction (`SelfCorrection` event) immutably on-chain. The agent's ELO, win rate, and strategy are readable via `agentStats(tokenId)`.
-
-**`CounterTradeEscrow.sol`** — Bankroll-backed betting escrow. Humans bet against the AI's pool. `placeBet` reverts if bankroll can't cover the bet. Settlement is on-chain — no server controls the outcome. Deployed with 1,000 testnet MNT bankroll.
+---
 
 ## 🔐 Why Mantle + ERC-8004 is Non-Replaceable
 
-> *"Could you swap Mantle out for a database?"* — **No.** Here's why:
+> *"Could you swap Mantle out for a database?"* — **No.**
 
-1. **`recordTrade()`** — Every trade result is an immutable on-chain event. A database record can be edited; a Mantle tx cannot.
-2. **`recordSelfCorrection()`** — The self-correction event emits a `SelfCorrection` log verifiable on Mantle Explorer by tx hash — public *before* the next trade.
-3. **Dynamic NFT metadata** — ERC-8004 allows token metadata to update after each cycle. The agent's ELO, win rate, and strategy are readable on-chain.
-4. **Counter-trade settlement** — `CounterTradeEscrow.settle()` is on-chain. Human payouts are provably fair.
-5. **Bankroll solvency** — The contract's `bankroll` is publicly readable. Bettors verify the AI's pool before placing a bet.
+1. **`recordTrade()`** — Immutable on-chain event. A DB record can be edited; a Mantle tx cannot.
+2. **`recordSelfCorrection()`** — `SelfCorrection` log on Mantle Explorer is public *before* the next trade executes.
+3. **Dynamic NFT** — ERC-8004 metadata updates after each cycle. Agent ELO, win rate, strategy readable on-chain.
+4. **`settle()`** — Escrow settlement is on-chain. No server controls the payout.
+5. **`bankroll`** — Publicly readable. Bettors verify solvency before placing a bet.
 
-> Remove Mantle and you'd need: a trusted settlement server + a mutable audit DB + a separate payout system + a trust model. The entire "Radical Transparency" claim collapses.
+Remove Mantle and you need: a trusted settlement server + mutable audit DB + separate payout system + a trust model. The entire transparency claim collapses.
 
-## 🏆 Sponsor Tracks Targeted
-1. **Mantle Network**: We deployed `TuringAgent8004` and `CounterTradeEscrow` smart contracts to Mantle Sepolia (Chain ID 5003), utilizing fast finality to settle prediction markets in real-time.
-2. **AI Trading & Strategy (BGA)**: Turena implements a transparent, on-chain macro-driven prediction market around an AI quant bot connected to Bybit testnet APIs.
-3. **Consumer & Viral DApps**: The live streaming "Twitch-style" interface gamifies the trading experience, creating a highly shareable consumer application where humans battle against AI.
+---
 
-## 🤝 Sponsors & Partners
-- **Co-Sponsored by:** Tencent Cloud, ELFA, Surf, Orbit AI, Minds, Mirana, OpenCheck, Nansen
-- **Community & AI Partners:** BU, OT, Decipher, Imperial Blockchain & Fintech, Cornell Blockchain, MU Shanghai, Z.AI, Orakle, HKUST Crypto-Fintech Lab, Akindo, KudasaiJP, Rocketpunch, TradeGainTT, Four Pillars, Blockchain, Blockchain Valley, Zhejiang University (浙江大学), Merchant Moe, Cornell Blockchain
-- **Co-Supported by:** DoraHacks, HackQuest
+## 🏆 Tracks Targeted
 
-## 🚀 Run it Locally (For Judges)
+1. **Mantle Network** — `TuringAgent8004` + `CounterTradeEscrow` on Mantle Sepolia; fast finality enables real-time 15-second settlement
+2. **AI Trading & Strategy (BGA)** — Autonomous quant agent with live Bybit integration and on-chain parameter tuning
+3. **Consumer & Viral DApps** — Twitch-style spectator UI; 15-second counter-trade windows create clip-worthy Human vs. AI moments
+
+---
+
+## 🚀 Run Locally (For Judges)
 
 ### Prerequisites
 - Node.js 20+, Python 3.12+
-- MetaMask (or any EIP-1193 wallet)
-- Testnet MNT from [https://faucet.sepolia.mantle.xyz](https://faucet.sepolia.mantle.xyz)
+- MetaMask with Mantle Sepolia configured (see below)
+- Testnet MNT from [faucet.sepolia.mantle.xyz](https://faucet.sepolia.mantle.xyz)
 
-### MetaMask — Add Mantle Sepolia Testnet
+### Add Mantle Sepolia to MetaMask
 
-> **Important:** Do **not** select "Testnet Mantle" from MetaMask's built-in list — that is the old deprecated network. Add the network manually with the values below.
-
-In MetaMask → Settings → Networks → Add a network → Add a network manually:
+> Do **not** use the built-in "Testnet Mantle" — it's the deprecated network. Add manually:
 
 | Field | Value |
 |---|---|
 | Network name | `Mantle Sepolia Testnet` |
-| Default RPC URL | `https://rpc.sepolia.mantle.xyz` |
+| RPC URL | `https://rpc.sepolia.mantle.xyz` |
 | Chain ID | `5003` |
 | Currency symbol | `MNT` |
-| Block explorer URL | `https://sepolia.mantlescan.xyz` |
+| Block explorer | `https://sepolia.mantlescan.xyz` |
 
 ### 1. Frontend
 ```bash
 npm install
 cp .env.example .env.local
-# Fill in: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
-#          NEXT_PUBLIC_TURING_AGENT_ADDRESS, NEXT_PUBLIC_ESCROW_ADDRESS
-#          SUPABASE_SERVICE_ROLE_KEY
-#          BACKEND_URL=http://localhost:8000
-#          NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+# Fill: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+#       NEXT_PUBLIC_TURING_AGENT_ADDRESS, NEXT_PUBLIC_ESCROW_ADDRESS
+#       SUPABASE_SERVICE_ROLE_KEY
+#       BACKEND_URL=http://localhost:8000
+#       NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 npm run dev
 ```
 
@@ -133,73 +173,69 @@ npm run dev
 ```bash
 cd backend
 cp .env.example .env
-# Fill in: DEEPSEEK_API_KEY, BYBIT_API_KEY, BYBIT_API_SECRET
-#          SUPABASE_URL, SUPABASE_DB_PASSWORD, SUPABASE_SERVICE_ROLE_KEY
-#          DEPLOYER_PRIVATE_KEY, TURING_AGENT_ADDRESS, ESCROW_ADDRESS
+# Fill: DEEPSEEK_API_KEY, BYBIT_API_KEY, BYBIT_API_SECRET
+#       SUPABASE_URL, SUPABASE_DB_PASSWORD
+#       DEPLOYER_PRIVATE_KEY, TURING_AGENT_ADDRESS, ESCROW_ADDRESS
 pip install -r requirements.txt
 AUTO_CYCLE=true uvicorn main:app --reload
 ```
 
-### 3. Contracts (already deployed — only needed to redeploy)
+### 3. Contracts (already deployed — only if redeploying)
 ```bash
 cd contracts
 npm install
-# Fill DEPLOYER_PRIVATE_KEY in ../.env
 npx hardhat run scripts/deploy.ts --network mantleTestnet
 ```
 
-### 4. Demo Recording Mode
+### 4. Trigger a cycle manually (demo)
 ```bash
-# Start backend with DEMO_MODE=true
-DEMO_MODE=true AUTO_CYCLE=true uvicorn main:app --reload
-
-# Force a loss + self-correction at the right moment
-./scripts/demo-trigger.sh
+curl -X POST https://turena-production.up.railway.app/agent/run-cycle
+# Then open /arena and click [dev] open counter window to place a bet
 ```
 
 ---
 
-## 🛠️ Key Environment Variables
+## 🛠️ Environment Variables
 
-**Vercel (Frontend)** — see `.env.example`
+**Vercel (Frontend)**
 
 | Variable | Description |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (public, safe for browser) |
-| `NEXT_PUBLIC_TURING_AGENT_ADDRESS` | Deployed TuringAgent8004 contract address |
-| `NEXT_PUBLIC_ESCROW_ADDRESS` | Deployed CounterTradeEscrow contract address |
-| `NEXT_PUBLIC_BACKEND_URL` | Railway backend URL — used client-side for manual cycle trigger. Local: `http://localhost:8000` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key — server-side API routes only, never exposed to browser |
-| `BACKEND_URL` | Railway backend URL — server-side proxy only. Local: `http://localhost:8000` |
-| `DEMO_MODE` | `true` enables `/agent/mock-outcome` endpoint. **Never `true` in production** |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key — safe for browser |
+| `NEXT_PUBLIC_TURING_AGENT_ADDRESS` | `0x3f24Bc75B258d35a347C4A76d49F45020A3457ce` |
+| `NEXT_PUBLIC_ESCROW_ADDRESS` | `0x766F2485219D5977AE727E6B1738891310EC8f3d` |
+| `NEXT_PUBLIC_BACKEND_URL` | Railway URL — client-side cycle trigger |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-side only, never exposed to browser |
+| `BACKEND_URL` | Railway URL — server-side price proxy |
+| `DEMO_MODE` | `true` enables `/agent/mock-outcome`. **Never `true` in production** |
 
-**Railway (Backend)** — see `backend/.env.example`
+**Railway (Backend)**
 
 | Variable | Description |
 |---|---|
-| `SUPABASE_URL` | Supabase project URL (same value as `NEXT_PUBLIC_SUPABASE_URL`) |
-| `SUPABASE_DB_PASSWORD` | Actual database password — **not** the JWT service role key. Get from Supabase Dashboard → Project Settings → Database → Database Password |
-| `SUPABASE_POOLER_HOST` | Optional. Transaction pooler host for your region. Defaults to `aws-1-ap-southeast-2.pooler.supabase.com` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (used for admin operations) |
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_DB_PASSWORD` | DB password (not the JWT key) — from Supabase → Settings → Database |
+| `SUPABASE_POOLER_HOST` | Transaction pooler host — defaults to `aws-1-ap-southeast-2.pooler.supabase.com` |
 | `DEEPSEEK_API_KEY` | DeepSeek API key |
-| `BYBIT_API_KEY` | Bybit testnet API key |
-| `BYBIT_API_SECRET` | Bybit testnet API secret |
-| `BYBIT_TESTNET` | Set to `true` for testnet |
+| `BYBIT_API_KEY` / `BYBIT_API_SECRET` | Bybit testnet credentials |
 | `DEPLOYER_PRIVATE_KEY` | Mantle deployer wallet private key |
-| `TURING_AGENT_ADDRESS` | Deployed TuringAgent8004 contract address |
-| `ESCROW_ADDRESS` | Deployed CounterTradeEscrow contract address |
-| `MANTLE_RPC_URL` | Mantle RPC URL (defaults to `https://rpc.sepolia.mantle.xyz`) |
-| `AUTO_CYCLE` | `true` starts the trade loop automatically on server boot |
-| `DEMO_MODE` | `true` enables `/agent/mock-outcome` endpoint. **Never `true` in production** |
+| `TURING_AGENT_ADDRESS` / `ESCROW_ADDRESS` | Deployed contract addresses |
+| `AUTO_CYCLE` | `true` runs trade cycles continuously on boot |
+| `DEMO_MODE` | `true` enables `/agent/mock-outcome`. **Never `true` in production** |
 
-**FE ↔ BE Communication**
+---
 
-| What | Route | How |
-|---|---|---|
-| Live price chart | `/api/market/price` | Next.js server route proxies to Railway via `BACKEND_URL` |
-| Manual cycle trigger | `POST /agent/run-cycle` | Arena page calls Railway directly via `NEXT_PUBLIC_BACKEND_URL` |
-| CoT token stream | Supabase Realtime | `postgres_changes` on `cot_tokens` — no backend involved |
-| Trade cycle updates | Supabase Realtime | `postgres_changes` on `trade_cycles` — no backend involved |
-| Self-correction alerts | Supabase Realtime | `postgres_changes` on `self_corrections` — no backend involved |
-| Counter-trade bets | MetaMask → Mantle | `placeBet()` on `CounterTradeEscrow` — no backend involved |
+## 🤝 Sponsors & Partners
+
+**Co-Sponsored by:** Tencent Cloud, ELFA, Surf, Orbit AI, Minds, Mirana, OpenCheck, Nansen
+
+**Community Partners:** BU, OT, Decipher, Imperial Blockchain & Fintech, Cornell Blockchain, MU Shanghai, Z.AI, Orakle, HKUST Crypto-Fintech Lab, Akindo, KudasaiJP, Rocketpunch, TradeGainTT, Four Pillars, Blockchain Valley, Zhejiang University, Merchant Moe
+
+**Co-Supported by:** DoraHacks, HackQuest
+
+---
+
+## 📄 License
+
+MIT

@@ -13,9 +13,11 @@ async def get_pool() -> asyncpg.Pool:
 
 
 def _build_url() -> str:
-    # Supabase connection string format
+    # Requires SUPABASE_DB_PASSWORD — the actual database password from
+    # Supabase Dashboard → Project Settings → Database → Database Password
+    # This is NOT the service role JWT key.
     project = os.environ["SUPABASE_URL"].split("//")[1].split(".")[0]
-    password = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
+    password = os.environ["SUPABASE_DB_PASSWORD"]
     return f"postgresql://postgres.{project}:{password}@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
 
 

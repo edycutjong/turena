@@ -16,7 +16,9 @@ class TestNextNonce:
         mock_w3 = MagicMock()
         mock_w3.eth.get_transaction_count = AsyncMock(side_effect=[5, 3])
 
-        result = await mantle_mod._next_nonce(mock_w3, "0xabc")
+        with patch("app.services.mantle.AsyncWeb3") as MockAW3:
+            MockAW3.to_checksum_address = MagicMock(return_value="0xAbc")
+            result = await mantle_mod._next_nonce(mock_w3, "0xabc")
         assert result == 5
         assert mantle_mod._nonce == 6  # incremented after use
         mantle_mod._nonce = None  # cleanup
@@ -27,7 +29,9 @@ class TestNextNonce:
         mock_w3 = MagicMock()
         mock_w3.eth.get_transaction_count = AsyncMock(side_effect=[10, 8])
 
-        result = await mantle_mod._next_nonce(mock_w3, "0xabc")
+        with patch("app.services.mantle.AsyncWeb3") as MockAW3:
+            MockAW3.to_checksum_address = MagicMock(return_value="0xAbc")
+            result = await mantle_mod._next_nonce(mock_w3, "0xabc")
         assert result == 10
         assert mantle_mod._nonce == 11
         mantle_mod._nonce = None  # cleanup
@@ -38,7 +42,9 @@ class TestNextNonce:
         mock_w3 = MagicMock()
         mock_w3.eth.get_transaction_count = AsyncMock(side_effect=[5, 5])
 
-        result = await mantle_mod._next_nonce(mock_w3, "0xabc")
+        with patch("app.services.mantle.AsyncWeb3") as MockAW3:
+            MockAW3.to_checksum_address = MagicMock(return_value="0xAbc")
+            result = await mantle_mod._next_nonce(mock_w3, "0xabc")
         assert result == 20
         assert mantle_mod._nonce == 21
         mantle_mod._nonce = None  # cleanup

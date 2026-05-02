@@ -3,23 +3,25 @@ import json
 import asyncio
 from web3 import AsyncWeb3
 from web3.middleware import ExtraDataToPOAMiddleware
+from web3.types import Nonce
 
 _nonce: int | None = None
 _nonce_lock = asyncio.Lock()
 
 
-async def _next_nonce(w3: AsyncWeb3, address: str) -> int:
+async def _next_nonce(w3: AsyncWeb3, address: str) -> Nonce:
     global _nonce
     async with _nonce_lock:
+        checksummed = AsyncWeb3.to_checksum_address(address)
         on_chain = max(
-            await w3.eth.get_transaction_count(address, "latest"),
-            await w3.eth.get_transaction_count(address, "pending"),
+            await w3.eth.get_transaction_count(checksummed, "latest"),
+            await w3.eth.get_transaction_count(checksummed, "pending"),
         )
         if _nonce is None or on_chain > _nonce:
             _nonce = on_chain
         nonce = _nonce
         _nonce += 1
-        return nonce
+        return Nonce(nonce)
 
 # Minimal ABIs — only functions we call
 AGENT_ABI = json.loads('[{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"win","type":"bool"},{"name":"pnl","type":"int256"}],"name":"recordTrade","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"param","type":"string"},{"name":"oldVal","type":"uint256"},{"name":"newVal","type":"uint256"},{"name":"regretScore","type":"uint256"},{"name":"newStrategy","type":"string"}],"name":"recordSelfCorrection","outputs":[],"stateMutability":"nonpayable","type":"function"}]')

@@ -88,7 +88,7 @@ export function TradeHistory() {
           Trade History
         </span>
       </div>
-      <div className="overflow-x-auto max-h-48 overflow-y-auto">
+      <div className="overflow-x-auto min-h-48 max-h-48 overflow-y-auto">
         <table className="w-full font-terminal text-xs">
           <thead className="sticky top-0 bg-arena-surface z-10">
             <tr className="text-arena-muted border-b border-arena-border">

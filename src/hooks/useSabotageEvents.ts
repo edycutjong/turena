@@ -12,13 +12,7 @@ interface SabotageTotals {
 }
 
 export function useSabotageEvents(cycleId: string | null): SabotageTotals {
-  const [events, setEvents] = useState<SabotageEvent[]>([]);
-  const [prevCycleId, setPrevCycleId] = useState(cycleId);
-
-  if (cycleId !== prevCycleId) {
-    setPrevCycleId(cycleId);
-    setEvents([]);
-  }
+  const [events, setEvents] = useState<SabotageEvent[]>(() => []);
 
   useEffect(() => {
     if (!cycleId) {
@@ -52,9 +46,10 @@ export function useSabotageEvents(cycleId: string | null): SabotageTotals {
     return () => { supabase.removeChannel(channel); };
   }, [cycleId]);
 
-  const totalMnt = events.reduce((sum, e) => sum + Number(e.mnt_paid), 0);
+  const filteredEvents = events.filter((e) => e.cycle_id === cycleId);
+  const totalMnt = filteredEvents.reduce((sum, e) => sum + Number(e.mnt_paid), 0);
 
-  const byCard = events.reduce<Record<string, { count: number; totalMnt: number }>>(
+  const byCard = filteredEvents.reduce<Record<string, { count: number; totalMnt: number }>>(
     (acc, e) => {
       const k = e.card_type;
       if (!acc[k]) acc[k] = { count: 0, totalMnt: 0 };
@@ -65,5 +60,5 @@ export function useSabotageEvents(cycleId: string | null): SabotageTotals {
     {}
   );
 
-  return { events, totalMnt, byCard };
+  return { events: filteredEvents, totalMnt, byCard };
 }

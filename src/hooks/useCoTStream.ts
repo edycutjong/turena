@@ -12,7 +12,11 @@ export function useCoTStream(cycleId: string | null) {
   useEffect(() => {
     if (!cycleId) return;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTokens([]);
+
+    // Subscribe for tokens inserted after we joined
+    const seenIds = new Set<number>();
 
     // Fetch all tokens already in the DB for late-joining browsers
     supabase
@@ -21,11 +25,12 @@ export function useCoTStream(cycleId: string | null) {
       .eq("cycle_id", cycleId)
       .order("id", { ascending: true })
       .then(({ data }) => {
-        if (data && data.length > 0) setTokens(data);
+        const rows = data as CotToken[] | null;
+        if (rows && rows.length > 0) {
+          rows.forEach((t) => seenIds.add(t.id));
+          setTokens(rows);
+        }
       });
-
-    // Subscribe for tokens inserted after we joined
-    const seenIds = new Set<number>();
     const channel = supabase
       .channel(`cot-${cycleId}-${Math.random().toString(36).slice(2, 8)}`)
       .on(

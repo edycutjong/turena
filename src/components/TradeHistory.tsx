@@ -97,99 +97,100 @@ export function TradeHistory() {
         )}
       </div>
       <div className="overflow-x-auto h-48 overflow-y-auto flex flex-col relative">
-        <table className="w-full font-terminal text-xs">
-          <thead className="sticky top-0 bg-arena-surface z-10">
-            <tr className="text-arena-muted border-b border-arena-border">
-              <th className="text-left px-4 py-2">Cycle</th>
-              <th className="text-left px-4 py-2">Event</th>
-              <th className="text-left px-4 py-2">Detail</th>
-              <th className="text-right px-4 py-2">P&amp;L / Score</th>
-              <th className="text-left px-4 py-2">Tx</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => {
-              if (row.kind === "trade") {
-                const t = row.data;
-                const intent = t.intent as { action?: string; asset?: string } | null;
+        {rows.length > 0 ? (
+          <table className="w-full font-terminal text-xs">
+            <thead className="sticky top-0 bg-arena-surface z-10">
+              <tr className="text-arena-muted border-b border-arena-border">
+                <th className="text-left px-4 py-2">Cycle</th>
+                <th className="text-left px-4 py-2">Event</th>
+                <th className="text-left px-4 py-2">Detail</th>
+                <th className="text-right px-4 py-2">P&amp;L / Score</th>
+                <th className="text-left px-4 py-2">Tx</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => {
+                if (row.kind === "trade") {
+                  const t = row.data;
+                  const intent = t.intent as { action?: string; asset?: string } | null;
+                  return (
+                    <tr
+                      key={row.key}
+                      className={`border-b border-arena-border/50 hover:bg-white/5 transition-colors ${
+                        t.result === "win" ? "flash-win" : t.result === "loss" ? "flash-loss" : ""
+                      }`}
+                    >
+                      <td className="px-4 py-2 text-arena-muted">#{t.cycle_number}</td>
+                      <td className="px-4 py-2 uppercase">
+                        {intent?.action ?? "—"}{" "}
+                        <span className="text-arena-muted">{intent?.asset ?? ""}</span>
+                      </td>
+                      <td className={`px-4 py-2 font-bold ${
+                        t.result === "win" ? "text-arena-green" : "text-arena-red"
+                      }`}>
+                        {t.result.toUpperCase()}
+                        {t.self_corrected && (
+                          <span className="ml-1 text-arena-purple text-xs">⚡</span>
+                        )}
+                      </td>
+                      <td className={`px-4 py-2 text-right tabular-nums ${
+                        (t.pnl_mnt ?? 0) >= 0 ? "text-arena-green" : "text-arena-red"
+                      }`}>
+                        {t.pnl_mnt != null
+                          ? `${t.pnl_mnt >= 0 ? "+" : ""}${t.pnl_mnt.toFixed(2)}`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-2">
+                        {t.tx_hash ? (
+                          <a
+                            href={`https://explorer.sepolia.mantle.xyz/tx/${t.tx_hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-arena-cyan hover:underline"
+                          >
+                            {t.tx_hash.slice(0, 8)}…
+                          </a>
+                        ) : "—"}
+                      </td>
+                    </tr>
+                  );
+                }
+
+                // Self-correction row
+                const c = row.data;
                 return (
-                  <tr
-                    key={row.key}
-                    className={`border-b border-arena-border/50 hover:bg-white/5 transition-colors ${
-                      t.result === "win" ? "flash-win" : t.result === "loss" ? "flash-loss" : ""
-                    }`}
-                  >
-                    <td className="px-4 py-2 text-arena-muted">#{t.cycle_number}</td>
-                    <td className="px-4 py-2 uppercase">
-                      {intent?.action ?? "—"}{" "}
-                      <span className="text-arena-muted">{intent?.asset ?? ""}</span>
+                  <tr key={row.key} className="border-b border-arena-border/50 bg-arena-purple/5 hover:bg-arena-purple/10 transition-colors">
+                    <td className="px-4 py-2 text-arena-muted">—</td>
+                    <td className="px-4 py-2 text-arena-purple font-bold">⚡ CORRECTION</td>
+                    <td className="px-4 py-2 text-arena-muted">
+                      <span className="text-arena-text">{c.parameter_changed}</span>
+                      {" "}
+                      <span className="text-arena-red tabular-nums">{Number(c.old_value).toFixed(3)}</span>
+                      {" → "}
+                      <span className="text-arena-green tabular-nums">{Number(c.new_value).toFixed(3)}</span>
                     </td>
-                    <td className={`px-4 py-2 font-bold ${
-                      t.result === "win" ? "text-arena-green" : "text-arena-red"
-                    }`}>
-                      {t.result.toUpperCase()}
-                      {t.self_corrected && (
-                        <span className="ml-1 text-arena-purple text-xs">⚡</span>
-                      )}
-                    </td>
-                    <td className={`px-4 py-2 text-right tabular-nums ${
-                      (t.pnl_mnt ?? 0) >= 0 ? "text-arena-green" : "text-arena-red"
-                    }`}>
-                      {t.pnl_mnt != null
-                        ? `${t.pnl_mnt >= 0 ? "+" : ""}${t.pnl_mnt.toFixed(2)}`
-                        : "—"}
+                    <td className="px-4 py-2 text-right text-arena-purple tabular-nums">
+                      -{c.regret_score}
                     </td>
                     <td className="px-4 py-2">
-                      {t.tx_hash ? (
+                      {c.tx_hash ? (
                         <a
-                          href={`https://explorer.sepolia.mantle.xyz/tx/${t.tx_hash}`}
+                          href={`https://explorer.sepolia.mantle.xyz/tx/${c.tx_hash}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-arena-cyan hover:underline"
                         >
-                          {t.tx_hash.slice(0, 8)}…
+                          {c.tx_hash.slice(0, 8)}…
                         </a>
                       ) : "—"}
                     </td>
                   </tr>
                 );
-              }
-
-              // Self-correction row
-              const c = row.data;
-              return (
-                <tr key={row.key} className="border-b border-arena-border/50 bg-arena-purple/5 hover:bg-arena-purple/10 transition-colors">
-                  <td className="px-4 py-2 text-arena-muted">—</td>
-                  <td className="px-4 py-2 text-arena-purple font-bold">⚡ CORRECTION</td>
-                  <td className="px-4 py-2 text-arena-muted">
-                    <span className="text-arena-text">{c.parameter_changed}</span>
-                    {" "}
-                    <span className="text-arena-red tabular-nums">{Number(c.old_value).toFixed(3)}</span>
-                    {" → "}
-                    <span className="text-arena-green tabular-nums">{Number(c.new_value).toFixed(3)}</span>
-                  </td>
-                  <td className="px-4 py-2 text-right text-arena-purple tabular-nums">
-                    -{c.regret_score}
-                  </td>
-                  <td className="px-4 py-2">
-                    {c.tx_hash ? (
-                      <a
-                        href={`https://explorer.sepolia.mantle.xyz/tx/${c.tx_hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-arena-cyan hover:underline"
-                      >
-                        {c.tx_hash.slice(0, 8)}…
-                      </a>
-                    ) : "—"}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        {rows.length === 0 && (
-          <div className="flex-1 flex items-center justify-center text-arena-muted italic min-h-[100px]">
+              })}
+            </tbody>
+          </table>
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-arena-muted italic h-full">
             {isLoading ? (
               <span className="text-arena-cyan animate-pulse">Loading trades...</span>
             ) : (

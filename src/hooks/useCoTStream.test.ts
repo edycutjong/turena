@@ -7,6 +7,10 @@ vi.mock("@/lib/supabase", () => ({
   supabase: {
     channel: vi.fn(),
     removeChannel: vi.fn(),
+    from: vi.fn().mockReturnThis(),
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    order: vi.fn().mockResolvedValue({ data: [] }),
   },
 }));
 
@@ -36,7 +40,7 @@ describe("useCoTStream", () => {
     });
 
     expect(result.current).toEqual([]);
-    expect(supabase.channel).toHaveBeenCalledWith("cot-cycle-1");
+    expect(supabase.channel).toHaveBeenCalledWith(expect.stringContaining("cot-cycle-1"));
     expect(mockSubscribe).toHaveBeenCalled();
 
     const token1 = { id: 1, token: "hello" };
@@ -59,7 +63,7 @@ describe("useCoTStream", () => {
     });
     
     expect(supabase.removeChannel).toHaveBeenCalledTimes(1);
-    expect(supabase.channel).toHaveBeenCalledWith("cot-cycle-2");
+    expect(supabase.channel).toHaveBeenCalledWith(expect.stringContaining("cot-cycle-2"));
 
     unmount();
     expect(supabase.removeChannel).toHaveBeenCalledTimes(2);

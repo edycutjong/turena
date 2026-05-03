@@ -7,6 +7,7 @@ import Link from "next/link";
 import { motion, animate } from "framer-motion";
 import { CorrectionTimeline } from "@/components/CorrectionTimeline";
 import { AppNav } from "@/components/AppNav";
+import { MANTLE_EXPLORER } from "@/lib/escrow";
 
 type CounterTrade = Database["public"]["Tables"]["counter_trades"]["Row"];
 type AgentState = Database["public"]["Tables"]["agent_state"]["Row"];
@@ -185,7 +186,7 @@ export default function LeaderboardPage() {
                       </td>
                       <td className="px-4 py-2 text-arena-cyan">
                         <a
-                          href={`https://explorer.sepolia.mantle.xyz/address/${t.wallet}`}
+                          href={`${MANTLE_EXPLORER}/address/${t.wallet}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="hover:underline"

@@ -2,10 +2,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Database } from "@/lib/database.types";
+import { MANTLE_EXPLORER } from "@/lib/escrow";
 
 type SelfCorrection = Database["public"]["Tables"]["self_corrections"]["Row"];
-
-const MANTLE_EXPLORER = "https://explorer.sepolia.mantle.xyz";
 
 function formatTime(iso: string) {
   const d = new Date(iso);

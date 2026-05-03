@@ -92,7 +92,7 @@ export function CoTTerminal({ cycleId, onEmotionChange }: Props) {
           </div>
         )}
 
-        <div className="whitespace-pre-wrap break-words">
+        <div className="whitespace-pre-wrap wrap-break-word">
           {tokens.map((token) => {
             if (token.token_type === "emotion") return null; // rendered as badge, not inline
             const isNew = !initialTokens.has(token.id);

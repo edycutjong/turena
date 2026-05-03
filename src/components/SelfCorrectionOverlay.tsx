@@ -3,8 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelfCorrections } from "@/hooks/useSelfCorrections";
 import { playCorrection } from "@/lib/sounds";
-
-const MANTLE_EXPLORER = "https://explorer.sepolia.mantle.xyz";
+import { MANTLE_EXPLORER } from "@/lib/escrow";
 
 export function SelfCorrectionOverlay() {
   const { latest } = useSelfCorrections();

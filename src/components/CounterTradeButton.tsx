@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { placeBetTx } from "@/lib/escrow";
+import { placeBetTx, MANTLE_EXPLORER } from "@/lib/escrow";
 import type { Address } from "viem";
 
 interface Props {
@@ -166,7 +166,7 @@ export function CounterTradeButton({
             className="font-terminal text-xs text-center"
           >
             <a
-              href={`https://explorer.sepolia.mantle.xyz/tx/${txHash}`}
+              href={`${MANTLE_EXPLORER}/tx/${txHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-arena-cyan hover:underline"

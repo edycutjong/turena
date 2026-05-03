@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { playWin, playLoss } from "@/lib/sounds";
 import type { Database } from "@/lib/database.types";
+import { MANTLE_EXPLORER } from "@/lib/escrow";
 
 type TradeCycle = Database["public"]["Tables"]["trade_cycles"]["Row"];
 type SelfCorrection = Database["public"]["Tables"]["self_corrections"]["Row"];
@@ -143,7 +144,7 @@ export function TradeHistory() {
                       <td className="px-4 py-2">
                         {t.tx_hash ? (
                           <a
-                            href={`https://explorer.sepolia.mantle.xyz/tx/${t.tx_hash}`}
+                            href={`${MANTLE_EXPLORER}/tx/${t.tx_hash}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-arena-cyan hover:underline"
@@ -175,7 +176,7 @@ export function TradeHistory() {
                     <td className="px-4 py-2">
                       {c.tx_hash ? (
                         <a
-                          href={`https://explorer.sepolia.mantle.xyz/tx/${c.tx_hash}`}
+                          href={`${MANTLE_EXPLORER}/tx/${c.tx_hash}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-arena-cyan hover:underline"

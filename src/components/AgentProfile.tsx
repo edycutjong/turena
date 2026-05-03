@@ -1,5 +1,6 @@
 "use client";
 import { useAgentState } from "@/hooks/useAgentState";
+import { MANTLE_EXPLORER } from "@/lib/escrow";
 
 type EmotionState = "CONFIDENT" | "CAUTIOUS" | "ANXIOUS" | "TILTED" | "MELTDOWN";
 
@@ -47,7 +48,7 @@ export function AgentProfile({ agentId, contractAddress }: Props) {
     `}>
       {/* NFT card header */}
       <div className={`relative px-4 py-4 border-b border-arena-border transition-colors duration-500
-        ${isMeltdown ? "bg-gradient-to-br from-red-900/20 to-red-800/10" : "bg-gradient-to-br from-arena-purple/20 to-arena-cyan/10"}
+        ${isMeltdown ? "bg-linear-to-br from-red-900/20 to-red-800/10" : "bg-linear-to-br from-arena-purple/20 to-arena-cyan/10"}
       `}>
         <div className="flex items-center gap-3">
           {/* Agent avatar — pulses red during meltdown */}
@@ -110,7 +111,7 @@ export function AgentProfile({ agentId, contractAddress }: Props) {
       {contractAddress && (
         <div className="px-4 py-2 border-t border-arena-border bg-black/20">
           <a
-            href={`https://sepolia.mantlescan.xyz/address/${contractAddress}`}
+            href={`${MANTLE_EXPLORER}/address/${contractAddress}`}
             target="_blank"
             rel="noopener noreferrer"
             className="font-terminal text-xs text-arena-cyan hover:underline flex items-center gap-1"

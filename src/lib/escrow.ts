@@ -1,17 +1,25 @@
 import { createWalletClient, createPublicClient, custom, http, parseEther, type Address } from "viem";
 
+const _chainId = Number(process.env.NEXT_PUBLIC_MANTLE_CHAIN_ID ?? "5003");
+const _isMainnet = _chainId === 5000;
+
 export const MANTLE_TESTNET = {
-  id: 5003,
-  name: "Mantle Sepolia Testnet",
+  id: _chainId,
+  name: _isMainnet ? "Mantle" : "Mantle Sepolia Testnet",
   nativeCurrency: { name: "MNT", symbol: "MNT", decimals: 18 },
   rpcUrls: {
     default: {
       http: [
-        process.env.NEXT_PUBLIC_MANTLE_RPC_URL ?? "https://rpc.sepolia.mantle.xyz",
+        process.env.NEXT_PUBLIC_MANTLE_RPC_URL ??
+          (_isMainnet ? "https://rpc.mantle.xyz" : "https://rpc.sepolia.mantle.xyz"),
       ],
     },
   },
-} as const;
+};
+
+export const MANTLE_EXPLORER =
+  process.env.NEXT_PUBLIC_MANTLE_EXPLORER ??
+  (_isMainnet ? "https://explorer.mantle.xyz" : "https://explorer.sepolia.mantle.xyz");
 
 export const ESCROW_ABI = [
   {

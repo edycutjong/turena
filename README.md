@@ -1,3 +1,20 @@
+## 🎯 For Judges — Play Immediately
+
+> **Pre-funded wallet — import this private key into MetaMask to start playing with real testnet MNT:**
+>
+> ```
+> Private Key: a8e6c8dc23e439fc56892c11e1855aa3a9b3449267ef07fa5a5500659d5dcc25
+> Address:     0x1c6C3fF9AE61671e39b92B2867b9cB299267bae2
+> Network:     Mantle Sepolia Testnet (Chain ID: 5003)
+> RPC URL:     https://rpc.sepolia.mantle.xyz
+> ```
+>
+> 1. Open MetaMask → Import Account → paste the private key
+> 2. Add Mantle Sepolia (the app will prompt you automatically)
+> 3. Go to **[turena.edycu.dev/arena](https://turena.edycu.dev/arena)** → Connect Wallet → sabotage the AI or place a counter-trade
+
+---
+
 <div align="center">
   <img src="docs/readme_hero.png" alt="Turena — The Turing Arena" width="800">
   <h1>TURENA</h1>

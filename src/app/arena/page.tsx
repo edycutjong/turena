@@ -142,7 +142,6 @@ export default function ArenaPage() {
             <span>Mantle Testnet</span>
             <span className="text-arena-muted/40">|</span>
             <Link href="/leaderboard" className="hover:text-arena-cyan transition-colors">Leaderboard</Link>
-            <Link href="/replay" className="hover:text-arena-cyan transition-colors">Replay</Link>
             <span className="text-arena-muted/40">|</span>
             <button
               onClick={toggleMute}

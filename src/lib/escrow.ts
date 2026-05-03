@@ -4,7 +4,13 @@ export const MANTLE_TESTNET = {
   id: 5003,
   name: "Mantle Sepolia Testnet",
   nativeCurrency: { name: "MNT", symbol: "MNT", decimals: 18 },
-  rpcUrls: { default: { http: ["https://rpc.sepolia.mantle.xyz"] } },
+  rpcUrls: {
+    default: {
+      http: [
+        process.env.NEXT_PUBLIC_MANTLE_RPC_URL ?? "https://rpc.sepolia.mantle.xyz",
+      ],
+    },
+  },
 } as const;
 
 export const ESCROW_ABI = [

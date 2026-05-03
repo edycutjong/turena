@@ -98,7 +98,6 @@ export default function Home() {
       <AppNav right={
         <>
           <Link href="/leaderboard" className="hover:text-arena-cyan transition-colors">Leaderboard</Link>
-          <Link href="/replay" className="hover:text-arena-cyan transition-colors">Replay</Link>
           <ArenaLink href="/arena" className="arena-cta px-4 py-1.5 rounded border border-arena-cyan text-arena-cyan font-terminal font-bold text-sm tracking-wider">
             Enter Arena →
           </ArenaLink>

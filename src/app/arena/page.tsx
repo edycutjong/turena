@@ -126,7 +126,7 @@ export default function ArenaPage() {
   const isTilted   = emotion === "TILTED";
 
   return (
-    <div className={`flex flex-col h-screen overflow-hidden transition-colors duration-500
+    <div className={`flex flex-col min-h-screen md:h-screen md:overflow-hidden transition-colors duration-500
       ${isMeltdown ? "bg-red-950/30" : "bg-arena-bg"}
       ${isTilted   ? "bg-orange-950/20" : ""}
     `}>
@@ -165,7 +165,7 @@ export default function ArenaPage() {
       />
 
       {/* Main split layout */}
-      <div className="flex flex-1 overflow-hidden gap-2 p-2 flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row md:flex-1 md:overflow-hidden gap-2 p-2">
         {/* Left — Agent profile + Market chart */}
         <div className="flex flex-col md:w-[38%] gap-2 arena-panel arena-panel-d1">
           <AgentProfile agentId={AGENT_ID} contractAddress={CONTRACT_ADDRESS} />
@@ -190,7 +190,7 @@ export default function ArenaPage() {
         </div>
 
         {/* Center — Timer + Intent + Bet button */}
-        <div className="flex flex-col items-center justify-center gap-5 md:w-[24%] arena-panel arena-panel-d3">
+        <div className="flex flex-col items-center justify-center gap-5 py-6 md:py-0 md:w-[24%] arena-panel arena-panel-d3">
           <CountdownTimer
             durationSeconds={WINDOW_SECONDS}
             startedAt={windowStartedAt}
@@ -240,7 +240,7 @@ export default function ArenaPage() {
       )}
 
       {/* Bottom — Trade history */}
-      <div className="px-2 pb-2 arena-panel arena-panel-d5">
+      <div className="px-2 pb-2 md:shrink-0 arena-panel arena-panel-d5">
         <TradeHistory />
       </div>
 

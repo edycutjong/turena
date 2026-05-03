@@ -41,6 +41,18 @@ export default function ArenaPage() {
   const prevPhaseRef = useRef<string | null>(null);
   const prevCycleIdRef = useRef<string | null>(null);
 
+  // Sync window open/start time from DB — works for any browser that loads mid-window
+  useEffect(() => {
+    const phase = cycle?.phase ?? null;
+    if (phase === "SABOTAGE_WINDOW" && cycle?.sabotage_started_at) {
+      setWindowStartedAt(new Date(cycle.sabotage_started_at));
+      setWindowOpen(true);
+      playWindowOpen();
+    } else if (phase !== "SABOTAGE_WINDOW") {
+      setWindowOpen(false);
+    }
+  }, [cycle?.phase, cycle?.sabotage_started_at]);
+
   // Ambient sound: play during READING phase
   useEffect(() => {
     const phase = cycle?.phase ?? null;

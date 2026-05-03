@@ -16,6 +16,7 @@ export interface Database {
           tx_hash: string | null;
           phase: "PENDING" | "READING" | "SABOTAGE_WINDOW" | "VERDICT" | "SETTLED" | null;
           sabotage_summary: string | null;
+          sabotage_started_at: string | null;
           created_at: string;
         };
         Insert: Omit<Database["public"]["Tables"]["trade_cycles"]["Row"], "id" | "created_at">;

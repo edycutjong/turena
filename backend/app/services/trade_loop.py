@@ -32,7 +32,13 @@ async def _get_consecutive_losses(pool: asyncpg.Pool) -> int:
 
 
 async def _set_phase(pool: asyncpg.Pool, cycle_id: str, phase: str) -> None:
-    await pool.execute("UPDATE trade_cycles SET phase = $1 WHERE id = $2", phase, cycle_id)
+    if phase == "SABOTAGE_WINDOW":
+        await pool.execute(
+            "UPDATE trade_cycles SET phase = $1, sabotage_started_at = now() WHERE id = $2",
+            phase, cycle_id,
+        )
+    else:
+        await pool.execute("UPDATE trade_cycles SET phase = $1 WHERE id = $2", phase, cycle_id)
 
 
 async def _fetch_sabotage_summary(pool: asyncpg.Pool, cycle_id: str) -> str:

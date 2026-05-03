@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { playTick, playUrgentTick, playWindowOpen, playCorrection, playWin, playLoss } from "./sounds";
+import { playTick, playUrgentTick, playWindowOpen, playCorrection, playWin, playLoss, setMuted, isMuted, playCardPlayed, startAmbient, stopAmbient } from "./sounds";
 
 describe("sounds", () => {
   let originalWindow: any;
@@ -14,17 +14,20 @@ describe("sounds", () => {
   });
 
   it("handles when window is undefined", async () => {
+    setMuted(false);
     global.window = undefined as any;
     // Should return early and not throw
     expect(() => playTick()).not.toThrow();
   });
 
   it("handles when AudioContext is undefined", () => {
+    setMuted(false);
     global.window = {} as any;
     expect(() => playTick()).not.toThrow();
   });
 
   it("plays all sounds", () => {
+    setMuted(false);
     const mockGain = {
       connect: vi.fn(),
       gain: {
@@ -38,6 +41,7 @@ describe("sounds", () => {
       connect: vi.fn(),
       frequency: {
         setValueAtTime: vi.fn(),
+        linearRampToValueAtTime: vi.fn(),
       },
       start: vi.fn(),
       stop: vi.fn(),
@@ -64,9 +68,36 @@ describe("sounds", () => {
     expect(() => playCorrection()).not.toThrow();
     expect(() => playWin()).not.toThrow();
     expect(() => playLoss()).not.toThrow();
+    expect(() => playCardPlayed()).not.toThrow();
+
+    // Ambient tests
+    expect(() => startAmbient()).not.toThrow();
+    // Second call should return early (already started)
+    expect(() => startAmbient()).not.toThrow();
+    expect(() => stopAmbient()).not.toThrow();
+    // Stop again when null
+    expect(() => stopAmbient()).not.toThrow();
     
     // At least one oscillator created per beep
     expect(mockAudioContext).toHaveBeenCalledTimes(1);
     expect(mockOscillator.start).toHaveBeenCalled();
+    
+    setMuted(true);
+    expect(isMuted()).toBe(true);
+  });
+
+  it("handles ambient with undefined AudioContext", () => {
+    setMuted(false);
+    global.window = {} as any;
+    expect(() => startAmbient()).not.toThrow();
+    expect(() => stopAmbient()).not.toThrow();
+    setMuted(true);
+  });
+
+  it("returns early when muted", () => {
+    setMuted(true);
+    // Should not throw or crash
+    expect(() => playTick()).not.toThrow();
+    expect(() => startAmbient()).not.toThrow();
   });
 });

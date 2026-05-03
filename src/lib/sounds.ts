@@ -74,3 +74,49 @@ export function playLoss() {
   beep(220, 0.2, "sawtooth", 0.08, 0);
   beep(180, 0.3, "sawtooth", 0.06, 0.15);
 }
+
+/** "Incoming!" alert when a FUD card is played */
+export function playCardPlayed() {
+  beep(300, 0.06, "sawtooth", 0.08, 0);
+  beep(600, 0.06, "sawtooth", 0.1, 0.07);
+  beep(1000, 0.15, "square", 0.12, 0.14);
+  beep(800, 0.2, "square", 0.09, 0.3);
+}
+
+let ambientOsc: OscillatorNode | null = null;
+let ambientGain: GainNode | null = null;
+
+/** Start low electronic drone during READING phase */
+export function startAmbient() {
+  if (_muted) return;
+  const ac = getCtx();
+  if (!ac || ambientOsc) return;
+
+  ambientOsc = ac.createOscillator();
+  ambientGain = ac.createGain();
+  ambientOsc.connect(ambientGain);
+  ambientGain.connect(ac.destination);
+
+  ambientOsc.type = "sine";
+  ambientOsc.frequency.setValueAtTime(55, ac.currentTime);
+  // slow LFO-like drift
+  ambientOsc.frequency.linearRampToValueAtTime(60, ac.currentTime + 4);
+  ambientOsc.frequency.linearRampToValueAtTime(55, ac.currentTime + 8);
+
+  ambientGain.gain.setValueAtTime(0, ac.currentTime);
+  ambientGain.gain.linearRampToValueAtTime(0.06, ac.currentTime + 1.5);
+
+  ambientOsc.start(ac.currentTime);
+}
+
+/** Fade out and stop ambient drone */
+export function stopAmbient() {
+  const ac = getCtx();
+  if (!ac || !ambientOsc || !ambientGain) return;
+
+  ambientGain.gain.setValueAtTime(ambientGain.gain.value, ac.currentTime);
+  ambientGain.gain.linearRampToValueAtTime(0.001, ac.currentTime + 0.8);
+  ambientOsc.stop(ac.currentTime + 0.85);
+  ambientOsc = null;
+  ambientGain = null;
+}

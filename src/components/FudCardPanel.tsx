@@ -1,8 +1,10 @@
 "use client";
 import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useWallet } from "@/hooks/useWallet";
 import { useSabotageEvents } from "@/hooks/useSabotageEvents";
 import { sendSabotageTx } from "@/lib/escrow";
+import { playCardPlayed } from "@/lib/sounds";
 import type { Address } from "viem";
 
 // Preset FUD cards — no free-text to prevent toxic content on-chain
@@ -69,12 +71,16 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
   const { byCard } = useSabotageEvents(cycleId);
   const [pending, setPending] = useState<FudCardId | null>(null);
   const [played, setPlayed] = useState<Set<FudCardId>>(new Set());
+  const [throwing, setThrowing] = useState<FudCardId | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const playCard = useCallback(async (card: (typeof FUD_CARDS)[number]) => {
     if (!cycleId || !connected || !address) return;
     setError(null);
     setPending(card.id);
+    setThrowing(card.id);
+    playCardPlayed();
+    setTimeout(() => setThrowing(null), 600);
 
     try {
       // 1. Plain transfer to escrow receive() — MNT added to AI bankroll, emits BankrollFunded.
@@ -141,36 +147,55 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
           {FUD_CARDS.map((card) => {
             const isPlayed  = played.has(card.id);
             const isPending = pending === card.id;
+            const isThrowing = throwing === card.id;
             const playCount = byCard[card.label]?.count ?? 0;
 
             return (
-              <button
-                key={card.id}
-                onClick={() => playCard(card)}
-                disabled={isPending || !cycleId}
-                className={`relative flex flex-col items-center gap-2 p-3 rounded-lg border transition-all duration-200
-                  font-terminal text-xs
-                  ${card.color} ${card.bg}
-                  ${isPlayed ? "opacity-70 scale-95" : ""}
-                  ${isPending ? "animate-pulse" : ""}
-                  disabled:opacity-40 disabled:cursor-not-allowed
-                `}
-              >
-                <span className="text-2xl">{card.emoji}</span>
-                <span className="text-center leading-tight">{card.label}</span>
-                <span className="font-bold tabular-nums">
-                  {isPending ? "signing…" : `${card.cost} MNT`}
-                </span>
-                {/* Per-card play count badge */}
-                {playCount > 0 && (
-                  <span className="absolute top-1 left-1 font-terminal text-[10px] font-bold bg-orange-900/60 text-orange-300 rounded px-1">
-                    ×{playCount}
+              <div key={card.id} className="relative overflow-visible">
+                <motion.button
+                  onClick={() => playCard(card)}
+                  disabled={isPending || !cycleId}
+                  animate={isThrowing ? { y: -28, scale: 1.15, opacity: 0.7 } : { y: 0, scale: isPlayed ? 0.95 : 1, opacity: isPlayed ? 0.7 : 1 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className={`relative w-full flex flex-col items-center gap-2 p-3 rounded-lg border
+                    font-terminal text-xs
+                    ${card.color} ${card.bg}
+                    ${isPending ? "animate-pulse" : ""}
+                    disabled:opacity-40 disabled:cursor-not-allowed
+                    transition-colors duration-200
+                  `}
+                >
+                  <span className="text-2xl">{card.emoji}</span>
+                  <span className="text-center leading-tight">{card.label}</span>
+                  <span className="font-bold tabular-nums">
+                    {isPending ? "signing…" : `${card.cost} MNT`}
                   </span>
-                )}
-                {isPlayed && (
-                  <span className="absolute top-1 right-1 text-[10px] text-arena-green font-bold">✓</span>
-                )}
-              </button>
+                  {playCount > 0 && (
+                    <span className="absolute top-1 left-1 font-terminal text-[10px] font-bold bg-orange-900/60 text-orange-300 rounded px-1">
+                      ×{playCount}
+                    </span>
+                  )}
+                  {isPlayed && (
+                    <span className="absolute top-1 right-1 text-[10px] text-arena-green font-bold">✓</span>
+                  )}
+                </motion.button>
+
+                {/* Flying emoji particle on throw */}
+                <AnimatePresence>
+                  {isThrowing && (
+                    <motion.span
+                      initial={{ opacity: 1, y: 0, x: 0, scale: 1 }}
+                      animate={{ opacity: 0, y: -80, x: (Math.random() - 0.5) * 40, scale: 0.4 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.55, ease: "easeOut" }}
+                      className="absolute inset-0 flex items-center justify-center text-3xl pointer-events-none z-10"
+                      style={{ top: 0, left: 0, right: 0 }}
+                    >
+                      {card.emoji}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </div>
             );
           })}
         </div>

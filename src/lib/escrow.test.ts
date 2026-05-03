@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getPublicClient, placeBetTx, MANTLE_TESTNET } from './escrow';
+import { getPublicClient, placeBetTx, sendSabotageTx, MANTLE_TESTNET } from './escrow';
 import * as viem from 'viem';
 
 vi.mock('viem', async (importOriginal) => {
@@ -105,6 +105,70 @@ describe('escrow.ts', () => {
       } as any);
 
       const hash = await placeBetTx(1, 10, mockContractAddress);
+
+      expect(mockSwitchChain).toHaveBeenCalled();
+      expect(mockAddChain).toHaveBeenCalledWith({ chain: MANTLE_TESTNET });
+      expect(hash).toBe('0xTxHash');
+    });
+  });
+
+  describe('sendSabotageTx', () => {
+    const mockEscrowAddress = '0x1234567890123456789012345678901234567890';
+
+    beforeEach(() => {
+      Object.defineProperty(global, 'window', {
+        value: { ethereum: { isMetaMask: true } },
+        writable: true,
+      });
+    });
+
+    it('throws error if MetaMask is not found', async () => {
+      Object.defineProperty(global, 'window', { value: { ethereum: undefined }, writable: true });
+      await expect(sendSabotageTx(10, mockEscrowAddress)).rejects.toThrow('MetaMask not found');
+    });
+
+    it('creates a wallet client, switches chain, and calls sendTransaction', async () => {
+      const mockRequestAddresses = vi.fn().mockResolvedValue(['0xAccount']);
+      const mockSwitchChain = vi.fn().mockResolvedValue(undefined);
+      const mockSendTransaction = vi.fn().mockResolvedValue('0xTxHash');
+      
+      vi.mocked(viem.custom).mockReturnValue('mock-custom-transport' as any);
+      vi.mocked(viem.createWalletClient).mockReturnValue({
+        requestAddresses: mockRequestAddresses,
+        switchChain: mockSwitchChain,
+        sendTransaction: mockSendTransaction,
+      } as any);
+
+      const hash = await sendSabotageTx(10, mockEscrowAddress);
+
+      expect(viem.createWalletClient).toHaveBeenCalledWith({
+        chain: MANTLE_TESTNET,
+        transport: 'mock-custom-transport',
+      });
+      expect(mockSwitchChain).toHaveBeenCalledWith({ id: MANTLE_TESTNET.id });
+      expect(mockSendTransaction).toHaveBeenCalledWith({
+        to: mockEscrowAddress,
+        value: viem.parseEther('10'),
+        account: '0xAccount',
+      });
+      expect(hash).toBe('0xTxHash');
+    });
+
+    it('adds chain if switchChain fails', async () => {
+      const mockRequestAddresses = vi.fn().mockResolvedValue(['0xAccount']);
+      const mockSwitchChain = vi.fn().mockRejectedValue(new Error('Chain not found'));
+      const mockAddChain = vi.fn().mockResolvedValue(undefined);
+      const mockSendTransaction = vi.fn().mockResolvedValue('0xTxHash');
+      
+      vi.mocked(viem.custom).mockReturnValue('mock-custom-transport' as any);
+      vi.mocked(viem.createWalletClient).mockReturnValue({
+        requestAddresses: mockRequestAddresses,
+        switchChain: mockSwitchChain,
+        addChain: mockAddChain,
+        sendTransaction: mockSendTransaction,
+      } as any);
+
+      const hash = await sendSabotageTx(10, mockEscrowAddress);
 
       expect(mockSwitchChain).toHaveBeenCalled();
       expect(mockAddChain).toHaveBeenCalledWith({ chain: MANTLE_TESTNET });

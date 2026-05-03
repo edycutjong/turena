@@ -75,4 +75,10 @@ describe("CountdownTimer", () => {
     expect(getByText("sabotage window")).toBeInTheDocument();
     expect(getByText("▶ sabotage the AI now")).toBeInTheDocument();
   });
+
+  it("does not display sabotage hint when phase is not SABOTAGE_WINDOW", () => {
+    const { queryByText, getByText } = render(<CountdownTimer durationSeconds={60} startedAt={null} phase={null} />);
+    expect(getByText("waiting")).toBeInTheDocument();
+    expect(queryByText("▶ sabotage the AI now")).not.toBeInTheDocument();
+  });
 });

@@ -188,9 +188,13 @@ export function TradeHistory() {
             })}
           </tbody>
         </table>
-        {!isLoading && rows.length === 0 && (
+        {rows.length === 0 && (
           <div className="flex-1 flex items-center justify-center text-arena-muted italic min-h-[100px]">
-            No completed trades yet
+            {isLoading ? (
+              <span className="text-arena-cyan animate-pulse">Loading trades...</span>
+            ) : (
+              "No completed trades yet"
+            )}
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 "use client";
 export const dynamic = "force-dynamic";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { CoTTerminal, type EmotionState } from "@/components/CoTTerminal";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { CounterTradeButton } from "@/components/CounterTradeButton";
@@ -12,11 +12,13 @@ import { SelfCorrectionOverlay } from "@/components/SelfCorrectionOverlay";
 import { LiveChat } from "@/components/LiveChat";
 import { FudCardPanel } from "@/components/FudCardPanel";
 import { TugOfWarBar } from "@/components/TugOfWarBar";
+import { SabotageFeed } from "@/components/SabotageFeed";
+import { ConfettiBurst } from "@/components/ConfettiBurst";
 import { useActiveCycle } from "@/hooks/useActiveCycle";
 import { useCounterTrades } from "@/hooks/useCounterTrades";
 import { useWallet } from "@/hooks/useWallet";
 import Link from "next/link";
-import { playWindowOpen, setMuted, isMuted } from "@/lib/sounds";
+import { playWindowOpen, setMuted, startAmbient, stopAmbient, playWin, playLoss } from "@/lib/sounds";
 import { AppNav } from "@/components/AppNav";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS;
@@ -34,6 +36,41 @@ export default function ArenaPage() {
   const [triggering, setTriggering] = useState(false);
   const [emotion, setEmotion] = useState<EmotionState>("CONFIDENT");
   const [muted, setMutedState] = useState(true);
+  const [burstType, setBurstType] = useState<"win" | "loss" | null>(null);
+
+  const prevPhaseRef = useRef<string | null>(null);
+  const prevCycleIdRef = useRef<string | null>(null);
+
+  // Ambient sound: play during READING phase
+  useEffect(() => {
+    const phase = cycle?.phase ?? null;
+    if (phase === "READING") {
+      startAmbient();
+    } else {
+      stopAmbient();
+    }
+  }, [cycle?.phase]);
+
+  // Settlement burst: trigger when cycle transitions to SETTLED
+  useEffect(() => {
+    const phase    = cycle?.phase ?? null;
+    const cycleId  = cycle?.id    ?? null;
+    const prevPhase   = prevPhaseRef.current;
+    const prevCycleId = prevCycleIdRef.current;
+
+    if (phase === "SETTLED" && prevPhase !== "SETTLED" && cycleId === prevCycleId) {
+      if (cycle?.result === "win") {
+        setBurstType("win");
+        playWin();
+      } else if (cycle?.result === "loss") {
+        setBurstType("loss");
+        playLoss();
+      }
+    }
+
+    prevPhaseRef.current   = phase;
+    prevCycleIdRef.current = cycleId;
+  }, [cycle]);
 
   const toggleMute = useCallback(() => {
     setMutedState((prev) => {
@@ -177,6 +214,11 @@ export default function ArenaPage() {
         </div>
       )}
 
+      {/* Live sabotage feed ticker */}
+      {(cycle?.phase === "SABOTAGE_WINDOW" || cycle?.phase === "VERDICT") && (
+        <SabotageFeed cycleId={cycle.id} />
+      )}
+
       {/* Tug of War bar — visible during SABOTAGE_WINDOW and VERDICT */}
       {(cycle?.phase === "SABOTAGE_WINDOW" || cycle?.phase === "VERDICT") && (
         <div className="px-2 pb-0">
@@ -191,6 +233,9 @@ export default function ArenaPage() {
 
       {/* Global self-correction overlay */}
       <SelfCorrectionOverlay />
+
+      {/* Settlement particle burst */}
+      <ConfettiBurst type={burstType} onDone={() => setBurstType(null)} />
     </div>
   );
 }

@@ -12,11 +12,22 @@ export function useCoTStream(cycleId: string | null) {
   useEffect(() => {
     if (!cycleId) return;
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTokens([]);
 
+    // Fetch all tokens already in the DB for late-joining browsers
+    supabase
+      .from("cot_tokens")
+      .select("*")
+      .eq("cycle_id", cycleId)
+      .order("id", { ascending: true })
+      .then(({ data }) => {
+        if (data && data.length > 0) setTokens(data);
+      });
+
+    // Subscribe for tokens inserted after we joined
+    const seenIds = new Set<number>();
     const channel = supabase
-      .channel(`cot-${cycleId}`)
+      .channel(`cot-${cycleId}-${Math.random().toString(36).slice(2, 8)}`)
       .on(
         "postgres_changes",
         {
@@ -26,7 +37,11 @@ export function useCoTStream(cycleId: string | null) {
           filter: `cycle_id=eq.${cycleId}`,
         },
         (payload) => {
-          setTokens((prev) => [...prev, payload.new as CotToken]);
+          const token = payload.new as CotToken;
+          // Guard against duplicates between the initial fetch and realtime stream
+          if (seenIds.has(token.id)) return;
+          seenIds.add(token.id);
+          setTokens((prev) => [...prev, token]);
         }
       )
       .subscribe();

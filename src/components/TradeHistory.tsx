@@ -33,7 +33,7 @@ export function TradeHistory() {
     ]).then(([tradesRes, corrRes]) => {
       if (tradesRes.data) {
         setTrades(tradesRes.data as TradeCycle[]);
-        prevTradeIds.current = new Set(tradesRes.data.map((t) => t.id));
+        prevTradeIds.current = new Set((tradesRes.data as TradeCycle[]).map((t) => t.id));
       }
       if (corrRes.data) {
         setCorrections(corrRes.data as SelfCorrection[]);

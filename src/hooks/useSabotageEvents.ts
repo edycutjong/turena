@@ -13,7 +13,6 @@ interface SabotageTotals {
 
 export function useSabotageEvents(cycleId: string | null): SabotageTotals {
   const [events, setEvents] = useState<SabotageEvent[]>([]);
-
   useEffect(() => {
     if (!cycleId) {
       setEvents([]);
@@ -28,8 +27,10 @@ export function useSabotageEvents(cycleId: string | null): SabotageTotals {
       .order("created_at", { ascending: true })
       .then(({ data }) => { if (data) setEvents(data); });
 
+    // Unique name per effect run — Math.random avoids collisions across multiple hook instances
+    const channelName = `sabotage-${cycleId}-${Math.random().toString(36).slice(2, 8)}`;
     const channel = supabase
-      .channel(`sabotage-${cycleId}`)
+      .channel(channelName)
       .on(
         "postgres_changes",
         {

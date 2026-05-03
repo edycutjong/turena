@@ -7,7 +7,6 @@ type CounterTrade = Database["public"]["Tables"]["counter_trades"]["Row"];
 
 export function useCounterTrades(cycleId: string | null) {
   const [trades, setTrades] = useState<CounterTrade[]>([]);
-
   useEffect(() => {
     if (!cycleId) return;
 
@@ -20,8 +19,10 @@ export function useCounterTrades(cycleId: string | null) {
       .eq("cycle_id", cycleId)
       .then(({ data }) => { if (data) setTrades(data); });
 
+    // Unique name per effect run — Math.random avoids collisions across multiple hook instances
+    const channelName = `counter-trades-${cycleId}-${Math.random().toString(36).slice(2, 8)}`;
     const channel = supabase
-      .channel(`counter-trades-${cycleId}`)
+      .channel(channelName)
       .on(
         "postgres_changes",
         {

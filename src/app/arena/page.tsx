@@ -16,13 +16,13 @@ import { useActiveCycle } from "@/hooks/useActiveCycle";
 import { useCounterTrades } from "@/hooks/useCounterTrades";
 import { useWallet } from "@/hooks/useWallet";
 import Link from "next/link";
-import { playWindowOpen } from "@/lib/sounds";
+import { playWindowOpen, setMuted, isMuted } from "@/lib/sounds";
 import { AppNav } from "@/components/AppNav";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS;
 const AGENT_ID = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS ?? "agent-0";
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://turena-production.up.railway.app";
-const WINDOW_SECONDS = 15;
+const WINDOW_SECONDS = 20;
 
 export default function ArenaPage() {
   const cycle = useActiveCycle();
@@ -33,6 +33,14 @@ export default function ArenaPage() {
   const [windowOpen, setWindowOpen] = useState(false);
   const [triggering, setTriggering] = useState(false);
   const [emotion, setEmotion] = useState<EmotionState>("CONFIDENT");
+  const [muted, setMutedState] = useState(true);
+
+  const toggleMute = useCallback(() => {
+    setMutedState((prev) => {
+      setMuted(!prev);
+      return !prev;
+    });
+  }, []);
 
   const triggerCycle = useCallback(async () => {
     setTriggering(true);
@@ -84,6 +92,14 @@ export default function ArenaPage() {
             <span className="text-arena-muted/40">|</span>
             <Link href="/leaderboard" className="hover:text-arena-cyan transition-colors">Leaderboard</Link>
             <Link href="/replay" className="hover:text-arena-cyan transition-colors">Replay</Link>
+            <span className="text-arena-muted/40">|</span>
+            <button
+              onClick={toggleMute}
+              className="font-terminal text-xs text-arena-muted hover:text-arena-text transition-colors"
+              title={muted ? "Unmute sounds" : "Mute sounds"}
+            >
+              {muted ? "🔇" : "🔊"}
+            </button>
             <span className="text-arena-muted/40">|</span>
             {connected && walletAddress ? (
               <span className="text-arena-green">
@@ -157,7 +173,7 @@ export default function ArenaPage() {
       {/* FUD Cards — visible during SABOTAGE_WINDOW */}
       {cycle?.phase === "SABOTAGE_WINDOW" && (
         <div className="px-2 pb-0">
-          <FudCardPanel cycleId={cycle.id} isOpen={cycle.phase === "SABOTAGE_WINDOW"} />
+          <FudCardPanel cycleId={cycle.id} cycleNumber={cycle.cycle_number} isOpen={cycle.phase === "SABOTAGE_WINDOW"} />
         </div>
       )}
 

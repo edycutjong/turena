@@ -1,7 +1,9 @@
 "use client";
 import { useState, useCallback } from "react";
-import { parseEther } from "viem";
 import { useWallet } from "@/hooks/useWallet";
+import { useSabotageEvents } from "@/hooks/useSabotageEvents";
+import { placeBetTx } from "@/lib/escrow";
+import type { Address } from "viem";
 
 // Preset FUD cards — no free-text to prevent toxic content on-chain
 export const FUD_CARDS = [
@@ -56,21 +58,32 @@ export type FudCardId = (typeof FUD_CARDS)[number]["id"];
 
 interface Props {
   cycleId: string | null;
+  cycleNumber: number | null;
   isOpen: boolean;
 }
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://turena-production.up.railway.app";
+const ESCROW_ADDRESS = process.env.NEXT_PUBLIC_ESCROW_ADDRESS as Address | undefined;
 
-export function FudCardPanel({ cycleId, isOpen }: Props) {
+export function FudCardPanel({ cycleId, cycleNumber, isOpen }: Props) {
   const { address, connected, connect } = useWallet();
+  const { byCard } = useSabotageEvents(cycleId);
   const [pending, setPending] = useState<FudCardId | null>(null);
   const [played, setPlayed] = useState<Set<FudCardId>>(new Set());
+  const [error, setError] = useState<string | null>(null);
 
   const playCard = useCallback(async (card: (typeof FUD_CARDS)[number]) => {
-    if (!cycleId || !connected || !address) return;
-
+    if (!cycleId || !connected || !address || !cycleNumber) return;
+    setError(null);
     setPending(card.id);
+
     try {
+      // 1. On-chain MNT payment — bet against the AI (forAI=false) with the card cost
+      if (ESCROW_ADDRESS) {
+        await placeBetTx(cycleNumber, card.cost, ESCROW_ADDRESS);
+      }
+
+      // 2. Record sabotage in DB so backend injects it into the verdict prompt
       const res = await fetch(`${BACKEND_URL}/agent/sabotage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -82,13 +95,18 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
           mnt_paid: card.cost,
         }),
       });
+
       if (res.ok) {
         setPlayed((prev) => new Set([...prev, card.id]));
+      } else {
+        setError("Card played but DB record failed");
       }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Transaction failed");
     } finally {
       setPending(null);
     }
-  }, [cycleId, connected, address]);
+  }, [cycleId, cycleNumber, connected, address]);
 
   if (!isOpen) return null;
 
@@ -102,6 +120,12 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
           Each card injects disinformation into its reasoning
         </p>
       </div>
+
+      {error && (
+        <div className="px-4 py-2 bg-red-900/20 border-b border-red-500/20">
+          <p className="font-terminal text-xs text-red-400">{error}</p>
+        </div>
+      )}
 
       {!connected ? (
         <div className="p-4 text-center">
@@ -117,6 +141,7 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
           {FUD_CARDS.map((card) => {
             const isPlayed  = played.has(card.id);
             const isPending = pending === card.id;
+            const playCount = byCard[card.label]?.count ?? 0;
 
             return (
               <button
@@ -126,7 +151,7 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
                 className={`relative flex flex-col items-center gap-2 p-3 rounded-lg border transition-all duration-200
                   font-terminal text-xs
                   ${card.color} ${card.bg}
-                  ${isPlayed ? "opacity-60 scale-95" : ""}
+                  ${isPlayed ? "opacity-70 scale-95" : ""}
                   ${isPending ? "animate-pulse" : ""}
                   disabled:opacity-40 disabled:cursor-not-allowed
                 `}
@@ -134,8 +159,14 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
                 <span className="text-2xl">{card.emoji}</span>
                 <span className="text-center leading-tight">{card.label}</span>
                 <span className="font-bold tabular-nums">
-                  {isPending ? "..." : `${card.cost} MNT`}
+                  {isPending ? "signing…" : `${card.cost} MNT`}
                 </span>
+                {/* Per-card play count badge */}
+                {playCount > 0 && (
+                  <span className="absolute top-1 left-1 font-terminal text-[10px] font-bold bg-orange-900/60 text-orange-300 rounded px-1">
+                    ×{playCount}
+                  </span>
+                )}
                 {isPlayed && (
                   <span className="absolute top-1 right-1 text-[10px] text-arena-green font-bold">✓</span>
                 )}

@@ -1,4 +1,8 @@
 let ctx: AudioContext | null = null;
+let _muted = true; // default muted — judges hate auto-play
+
+export function setMuted(v: boolean) { _muted = v; }
+export function isMuted() { return _muted; }
 
 function getCtx(): AudioContext | null {
   if (typeof window === "undefined" || typeof window.AudioContext === "undefined") return null;
@@ -13,6 +17,7 @@ function beep(
   gainPeak = 0.12,
   delay = 0
 ) {
+  if (_muted) return;
   const ac = getCtx();
   if (!ac) return;
   const osc = ac.createOscillator();

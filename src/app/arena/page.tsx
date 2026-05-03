@@ -173,7 +173,7 @@ export default function ArenaPage() {
       {/* FUD Cards — visible during SABOTAGE_WINDOW */}
       {cycle?.phase === "SABOTAGE_WINDOW" && (
         <div className="px-2 pb-0">
-          <FudCardPanel cycleId={cycle.id} cycleNumber={cycle.cycle_number} isOpen={cycle.phase === "SABOTAGE_WINDOW"} />
+          <FudCardPanel cycleId={cycle.id} isOpen={cycle.phase === "SABOTAGE_WINDOW"} />
         </div>
       )}
 

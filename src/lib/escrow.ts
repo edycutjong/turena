@@ -71,3 +71,32 @@ export async function placeBetTx(
 
   return hash;
 }
+
+// Send MNT directly to the escrow's receive() — adds to AI bankroll, emits BankrollFunded.
+// Used for FUD card payments: saboteur pays, AI's war chest grows, no payout to sender.
+export async function sendSabotageTx(
+  amountMnt: number,
+  escrowAddress: Address,
+): Promise<`0x${string}`> {
+  if (typeof window === "undefined" || !window.ethereum) {
+    throw new Error("MetaMask not found");
+  }
+  const walletClient = createWalletClient({
+    chain: MANTLE_TESTNET,
+    transport: custom(window.ethereum),
+  });
+
+  const [account] = await walletClient.requestAddresses();
+
+  await walletClient.switchChain({ id: MANTLE_TESTNET.id }).catch(() => {
+    return walletClient.addChain({ chain: MANTLE_TESTNET });
+  });
+
+  const hash = await walletClient.sendTransaction({
+    to: escrowAddress,
+    value: parseEther(amountMnt.toString()),
+    account,
+  });
+
+  return hash;
+}

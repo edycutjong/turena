@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 import { useWallet } from "@/hooks/useWallet";
 import { useSabotageEvents } from "@/hooks/useSabotageEvents";
-import { placeBetTx } from "@/lib/escrow";
+import { sendSabotageTx } from "@/lib/escrow";
 import type { Address } from "viem";
 
 // Preset FUD cards — no free-text to prevent toxic content on-chain
@@ -58,14 +58,13 @@ export type FudCardId = (typeof FUD_CARDS)[number]["id"];
 
 interface Props {
   cycleId: string | null;
-  cycleNumber: number | null;
   isOpen: boolean;
 }
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://turena-production.up.railway.app";
 const ESCROW_ADDRESS = process.env.NEXT_PUBLIC_ESCROW_ADDRESS as Address | undefined;
 
-export function FudCardPanel({ cycleId, cycleNumber, isOpen }: Props) {
+export function FudCardPanel({ cycleId, isOpen }: Props) {
   const { address, connected, connect } = useWallet();
   const { byCard } = useSabotageEvents(cycleId);
   const [pending, setPending] = useState<FudCardId | null>(null);
@@ -73,14 +72,15 @@ export function FudCardPanel({ cycleId, cycleNumber, isOpen }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const playCard = useCallback(async (card: (typeof FUD_CARDS)[number]) => {
-    if (!cycleId || !connected || !address || !cycleNumber) return;
+    if (!cycleId || !connected || !address) return;
     setError(null);
     setPending(card.id);
 
     try {
-      // 1. On-chain MNT payment — bet against the AI (forAI=false) with the card cost
+      // 1. Plain transfer to escrow receive() — MNT added to AI bankroll, emits BankrollFunded.
+      //    Not a bet: saboteur gets no payout, AI's war chest grows.
       if (ESCROW_ADDRESS) {
-        await placeBetTx(cycleNumber, card.cost, ESCROW_ADDRESS);
+        await sendSabotageTx(card.cost, ESCROW_ADDRESS);
       }
 
       // 2. Record sabotage in DB so backend injects it into the verdict prompt
@@ -106,7 +106,7 @@ export function FudCardPanel({ cycleId, cycleNumber, isOpen }: Props) {
     } finally {
       setPending(null);
     }
-  }, [cycleId, cycleNumber, connected, address]);
+  }, [cycleId, connected, address]);
 
   if (!isOpen) return null;
 

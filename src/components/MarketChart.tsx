@@ -10,20 +10,23 @@ interface Props { symbol?: string; }
 
 export function MarketChart({ symbol = "MNTUSDT" }: Props) {
   const [candles, setCandles] = useState<Candle[]>([]);
+  const [source, setSource] = useState<string>("Bybit");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const push = (price: number) =>
+  const push = (price: number, src?: string) => {
     setCandles((prev) => [
       ...prev.slice(-59),
       { time: new Date().toLocaleTimeString(), price },
     ]);
+    if (src) setSource(src === "coingecko-fallback" ? "CoinGecko" : "Bybit");
+  };
 
   useEffect(() => {
-    // Initial fetch + seed history
     fetch(`/api/market/price?symbol=${encodeURIComponent(symbol)}`)
       .then((r) => r.json())
       .then((d) => {
         if (!d.price) return;
+        setSource(d.source === "coingecko-fallback" ? "CoinGecko" : "Bybit");
         const now = Date.now();
         const seed: Candle[] = Array.from({ length: 30 }, (_, i) => ({
           time: new Date(now - (29 - i) * 10_000).toLocaleTimeString(),
@@ -33,11 +36,10 @@ export function MarketChart({ symbol = "MNTUSDT" }: Props) {
       })
       .catch(() => {});
 
-    // Poll CoinGecko every 10 s via backend proxy
     intervalRef.current = setInterval(() => {
       fetch(`/api/market/price?symbol=${encodeURIComponent(symbol)}`)
         .then((r) => r.json())
-        .then((d) => { if (d.price) push(d.price); })
+        .then((d) => { if (d.price) push(d.price, d.source); })
         .catch(() => {});
     }, 10_000);
 
@@ -62,7 +64,7 @@ export function MarketChart({ symbol = "MNTUSDT" }: Props) {
             ${lastPrice.toFixed(4)}
           </span>
           <span className="font-terminal text-[10px] text-arena-muted border border-arena-border rounded px-1">
-            CoinGecko
+            {source}
           </span>
         </div>
       </div>

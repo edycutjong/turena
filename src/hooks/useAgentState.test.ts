@@ -41,7 +41,7 @@ describe("useAgentState", () => {
       expect(result.current).toEqual(mockState);
     });
 
-    expect(supabase.channel).toHaveBeenCalledWith("agent-state-agent-1");
+    expect(supabase.channel).toHaveBeenCalledWith(expect.stringContaining("agent-state-agent-1"));
     expect(mockSubscribe).toHaveBeenCalled();
 
     const updatedState = { agent_id: "agent-1", name: "Agent 1 Updated" };

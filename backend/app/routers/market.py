@@ -1,19 +1,32 @@
-import os
 import random
 import httpx
 import ccxt.async_support as ccxt
+import os
 from fastapi import APIRouter
 
 router = APIRouter()
 
+# Bybit mainnet public REST — no auth, no sandbox, works from Railway
+_BYBIT_TICKER_URL = "https://api.bybit.com/v5/market/tickers"
 
-def _bybit():
-    return ccxt.bybit({
-        "apiKey":  os.getenv("BYBIT_API_KEY", ""),
-        "secret":  os.getenv("BYBIT_API_SECRET", ""),
-        "sandbox": os.getenv("BYBIT_TESTNET", "true").lower() == "true",
-        "timeout": 8000,
-    })
+
+async def _bybit_spot_price(symbol: str) -> dict:
+    """Direct Bybit mainnet public ticker — bypasses ccxt sandbox routing."""
+    async with httpx.AsyncClient(timeout=6) as client:
+        # Try spot first, then linear (perpetual)
+        for category in ("spot", "linear"):
+            r = await client.get(_BYBIT_TICKER_URL, params={"category": category, "symbol": symbol})
+            r.raise_for_status()
+            data = r.json()
+            items = data.get("result", {}).get("list", [])
+            if items:
+                t = items[0]
+                price = float(t.get("lastPrice") or t.get("last") or 0)
+                bid   = float(t.get("bid1Price") or t.get("bidPrice") or price * 0.9998)
+                ask   = float(t.get("ask1Price") or t.get("askPrice") or price * 1.0002)
+                if price:
+                    return {"price": price, "bid": bid, "ask": ask}
+    raise ValueError(f"No Bybit price for {symbol}")
 
 
 async def _coingecko_price() -> float:
@@ -21,19 +34,27 @@ async def _coingecko_price() -> float:
     return await _cached()
 
 
+def _bybit_ccxt():
+    return ccxt.bybit({
+        "apiKey":  os.getenv("BYBIT_API_KEY", ""),
+        "secret":  os.getenv("BYBIT_API_SECRET", ""),
+        "sandbox": os.getenv("BYBIT_TESTNET", "true").lower() == "true",
+        "options": {"defaultType": "linear"},
+        "timeout": 8000,
+    })
+
+
 @router.get("/price")
 async def get_price(symbol: str = "MNTUSDT"):
-    exchange = _bybit()
+    # 1. Bybit mainnet public REST (no auth, no sandbox)
     try:
-        ticker = await exchange.fetch_ticker(symbol)
-        return {
-            "symbol": symbol,
-            "price":  ticker["last"],
-            "bid":    ticker["bid"],
-            "ask":    ticker["ask"],
-            "source": "bybit",
-        }
+        t = await _bybit_spot_price(symbol)
+        return {"symbol": symbol, "price": t["price"], "bid": t["bid"], "ask": t["ask"], "source": "bybit"}
     except Exception:
+        pass
+
+    # 2. CoinGecko fallback
+    try:
         price = await _coingecko_price()
         return {
             "symbol": symbol,
@@ -42,20 +63,40 @@ async def get_price(symbol: str = "MNTUSDT"):
             "ask":    round(price * 1.0002, 6),
             "source": "coingecko-fallback",
         }
-    finally:
-        await exchange.close()
+    except Exception:
+        pass
+
+    # 3. Last resort mock
+    base = 0.63
+    price = round(base + (random.random() - 0.5) * 0.004, 6)
+    return {"symbol": symbol, "price": price, "bid": round(price * 0.9998, 6), "ask": round(price * 1.0002, 6), "source": "mock-fallback"}
 
 
 @router.get("/orderbook")
 async def get_orderbook(symbol: str = "MNTUSDT", limit: int = 10):
-    exchange = _bybit()
     try:
-        book = await exchange.fetch_order_book(symbol, limit)
-        return {"symbol": symbol, "bids": book["bids"][:limit], "asks": book["asks"][:limit], "source": "bybit"}
+        async with httpx.AsyncClient(timeout=6) as client:
+            for category in ("spot", "linear"):
+                r = await client.get(
+                    "https://api.bybit.com/v5/market/orderbook",
+                    params={"category": category, "symbol": symbol, "limit": limit},
+                )
+                r.raise_for_status()
+                data = r.json()
+                result = data.get("result", {})
+                if result.get("b") or result.get("bids"):
+                    bids = result.get("b") or result.get("bids") or []
+                    asks = result.get("a") or result.get("asks") or []
+                    return {
+                        "symbol": symbol,
+                        "bids":   [[float(b[0]), float(b[1])] for b in bids[:limit]],
+                        "asks":   [[float(a[0]), float(a[1])] for a in asks[:limit]],
+                        "source": "bybit",
+                    }
     except Exception:
-        price = await _coingecko_price()
-        bids  = [[round(price * (1 - i * 0.0001), 6), round(random.uniform(100, 5000), 2)] for i in range(1, limit + 1)]
-        asks  = [[round(price * (1 + i * 0.0001), 6), round(random.uniform(100, 5000), 2)] for i in range(1, limit + 1)]
-        return {"symbol": symbol, "bids": bids, "asks": asks, "source": "coingecko-fallback"}
-    finally:
-        await exchange.close()
+        pass
+
+    price = await _coingecko_price()
+    bids  = [[round(price * (1 - i * 0.0001), 6), round(random.uniform(100, 5000), 2)] for i in range(1, limit + 1)]
+    asks  = [[round(price * (1 + i * 0.0001), 6), round(random.uniform(100, 5000), 2)] for i in range(1, limit + 1)]
+    return {"symbol": symbol, "bids": bids, "asks": asks, "source": "coingecko-fallback"}

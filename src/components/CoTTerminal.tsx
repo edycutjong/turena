@@ -29,6 +29,7 @@ export function CoTTerminal({ cycleId, onEmotionChange }: Props) {
     const emotionTokens = tokens.filter(t => t.token_type === "emotion");
     if (emotionTokens.length > 0) {
       const latest = emotionTokens[emotionTokens.length - 1].token_text as EmotionState;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEmotion(latest);
       onEmotionChange?.(latest);
     }

@@ -60,9 +60,11 @@ export default function ArenaPage() {
 
     if (phase === "SETTLED" && prevPhase !== "SETTLED" && cycleId === prevCycleId) {
       if (cycle?.result === "win") {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setBurstType("win");
         playWin();
       } else if (cycle?.result === "loss") {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setBurstType("loss");
         playLoss();
       }

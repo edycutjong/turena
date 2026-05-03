@@ -71,14 +71,14 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
   const { byCard } = useSabotageEvents(cycleId);
   const [pending, setPending] = useState<FudCardId | null>(null);
   const [played, setPlayed] = useState<Set<FudCardId>>(new Set());
-  const [throwing, setThrowing] = useState<FudCardId | null>(null);
+  const [throwing, setThrowing] = useState<{ id: FudCardId; randomX: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const playCard = useCallback(async (card: (typeof FUD_CARDS)[number]) => {
     if (!cycleId || !connected || !address) return;
     setError(null);
     setPending(card.id);
-    setThrowing(card.id);
+    setThrowing({ id: card.id, randomX: (Math.random() - 0.5) * 40 });
     playCardPlayed();
     setTimeout(() => setThrowing(null), 600);
 
@@ -147,7 +147,7 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
           {FUD_CARDS.map((card) => {
             const isPlayed  = played.has(card.id);
             const isPending = pending === card.id;
-            const isThrowing = throwing === card.id;
+            const isThrowing = throwing?.id === card.id;
             const playCount = byCard[card.label]?.count ?? 0;
 
             return (
@@ -185,7 +185,7 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
                   {isThrowing && (
                     <motion.span
                       initial={{ opacity: 1, y: 0, x: 0, scale: 1 }}
-                      animate={{ opacity: 0, y: -80, x: (Math.random() - 0.5) * 40, scale: 0.4 }}
+                      animate={{ opacity: 0, y: -80, x: throwing?.randomX ?? 0, scale: 0.4 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.55, ease: "easeOut" }}
                       className="absolute inset-0 flex items-center justify-center text-3xl pointer-events-none z-10"

@@ -10,6 +10,7 @@ export function DisclaimerModal() {
   useEffect(() => {
     // Only show if not already accepted in this browser
     if (typeof window !== "undefined" && !localStorage.getItem(STORAGE_KEY)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible(true);
     }
   }, []);

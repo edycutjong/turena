@@ -143,7 +143,7 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
           </button>
         </div>
       ) : (
-        <div className="p-3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+        <div className="p-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
           {FUD_CARDS.map((card) => {
             const isPlayed  = played.has(card.id);
             const isPending = pending === card.id;
@@ -157,8 +157,8 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
                   disabled={isPending || !cycleId}
                   animate={isThrowing ? { y: -28, scale: 1.15, opacity: 0.7 } : { y: 0, scale: isPlayed ? 0.95 : 1, opacity: isPlayed ? 0.7 : 1 }}
                   transition={{ duration: 0.25, ease: "easeOut" }}
-                  className={`relative w-full flex flex-col items-center gap-2 p-3 rounded-lg border
-                    font-terminal text-xs
+                  className={`relative w-full flex sm:flex-col flex-row items-center gap-3 sm:gap-2 p-4 sm:p-3 rounded-lg border
+                    font-terminal text-xs min-h-[56px] sm:min-h-0
                     ${card.color} ${card.bg}
                     ${isPending ? "animate-pulse" : ""}
                     disabled:opacity-40 disabled:cursor-not-allowed

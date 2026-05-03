@@ -38,11 +38,20 @@ export function CounterTradeButton({
     setBetState("confirm");
   };
 
+  const MIN_BET = 0.5;
+  const MAX_BET = 2;
+
   const handleConfirm = async () => {
     if (!cycleNumber || !CONTRACT_ADDRESS) return;
+    const amt = parseFloat(amount);
+    if (isNaN(amt) || amt < MIN_BET || amt > MAX_BET) {
+      setErrorMsg(`Bet must be between ${MIN_BET} and ${MAX_BET} MNT`);
+      setBetState("error");
+      return;
+    }
     setBetState("pending");
     try {
-      const hash = await placeBetTx(cycleNumber, parseFloat(amount), CONTRACT_ADDRESS);
+      const hash = await placeBetTx(cycleNumber, amt, CONTRACT_ADDRESS);
       setTxHash(hash);
       setBetState("done");
       onBetSuccess(hash);
@@ -101,11 +110,15 @@ export function CounterTradeButton({
             exit={{ opacity: 0, y: 8 }}
             className="w-full glass rounded-xl p-4 flex flex-col gap-3 border border-arena-red/40"
           >
-            <p className="font-terminal text-xs text-arena-muted uppercase tracking-widest">Bet against AI</p>
+            <div className="flex items-center justify-between">
+              <p className="font-terminal text-xs text-arena-muted uppercase tracking-widest">Bet against AI</p>
+              <p className="font-terminal text-[10px] text-arena-muted/60">{MIN_BET}–{MAX_BET} MNT</p>
+            </div>
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                min="0.01"
+                min={MIN_BET}
+                max={MAX_BET}
                 step="0.1"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}

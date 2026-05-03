@@ -10,7 +10,8 @@ import app.services.bybit as bybit_mod
 class TestExchange:
     """Tests for _exchange()."""
 
-    def test_creates_exchange_with_defaults(self):
+    @pytest.mark.asyncio
+    async def test_creates_exchange_with_defaults(self):
         with patch.dict(os.environ, {
             "BYBIT_API_KEY": "key",
             "BYBIT_API_SECRET": "secret",
@@ -19,8 +20,10 @@ class TestExchange:
             ex = bybit_mod._exchange()
             assert ex is not None
             assert ex.apiKey == "key"
+            await ex.close()
 
-    def test_sandbox_false(self):
+    @pytest.mark.asyncio
+    async def test_sandbox_false(self):
         with patch.dict(os.environ, {
             "BYBIT_API_KEY": "k",
             "BYBIT_API_SECRET": "s",
@@ -28,6 +31,7 @@ class TestExchange:
         }):
             ex = bybit_mod._exchange()
             assert ex.sandbox is False
+            await ex.close()
 
 
 class TestCoingeckoPrice:

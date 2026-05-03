@@ -93,13 +93,15 @@ class TestMarketRouterOrderbook:
 class TestBybitFactory:
     """Tests for _bybit() factory."""
 
-    def test_creates_exchange(self):
+    @pytest.mark.asyncio
+    async def test_creates_exchange(self):
         from app.routers.market import _bybit
         with patch.dict(os.environ, {
             "BYBIT_API_KEY": "k", "BYBIT_API_SECRET": "s", "BYBIT_TESTNET": "true"
         }):
             ex = _bybit()
             assert ex is not None
+            await ex.close()
 
 
 class TestCoingeckoPriceProxy:

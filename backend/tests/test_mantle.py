@@ -137,6 +137,36 @@ class TestRecordSelfCorrection:
         mantle_mod._nonce = None  # cleanup
 
 
+class TestRecordEmotionalState:
+    """Tests for record_emotional_state()."""
+
+    @pytest.mark.asyncio
+    async def test_record_emotional_state_sends_transaction(self):
+        mantle_mod._nonce = None
+        mock_w3 = MagicMock()
+        mock_w3.eth.get_transaction_count = AsyncMock(return_value=0)
+        mock_w3.eth.send_raw_transaction = AsyncMock(return_value=b"\xab" * 32)
+
+        mock_contract = MagicMock()
+        mock_contract.functions.recordEmotionalState.return_value.build_transaction = AsyncMock(return_value={"data": "0x"})
+        mock_w3.eth.contract = MagicMock(return_value=mock_contract)
+
+        mock_account = MagicMock()
+        mock_account.address = "0x" + "aa" * 20
+        signed = MagicMock()
+        signed.raw_transaction = b"\x00" * 100
+        mock_account.sign_transaction = MagicMock(return_value=signed)
+
+        with patch("app.services.mantle.get_w3", return_value=mock_w3), \
+             patch("app.services.mantle.get_account", return_value=mock_account), \
+             patch("app.services.mantle.AsyncWeb3") as MockAsyncWeb3:
+            MockAsyncWeb3.to_checksum_address = MagicMock(return_value="0x" + "00" * 20)
+            result = await mantle_mod.record_emotional_state(0, "CONFIDENT")
+
+        assert isinstance(result, str)
+        mantle_mod._nonce = None  # cleanup
+
+
 class TestSettleCycle:
     """Tests for settle_cycle()."""
 
@@ -172,7 +202,7 @@ class TestABIs:
 
     def test_agent_abi_is_list(self):
         assert isinstance(mantle_mod.AGENT_ABI, list)
-        assert len(mantle_mod.AGENT_ABI) == 2
+        assert len(mantle_mod.AGENT_ABI) == 3
 
     def test_escrow_abi_is_list(self):
         assert isinstance(mantle_mod.ESCROW_ABI, list)

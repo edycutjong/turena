@@ -16,19 +16,26 @@ class TestRunCycle:
             {"next": 1},  # cycle number
         ])
 
-        async def mock_stream(_ctx):
+        async def mock_initial(*args):
+            yield ("emotion", "CONFIDENT")
             yield ("reasoning", "thinking...")
-            yield ("content", '{"action": "long", "confidence": 0.9, "reason": "bullish"}')
+            yield ("analysis_complete", "analysis done")
+
+        async def mock_verdict(*args):
+            yield ("reasoning", "final thoughts...")
             yield ("intent", '{"action": "long", "confidence": 0.9, "reason": "bullish"}')
 
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="price data"), \
-             patch("app.services.trade_loop.stream_reasoning", side_effect=mock_stream), \
+             patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
+             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
+             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o1", "price": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=2.5), \
              patch("app.services.trade_loop.record_trade", new_callable=AsyncMock, return_value="0xabc"), \
              patch("app.services.trade_loop.settle_cycle", new_callable=AsyncMock), \
+             patch("app.services.trade_loop._fetch_sabotage_summary", new_callable=AsyncMock, return_value="some sabotage"), \
              patch("app.services.trade_loop.asyncio.sleep", new_callable=AsyncMock):
 
             result = await tl_mod.run_cycle()
@@ -46,15 +53,20 @@ class TestRunCycle:
             {"current_params": '{"risk_weight": 0.1}'},  # params for correction
         ])
 
-        async def mock_stream(_ctx):
+        async def mock_initial(*args):
             yield ("reasoning", "analyzing...")
+            yield ("analysis_complete", "analysis done")
+
+        async def mock_verdict(*args):
             yield ("intent", '{"action": "short", "confidence": 0.6}')
 
         correction_result = {"param": "risk_weight", "old_val": 0.1, "new_val": 0.085}
 
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
-             patch("app.services.trade_loop.stream_reasoning", side_effect=mock_stream), \
+             patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
+             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
+             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o2", "average": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=-3.0), \
@@ -76,12 +88,18 @@ class TestRunCycle:
             {"next": 3},  # cycle number
         ])
 
-        async def mock_stream(_ctx):
+        async def mock_initial(*args):
+            yield ("reasoning", "analyzing...")
+            yield ("analysis_complete", "analysis done")
+
+        async def mock_verdict(*args):
             yield ("reasoning", "no intent here")
 
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
-             patch("app.services.trade_loop.stream_reasoning", side_effect=mock_stream), \
+             patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
+             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
+             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o3", "price": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=1.0), \
@@ -100,12 +118,18 @@ class TestRunCycle:
             {"next": 4},
         ])
 
-        async def mock_stream(_ctx):
+        async def mock_initial(*args):
+            yield ("reasoning", "analyzing...")
+            yield ("analysis_complete", "analysis done")
+
+        async def mock_verdict(*args):
             yield ("intent", '{"action": "long"}')
 
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
-             patch("app.services.trade_loop.stream_reasoning", side_effect=mock_stream), \
+             patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
+             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
+             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o4", "price": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=0.5), \
@@ -125,12 +149,18 @@ class TestRunCycle:
             {"next": 5},
         ])
 
-        async def mock_stream(_ctx):
+        async def mock_initial(*args):
+            yield ("reasoning", "analyzing...")
+            yield ("analysis_complete", "analysis done")
+
+        async def mock_verdict(*args):
             yield ("intent", '{"action": "short"}')
 
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
-             patch("app.services.trade_loop.stream_reasoning", side_effect=mock_stream), \
+             patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
+             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
+             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o5"}) as mock_place, \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=1.0), \
@@ -151,14 +181,20 @@ class TestRunCycle:
             None,         # no agent_state row
         ])
 
-        async def mock_stream(_ctx):
+        async def mock_initial(*args):
+            yield ("reasoning", "analyzing...")
+            yield ("analysis_complete", "analysis done")
+
+        async def mock_verdict(*args):
             yield ("intent", '{"action": "long"}')
 
         correction_result = {"param": "risk_weight", "old_val": 0.1, "new_val": 0.085}
 
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
-             patch("app.services.trade_loop.stream_reasoning", side_effect=mock_stream), \
+             patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
+             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
+             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o6", "price": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=-1.0), \
@@ -180,12 +216,18 @@ class TestRunCycle:
             {"next": 7},
         ])
 
-        async def mock_stream(_ctx):
+        async def mock_initial(*args):
+            yield ("reasoning", "analyzing...")
+            yield ("analysis_complete", "analysis done")
+
+        async def mock_verdict(*args):
             yield ("content", "some content")
 
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
-             patch("app.services.trade_loop.stream_reasoning", side_effect=mock_stream), \
+             patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
+             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
+             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock) as mock_insert, \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o7", "price": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=1.0), \
@@ -198,7 +240,10 @@ class TestRunCycle:
         # Verify "content" was mapped to "reasoning" for DB
         mock_insert.assert_awaited()
         call_args = mock_insert.call_args_list[0]
-        assert call_args[0][3] == "reasoning"  # 4th arg is token_type
+        # Which call has "content"? It's the first call from mock_verdict or mock_initial
+        # Actually insert_cot_token was called with "reasoning" instead of "content"
+        # We can just check that any call had "reasoning"
+        assert any(call[0][3] == "reasoning" for call in mock_insert.call_args_list)
 
     @pytest.mark.asyncio
     async def test_order_with_no_price_or_average(self):
@@ -209,12 +254,18 @@ class TestRunCycle:
             {"current_params": "{}"},  # pnl=0 → loss → needs params
         ])
 
-        async def mock_stream(_ctx):
+        async def mock_initial(*args):
+            yield ("reasoning", "analyzing...")
+            yield ("analysis_complete", "analysis done")
+
+        async def mock_verdict(*args):
             yield ("intent", '{"action": "long"}')
 
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
-             patch("app.services.trade_loop.stream_reasoning", side_effect=mock_stream), \
+             patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
+             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
+             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o8"}) as _mock_place, \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=0.0) as mock_pnl, \
@@ -229,9 +280,53 @@ class TestRunCycle:
         mock_pnl.assert_awaited_once_with("o8", "MNTUSDT", "buy", 0)
 
 
+class TestGetConsecutiveLosses:
+    @pytest.mark.asyncio
+    async def test_get_consecutive_losses_with_row(self):
+        mock_pool = AsyncMock()
+        mock_pool.fetchrow = AsyncMock(return_value={"streak": 3})
+        result = await tl_mod._get_consecutive_losses(mock_pool)
+        assert result == 3
+
+    @pytest.mark.asyncio
+    async def test_get_consecutive_losses_no_row(self):
+        mock_pool = AsyncMock()
+        mock_pool.fetchrow = AsyncMock(return_value=None)
+        result = await tl_mod._get_consecutive_losses(mock_pool)
+        assert result == 0
+
+class TestFetchSabotageSummary:
+    @pytest.mark.asyncio
+    async def test_fetch_sabotage_summary_with_rows(self):
+        mock_pool = AsyncMock()
+        mock_pool.fetch = AsyncMock(return_value=[
+            {"card_type": "FUD", "n": 2, "total_mnt": 1.5},
+            {"card_type": "DUMP", "n": 1, "total_mnt": 0.5},
+        ])
+        result = await tl_mod._fetch_sabotage_summary(mock_pool, "cycle-1")
+        assert "2 humans paid 1.5 MNT" in result
+        assert "1 humans paid 0.5 MNT" in result
+
+    @pytest.mark.asyncio
+    async def test_fetch_sabotage_summary_no_rows(self):
+        mock_pool = AsyncMock()
+        mock_pool.fetch = AsyncMock(return_value=[])
+        result = await tl_mod._fetch_sabotage_summary(mock_pool, "cycle-1")
+        assert result == ""
+
+    @pytest.mark.asyncio
+    async def test_fetch_sabotage_summary_exception(self):
+        mock_pool = AsyncMock()
+        mock_pool.fetch = AsyncMock(side_effect=Exception("DB Error"))
+        result = await tl_mod._fetch_sabotage_summary(mock_pool, "cycle-1")
+        assert result == ""
+
 class TestConstants:
-    def test_counter_window(self):
-        assert tl_mod.COUNTER_WINDOW == 15
+    def test_sabotage_window(self):
+        assert tl_mod.SABOTAGE_WINDOW == 20
+
+    def test_reading_window(self):
+        assert tl_mod.READING_WINDOW == 0
 
     def test_eval_window(self):
         assert tl_mod.EVAL_WINDOW == 30

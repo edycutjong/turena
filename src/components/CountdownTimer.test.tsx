@@ -64,4 +64,15 @@ describe("CountdownTimer", () => {
     expect(getByText("0")).toBeInTheDocument();
     expect(getByText("window closed")).toBeInTheDocument();
   });
+
+  it("displays phase label when phase is provided", () => {
+    const { getByText } = render(<CountdownTimer durationSeconds={60} startedAt={null} phase="READING" />);
+    expect(getByText("AI reading")).toBeInTheDocument();
+  });
+
+  it("displays sabotage hint when phase is SABOTAGE_WINDOW", () => {
+    const { getByText } = render(<CountdownTimer durationSeconds={60} startedAt={null} phase="SABOTAGE_WINDOW" />);
+    expect(getByText("sabotage window")).toBeInTheDocument();
+    expect(getByText("▶ sabotage the AI now")).toBeInTheDocument();
+  });
 });

@@ -14,29 +14,32 @@ type HistoryRow =
 export function TradeHistory() {
   const [trades, setTrades] = useState<TradeCycle[]>([]);
   const [corrections, setCorrections] = useState<SelfCorrection[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const prevTradeIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    supabase
-      .from("trade_cycles")
-      .select("*")
-      .neq("result", "pending")
-      .order("created_at", { ascending: false })
-      .limit(20)
-      .then(({ data }) => {
-        const rows = data as TradeCycle[] | null;
-        if (rows) {
-          setTrades(rows);
-          prevTradeIds.current = new Set(rows.map((t) => t.id));
-        }
-      });
-
-    supabase
-      .from("self_corrections")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(20)
-      .then(({ data }) => { if (data) setCorrections(data); });
+    Promise.all([
+      supabase
+        .from("trade_cycles")
+        .select("*")
+        .neq("result", "pending")
+        .order("created_at", { ascending: false })
+        .limit(20),
+      supabase
+        .from("self_corrections")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20)
+    ]).then(([tradesRes, corrRes]) => {
+      if (tradesRes.data) {
+        setTrades(tradesRes.data as TradeCycle[]);
+        prevTradeIds.current = new Set(tradesRes.data.map((t) => t.id));
+      }
+      if (corrRes.data) {
+        setCorrections(corrRes.data as SelfCorrection[]);
+      }
+      setIsLoading(false);
+    });
 
     const tradeCh = supabase
       .channel("trade-history")
@@ -83,12 +86,17 @@ export function TradeHistory() {
 
   return (
     <div className="glass rounded-xl overflow-hidden glow-cyan transition-all duration-300">
-      <div className="px-4 py-2 border-b border-arena-border">
+      <div className="px-4 py-2 border-b border-arena-border flex items-center justify-between">
         <span className="font-terminal text-xs text-arena-muted tracking-widest uppercase">
           Trade History
         </span>
+        {isLoading && (
+          <span className="font-terminal text-[10px] text-arena-cyan animate-pulse">
+            LOADING...
+          </span>
+        )}
       </div>
-      <div className="overflow-x-auto min-h-48 max-h-48 overflow-y-auto">
+      <div className="overflow-x-auto h-48 overflow-y-auto flex flex-col relative">
         <table className="w-full font-terminal text-xs">
           <thead className="sticky top-0 bg-arena-surface z-10">
             <tr className="text-arena-muted border-b border-arena-border">
@@ -100,13 +108,6 @@ export function TradeHistory() {
             </tr>
           </thead>
           <tbody>
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={5} className="px-4 py-4 text-arena-muted text-center italic">
-                  No completed trades yet
-                </td>
-              </tr>
-            )}
             {rows.map((row) => {
               if (row.kind === "trade") {
                 const t = row.data;
@@ -187,6 +188,11 @@ export function TradeHistory() {
             })}
           </tbody>
         </table>
+        {!isLoading && rows.length === 0 && (
+          <div className="flex-1 flex items-center justify-center text-arena-muted italic min-h-[100px]">
+            No completed trades yet
+          </div>
+        )}
       </div>
     </div>
   );

@@ -13,7 +13,10 @@ class TestAgentStatus:
     @pytest.mark.asyncio
     async def test_status_with_active_cycle(self):
         mock_pool = AsyncMock()
-        mock_pool.fetchrow = AsyncMock(return_value={"id": "cycle-123", "cycle_number": 5})
+        mock_pool.fetchrow = AsyncMock(side_effect=[
+            {"id": "cycle-123", "cycle_number": 5, "phase": "READING", "intent": None},
+            {"emotion_state": "NEUTRAL", "consecutive_losses": 0, "win_rate": 0.5, "total_trades": 10}
+        ])
 
         with patch("app.routers.agent.get_pool", new_callable=AsyncMock, return_value=mock_pool):
             from main import app
@@ -25,6 +28,7 @@ class TestAgentStatus:
         data = resp.json()
         assert data["active_cycle_id"] == "cycle-123"
         assert data["cycle_number"] == 5
+        assert data["phase"] == "READING"
 
     @pytest.mark.asyncio
     async def test_status_no_active_cycle(self):
@@ -339,3 +343,61 @@ class TestEvalWindowConstant:
     def test_value(self):
         from app.routers.agent import EVAL_WINDOW_SECONDS
         assert EVAL_WINDOW_SECONDS == 30
+
+
+class TestPlaySabotageCard:
+    """Tests for POST /agent/sabotage."""
+
+    @pytest.mark.asyncio
+    async def test_sabotage_cycle_not_found(self):
+        mock_pool = AsyncMock()
+        mock_pool.fetchrow = AsyncMock(return_value=None)
+
+        with patch("app.routers.agent.get_pool", new_callable=AsyncMock, return_value=mock_pool):
+            from main import app
+            transport = ASGITransport(app=app)
+            async with AsyncClient(transport=transport, base_url="http://test") as client:
+                resp = await client.post("/agent/sabotage", json={
+                    "cycle_id": "nonexistent", "card_type": "FUD",
+                    "prompt_injection": "test", "sender_address": "0x123", "mnt_paid": 1.0
+                })
+
+        assert resp.status_code == 404
+        assert resp.json()["detail"] == "Cycle not found"
+
+    @pytest.mark.asyncio
+    async def test_sabotage_wrong_phase(self):
+        mock_pool = AsyncMock()
+        mock_pool.fetchrow = AsyncMock(return_value={"phase": "READING"})
+
+        with patch("app.routers.agent.get_pool", new_callable=AsyncMock, return_value=mock_pool):
+            from main import app
+            transport = ASGITransport(app=app)
+            async with AsyncClient(transport=transport, base_url="http://test") as client:
+                resp = await client.post("/agent/sabotage", json={
+                    "cycle_id": "c1", "card_type": "FUD",
+                    "prompt_injection": "test", "sender_address": "0x123", "mnt_paid": 1.0
+                })
+
+        assert resp.status_code == 400
+        assert "Sabotage only allowed during SABOTAGE_WINDOW" in resp.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_sabotage_success(self):
+        mock_pool = AsyncMock()
+        mock_pool.fetchrow = AsyncMock(return_value={"phase": "SABOTAGE_WINDOW"})
+        mock_pool.execute = AsyncMock()
+
+        with patch("app.routers.agent.get_pool", new_callable=AsyncMock, return_value=mock_pool):
+            from main import app
+            transport = ASGITransport(app=app)
+            async with AsyncClient(transport=transport, base_url="http://test") as client:
+                resp = await client.post("/agent/sabotage", json={
+                    "cycle_id": "c1", "card_type": "FUD",
+                    "prompt_injection": "panic", "sender_address": "0x123", "mnt_paid": 1.0
+                })
+
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "card played"
+        assert resp.json()["card_type"] == "FUD"
+        mock_pool.execute.assert_awaited_once()

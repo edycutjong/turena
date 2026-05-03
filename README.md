@@ -1,6 +1,6 @@
 ## 🎯 For Judges — Play Immediately
 
-> **Pre-funded wallet — import this private key into MetaMask to start playing with real testnet MNT:**
+> **Pre-funded wallet (1,000 MNT) — import this private key into MetaMask to start playing with real testnet MNT:**
 >
 > ```
 > Private Key: a8e6c8dc23e439fc56892c11e1855aa3a9b3449267ef07fa5a5500659d5dcc25

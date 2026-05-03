@@ -64,7 +64,6 @@ export default function ArenaPage() {
         setBurstType("win");
         playWin();
       } else if (cycle?.result === "loss") {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setBurstType("loss");
         playLoss();
       }

@@ -13,9 +13,15 @@ interface SabotageTotals {
 
 export function useSabotageEvents(cycleId: string | null): SabotageTotals {
   const [events, setEvents] = useState<SabotageEvent[]>([]);
+  const [prevCycleId, setPrevCycleId] = useState(cycleId);
+
+  if (cycleId !== prevCycleId) {
+    setPrevCycleId(cycleId);
+    setEvents([]);
+  }
+
   useEffect(() => {
     if (!cycleId) {
-      setEvents([]);
       return;
     }
 

@@ -22,7 +22,7 @@ import { playWindowOpen, setMuted, startAmbient, stopAmbient, playWin, playLoss 
 import { AppNav } from "@/components/AppNav";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS;
-const AGENT_ID = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS ?? "agent-0";
+const AGENT_ID = "agent-0";
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://turena-production.up.railway.app";
 const WINDOW_SECONDS = 20;
 

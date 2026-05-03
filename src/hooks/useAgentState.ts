@@ -17,7 +17,7 @@ export function useAgentState(agentId: string) {
       .then(({ data }) => { if (data) setState(data); });
 
     const channel = supabase
-      .channel(`agent-state-${agentId}`)
+      .channel(`agent-state-${agentId}-${Math.random().toString(36).slice(2, 8)}`)
       .on(
         "postgres_changes",
         {

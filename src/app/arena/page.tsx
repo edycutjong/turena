@@ -16,6 +16,7 @@ import { SabotageFeed } from "@/components/SabotageFeed";
 import { ConfettiBurst } from "@/components/ConfettiBurst";
 import { useActiveCycle } from "@/hooks/useActiveCycle";
 import { useCounterTrades } from "@/hooks/useCounterTrades";
+import { useAgentState } from "@/hooks/useAgentState";
 import { useWallet } from "@/hooks/useWallet";
 import Link from "next/link";
 import { playWindowOpen, setMuted, startAmbient, stopAmbient, playWin, playLoss } from "@/lib/sounds";
@@ -28,15 +29,32 @@ const WINDOW_SECONDS = 20;
 
 export default function ArenaPage() {
   const cycle = useActiveCycle();
+  const agentState = useAgentState(AGENT_ID);
   const { totalPool, againstPool } = useCounterTrades(cycle?.id ?? null);
   const { address: walletAddress, connected, connect } = useWallet();
 
   const [windowStartedAt, setWindowStartedAt] = useState<Date | null>(null);
   const [windowOpen, setWindowOpen] = useState(false);
   const [triggering, setTriggering] = useState(false);
-  const [emotion, setEmotion] = useState<EmotionState>("CONFIDENT");
+  // cotEmotion: set only when CoT stream emits [EMOTION:...] for the current cycle
+  const [cotEmotion, setCotEmotion] = useState<EmotionState | null>(null);
   const [muted, setMutedState] = useState(true);
   const [burstType, setBurstType] = useState<"win" | "loss" | null>(null);
+
+  // Reset CoT emotion on each new cycle so stale MELTDOWN doesn't linger
+  const prevCycleForEmotionRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (cycle?.id !== prevCycleForEmotionRef.current) {
+      prevCycleForEmotionRef.current = cycle?.id ?? null;
+      setCotEmotion(null);
+    }
+  }, [cycle?.id]);
+
+  // displayEmotion: CoT stream wins if available; fall back to last settled emotion from DB
+  const displayEmotion: EmotionState =
+    cotEmotion ??
+    (agentState?.emotion_state as EmotionState | null) ??
+    "CONFIDENT";
 
   const prevPhaseRef = useRef<string | null>(null);
   const prevCycleIdRef = useRef<string | null>(null);
@@ -122,8 +140,8 @@ export default function ArenaPage() {
     confidence: number;
   } | null;
 
-  const isMeltdown = emotion === "MELTDOWN";
-  const isTilted   = emotion === "TILTED";
+  const isMeltdown = displayEmotion === "MELTDOWN";
+  const isTilted   = displayEmotion === "TILTED";
 
   return (
     <div className={`flex flex-col min-h-screen md:h-screen md:overflow-hidden transition-colors duration-500
@@ -212,7 +230,7 @@ export default function ArenaPage() {
         {/* Right — CoT Terminal + Live Chat */}
         <div className="flex flex-col flex-1 gap-2 min-h-[400px] md:min-h-0 arena-panel arena-panel-d2" style={{ minWidth: 0 }}>
           <div className="flex-1 min-h-0">
-            <CoTTerminal cycleId={cycle?.id ?? null} onEmotionChange={setEmotion} />
+            <CoTTerminal cycleId={cycle?.id ?? null} onEmotionChange={setCotEmotion} />
           </div>
           <div className="h-48">
             <LiveChat />

@@ -45,6 +45,7 @@ export default function ArenaPage() {
   useEffect(() => {
     const phase = cycle?.phase ?? null;
     if (phase === "SABOTAGE_WINDOW" && cycle?.sabotage_started_at) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWindowStartedAt(new Date(cycle.sabotage_started_at));
       setWindowOpen(true);
       playWindowOpen();

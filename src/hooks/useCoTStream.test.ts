@@ -68,4 +68,34 @@ describe("useCoTStream", () => {
     unmount();
     expect(supabase.removeChannel).toHaveBeenCalledTimes(2);
   });
+
+  it("loads initial tokens from db and ignores duplicates", async () => {
+    let insertCallback: any;
+    const mockOn = vi.fn().mockImplementation((event, filter, cb) => {
+      insertCallback = cb;
+      return { subscribe: vi.fn() };
+    });
+    vi.mocked(supabase.channel).mockReturnValue({ on: mockOn } as any);
+    
+    // Mock the DB returning some initial tokens
+    const initialData = [{ id: 100, token: "initial" }];
+    (supabase as any).order.mockResolvedValueOnce({ data: initialData });
+
+    const { result } = renderHook(() => useCoTStream("cycle-1"));
+    
+    await waitFor(() => {
+      expect(result.current).toEqual(initialData);
+    });
+
+    // Fire a duplicate event (should be ignored)
+    insertCallback({ new: { id: 100, token: "initial" } });
+    
+    // Fire a new, unique event
+    const newToken = { id: 101, token: "new" };
+    insertCallback({ new: newToken });
+
+    await waitFor(() => {
+      expect(result.current).toEqual([...initialData, newToken]);
+    });
+  });
 });

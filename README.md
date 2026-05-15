@@ -23,7 +23,7 @@
 
   [![Live Demo](https://img.shields.io/badge/Live-turena.edycu.dev-brightgreen.svg)](https://turena.edycu.dev)
   [![Pitch Deck](https://img.shields.io/badge/Pitch-Deck-purple.svg)](https://turena.edycu.dev/pitch/index.html)
-  [![Pitch Video](https://img.shields.io/badge/Pitch-Video-red.svg)](https://youtube.com/)
+  [![Pitch Video](https://img.shields.io/badge/Pitch-Video-red.svg)](https://youtu.be/q7CWFfPbYSE)
   [![Mantle Sepolia](https://img.shields.io/badge/Chain-Mantle%20Sepolia-000000.svg)](https://sepolia.mantlescan.xyz)
   [![DoraHacks](https://img.shields.io/badge/DoraHacks-BUIDL-FF761B.svg)](https://dorahacks.io/hackathon/mantleturingtesthackathon2026/detail)
   <br><br>

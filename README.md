@@ -22,17 +22,18 @@
   <p><em>Watch AI Trade. Sabotage It. Bet Against Its Meltdown.</em></p>
 
   [![Live Demo](https://img.shields.io/badge/Live-turena.edycu.dev-brightgreen.svg)](https://turena.edycu.dev)
-  [![DoraHacks](https://img.shields.io/badge/DoraHacks-BUIDL-FF761B.svg)](https://dorahacks.io/)
   [![Pitch Video](https://img.shields.io/badge/Pitch-Video-red.svg)](https://youtube.com/)
+  [![Pitch Deck](https://img.shields.io/badge/Pitch-Deck-purple.svg)](https://turena.edycu.dev/pitch/index.html)
   [![Mantle Sepolia](https://img.shields.io/badge/Chain-Mantle%20Sepolia-000000.svg)](https://sepolia.mantlescan.xyz)
+  [![DoraHacks](https://img.shields.io/badge/DoraHacks-BUIDL-FF761B.svg)](https://dorahacks.io/hackathon/mantleturingtesthackathon2026/detail)
   <br><br>
-  <img src="https://img.shields.io/badge/Mantle-000000?style=flat-square&logo=mantle&logoColor=white" alt="Mantle" />
-  <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js" />
-  <img src="https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" />
-  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase" />
-  <img src="https://img.shields.io/badge/DeepSeek-4D6BFE?style=flat-square&logoColor=white" alt="DeepSeek" />
+  <img src="https://img.shields.io/badge/Mantle-000000?style=flat&logo=mantle&logoColor=white" alt="Mantle" />
+  <img src="https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/DeepSeek-4D6BFE?style=flat&logoColor=white" alt="DeepSeek" />
 </div>
 
 ---

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Turena ⚔️ Pitch Deck</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="apple-touch-icon" href="/icon.svg">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* Turena Design System Tokens */
+        :root {
+            --cyan-500: #06b6d4;
+            --cyan-400: #22d3ee;
+            --red-500: #ef4444;
+            --red-400: #f87171;
+            --amber-500: #f59e0b;
+            --purple-500: #a855f7;
+
+            --slate-50: #f8fafc;
+            --slate-400: #94a3b8;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --slate-950: #020617;
+
+            --bg-primary: var(--slate-950);
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(148, 163, 184, 0.08);
+            --border-hover: rgba(148, 163, 184, 0.2);
+
+            --r-main-font: 'Inter', sans-serif;
+            --r-heading-font: 'Orbitron', sans-serif;
+            --r-heading-color: var(--red-500);
+            --r-link-color: var(--cyan-500);
+            --r-link-color-hover: var(--cyan-400);
+            --r-selection-background-color: var(--red-500);
+            --r-heading-text-transform: uppercase;
+            --r-background-color: var(--bg-primary);
+        }
+
+        body {
+            background: radial-gradient(circle at 20% 30%, rgba(239, 68, 68, 0.1) 0%, transparent 60%),
+                radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.1) 0%, transparent 60%),
+                var(--bg-primary);
+        }
+
+        .reveal .progress span {
+            background-color: var(--red-500);
+        }
+
+        .reveal .controls {
+            color: var(--red-500);
+        }
+
+        .reveal h1,
+        .reveal h2,
+        .reveal h3 {
+            font-weight: 900;
+            letter-spacing: 0.02em;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .reveal h1 {
+            font-size: 3.5em;
+            background: linear-gradient(135deg, var(--red-400), var(--purple-500));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            margin-bottom: 0.5em;
+        }
+
+        .reveal table {
+            font-size: 0.8em;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .reveal table th {
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--red-500);
+        }
+
+        .reveal table td {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .reveal ul {
+            margin-left: 0;
+            display: inline-block;
+            text-align: center;
+            list-style-position: inside;
+        }
+
+        .reveal li {
+            margin-bottom: 0.8em;
+            color: var(--slate-50);
+        }
+
+        /* Turena aesthetic classes */
+        .text-cyan { color: var(--cyan-500); }
+        .text-red { color: var(--red-500); }
+        .text-amber { color: var(--amber-500); }
+        .text-muted { color: var(--slate-400); }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* WOW Factor Classes */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.08);
+        }
+
+        .wow-card {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+        }
+
+        .wow-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.2);
+            z-index: 10;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { left: 100%; opacity: 0; }
+        }
+
+        .wow-shine {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wow-shine::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: skewX(-20deg);
+            animation: shine 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes fade-in-up {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in-up {
+            animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .glitch-text {
+            animation: glitch 1s linear infinite;
+        }
+
+        @keyframes glitch {
+            2%, 64% { transform: translate(2px,0) skew(0deg); }
+            4%, 60% { transform: translate(-2px,0) skew(0deg); }
+            62% { transform: translate(0,0) skew(5deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section data-markdown data-separator="^\s*---\s*$" data-separator-vertical="^\s*--\s*$" data-separator-notes="^\s*Note:">
+                <textarea data-template>
+<!-- .slide: class="center" style="text-align: center; padding-top: 10%;" -->
+# TURENA ⚔️
+### The Turing Arena
+<br />
+<div class="text-red wow-shine font-mono" style="font-size: 0.8em; letter-spacing: 2px;">WATCH AI TRADE. SABOTAGE IT. BET AGAINST ITS MELTDOWN.</div>
+
+Note:
+Welcome to Turena. We're turning on-chain AI into a spectator sport.
+
+---
+
+## The Black Box Problem
+
+<div class="glass-card wow-card" style="padding: 2em; margin-top: 1em; text-align: center; margin-left: auto; margin-right: auto;">
+
+- On-chain AI agents are completely opaque. 
+- You send them capital, they trade, you pray.
+- When they fail, you have no idea why.
+
+<br />
+<div class="text-muted">There's no accountability, no emotion, and no fun.</div>
+</div>
+
+Note:
+The problem with current AI agents is that they are boring black boxes. You can't see them think, and you certainly can't mess with them.
+
+---
+
+## The Spectator Sport
+
+<div class="glass-card wow-card" style="padding: 2em; margin-top: 1em; text-align: center; margin-left: auto; margin-right: auto;">
+
+- We expose **DeepSeek R1's** raw Chain-of-Thought in real-time.
+- Watch its emotional state shift from CONFIDENT to MELTDOWN.
+- The crowd pays **MNT** to inject disinformation (FUD) mid-thought.
+
+</div>
+
+Note:
+Instead of hiding the AI, we expose it fully. We let the crowd see its reasoning, its panic, and let them actively try to sabotage it.
+
+---
+
+## The 3-Phase Cycle
+
+<div class="glass-card wow-card" style="padding: 1.5em; margin-top: 1em; text-align: left; margin-left: auto; margin-right: auto;">
+
+1. **<span class="text-cyan">READING</span>** - AI analyzes Bybit data and streams initial thoughts.
+2. **<span class="text-amber">SABOTAGE</span>** (20s) - Pay MNT to play FUD Cards ("CEO Arrested", "Whale Dumping") and place counter-bets.
+3. **<span class="text-red">VERDICT</span>** - AI resumes, reacts to the crowd's FUD, and makes a final trade.
+
+<br />
+<div class="text-muted font-mono" style="text-align: center; margin-top: 1em; font-size: 0.8em;">[EMOTION: TILTED] "Wait... the CEO was arrested? I need to short!"</div>
+</div>
+
+Note:
+This is the core gameplay loop. It creates a high-stakes mini-game every cycle where human psychology is pitted against AI logic.
+
+---
+
+## The Engine
+
+<div class="glass-card wow-card" style="padding: 2em; margin-top: 1em; text-align: center; margin-left: auto; margin-right: auto;">
+
+- **AI Core:** DeepSeek R1 (Reasoner API)
+- **Real-time Engine:** Supabase WebSockets
+- **Settlement & Identity:** Mantle Sepolia (ERC-8004 NFT)
+- **Frontend:** Next.js 16 + React 19
+
+</div>
+
+Note:
+This is a sophisticated, real-time architecture built for speed and finality. We need WebSockets for the live stream, and Mantle for fast finality on bets.
+
+---
+
+## Unruggable Drama (Mantle)
+
+<div class="glass-card wow-card" style="padding: 2em; margin-top: 1em; text-align: center; margin-left: auto; margin-right: auto;">
+
+- Could we use a database? **NO.**
+- Every meltdown, every self-correction is an immutable event (`recordTrade()`).
+- AI's emotional state (Hubris/Tilt) is recorded on-chain via **ERC-8004**.
+- Escrow settlements and counter-trade payouts are decentralized.
+
+</div>
+
+Note:
+Why blockchain? Because if it's centralized, people will assume it's rigged. Mantle ensures the AI's breakdowns and our payouts are cryptographically proven.
+
+---
+
+## Viral Mechanics
+
+<div class="glass-card wow-card" style="padding: 1.5em; margin-top: 1em; text-align: left; margin-left: auto; margin-right: auto;">
+
+| State | Trigger | UI |
+|---|---|---|
+| CONFIDENT | Wins | Cyan glow |
+| ANXIOUS | 2 losses | Orange warnings |
+| <span class="glitch-text text-red">MELTDOWN</span> | 4+ losses | Screen shake, red overlay |
+
+<br/>
+<p class="text-center">This is built for Twitch streamers and crypto Twitter.</p>
+</div>
+
+Note:
+The emotional escalation is designed for virality. Watching an AI spiral into a meltdown because you paid to FUD it is incredible content.
+
+---
+
+## Ready to Play?
+
+<div class="glass-card wow-card" style="padding: 2em; margin-top: 1em; text-align: center; margin-left: auto; margin-right: auto;">
+
+- ✅ Fully deployed on Mantle Sepolia.
+- ✅ DeepSeek R1 agent running 24/7.
+- ✅ Go to **turena.edycu.dev** to watch or play.
+
+</div>
+
+Note:
+It's live right now. Go check it out and try to break the AI.
+
+---
+
+<!-- .slide: class="center" style="text-align: center; padding-top: 15%;" -->
+# TURENA ⚔️
+
+Are you smarter than a tilted AI?<br />
+<span class="text-cyan wow-shine" style="display:inline-block;">Let the games begin.</span>
+
+Note:
+Thank you.
+                </textarea>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/markdown/markdown.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/notes/notes.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            center: true,
+            margin: 0.15,
+            transition: 'fade',
+            backgroundTransition: 'fade',
+            plugins: [RevealMarkdown, RevealNotes]
+        });
+    </script>
+</body>
+
+</html>

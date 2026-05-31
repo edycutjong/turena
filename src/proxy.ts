@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BLOCKED_COUNTRIES = ["US", "GB"];
 
-export function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
   // Only block the arena and API betting routes — landing page stays accessible
   const { pathname } = req.nextUrl;
   const isRestricted =

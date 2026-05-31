@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       handle: randomPersona.handle,
       message: generatedMessage
     });
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: "Failed to generate chat" }, { status: 500 });
   }
 }

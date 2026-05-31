@@ -21,7 +21,7 @@ export function useActiveCycle() {
 
     // Subscribe to new cycles being inserted
     const channel = supabase
-      .channel(`active-cycle-${Date.now()}`)
+      .channel(`active-cycle-${Math.random().toString(36).slice(2, 8)}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "trade_cycles" },

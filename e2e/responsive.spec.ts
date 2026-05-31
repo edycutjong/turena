@@ -17,6 +17,6 @@ test.describe('Responsive layout', () => {
     await page.goto('/arena');
     
     // Check main elements are visible
-    await expect(page.locator('main')).toBeVisible();
+    await expect(page.locator('.arena-panel').first()).toBeVisible();
   });
 });

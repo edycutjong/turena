@@ -144,7 +144,7 @@ export default function ArenaPage() {
   const isTilted   = displayEmotion === "TILTED";
 
   return (
-    <div className={`flex flex-col min-h-screen md:h-screen md:overflow-hidden transition-colors duration-500
+    <div className={`flex flex-col min-h-screen md:h-screen md:overflow-hidden overflow-x-hidden transition-colors duration-500
       ${isMeltdown ? "bg-red-950/30" : "bg-arena-bg"}
       ${isTilted   ? "bg-orange-950/20" : ""}
     `}>

@@ -18,7 +18,7 @@ export function useSelfCorrections() {
       .then(({ data }) => { if (data) setCorrections(data); });
 
     const channel = supabase
-      .channel("self-corrections")
+      .channel(`self-corrections-${Math.random().toString(36).slice(2, 8)}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "self_corrections" },

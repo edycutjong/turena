@@ -27,6 +27,13 @@ async def _next_nonce(w3: AsyncWeb3, address: str) -> Nonce:
 AGENT_ABI = json.loads('[{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"win","type":"bool"},{"name":"pnl","type":"int256"}],"name":"recordTrade","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"param","type":"string"},{"name":"oldVal","type":"uint256"},{"name":"newVal","type":"uint256"},{"name":"regretScore","type":"uint256"},{"name":"newStrategy","type":"string"}],"name":"recordSelfCorrection","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"emotionState","type":"string"}],"name":"recordEmotionalState","outputs":[],"stateMutability":"nonpayable","type":"function"}]')
 ESCROW_ABI = json.loads('[{"inputs":[{"name":"cycleId","type":"uint256"},{"name":"aiWon","type":"bool"}],"name":"settle","outputs":[],"stateMutability":"nonpayable","type":"function"}]')
 
+registry_abi_path = os.path.join(os.path.dirname(__file__), "..", "..", "abi", "PredictionRegistry.json")
+if os.path.exists(registry_abi_path):
+    with open(registry_abi_path, "r") as f:
+        PREDICTION_REGISTRY_ABI = json.load(f)
+else:
+    PREDICTION_REGISTRY_ABI = []
+
 
 def get_w3() -> AsyncWeb3:
     # MANTLE_MAINNET_RPC_URL used in production; fall back to testnet for local dev.
@@ -95,6 +102,41 @@ async def settle_cycle(cycle_id: int, ai_won: bool) -> str:
     addr = AsyncWeb3.to_checksum_address(os.environ["ESCROW_ADDRESS"])
     contract = w3.eth.contract(address=addr, abi=ESCROW_ABI)
     tx = await contract.functions.settle(cycle_id, ai_won).build_transaction({
+        "from": account.address,
+        "nonce": await _next_nonce(w3, account.address),
+    })
+    signed = account.sign_transaction(tx)
+    tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)
+    return tx_hash.hex()
+
+
+async def commit_prediction(cycle_id: int, agent_id: int, direction: str, confidence: int, nonce: int) -> str:
+    w3 = get_w3()
+    account = get_account(w3)
+    addr = AsyncWeb3.to_checksum_address(os.environ["PREDICTION_REGISTRY_ADDRESS"])
+    contract = w3.eth.contract(address=addr, abi=PREDICTION_REGISTRY_ABI)
+    
+    # Generate hash exactly as Solidity does: keccak256(abi.encodePacked(direction, confidence, nonce))
+    commit_hash = w3.solidity_keccak(['string', 'uint256', 'uint256'], [direction, confidence, nonce])
+    
+    tx = await contract.functions.commit(cycle_id, agent_id, commit_hash).build_transaction({
+        "from": account.address,
+        "nonce": await _next_nonce(w3, account.address),
+    })
+    signed = account.sign_transaction(tx)
+    tx_hash = await w3.eth.send_raw_transaction(signed.raw_transaction)
+    return tx_hash.hex()
+
+
+async def reveal_prediction(cycle_id: int, agent_id: int, direction: str, confidence: int, nonce: int, was_profitable: bool) -> str:
+    w3 = get_w3()
+    account = get_account(w3)
+    addr = AsyncWeb3.to_checksum_address(os.environ["PREDICTION_REGISTRY_ADDRESS"])
+    contract = w3.eth.contract(address=addr, abi=PREDICTION_REGISTRY_ABI)
+    
+    tx = await contract.functions.reveal(
+        cycle_id, agent_id, direction, confidence, nonce, was_profitable
+    ).build_transaction({
         "from": account.address,
         "nonce": await _next_nonce(w3, account.address),
     })

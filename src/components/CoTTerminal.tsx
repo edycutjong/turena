@@ -15,10 +15,11 @@ const EMOTION_STYLES: Record<EmotionState, { label: string; color: string; bg: s
 
 interface Props {
   cycleId: string | null;
+  agentId?: string;
   onEmotionChange?: (emotion: EmotionState) => void;
 }
 
-export function CoTTerminal({ cycleId, onEmotionChange }: Props) {
+export function CoTTerminal({ cycleId, agentId = "agent-0", onEmotionChange }: Props) {
   const tokens = useCoTStream(cycleId);
   const endRef = useRef<HTMLDivElement>(null);
   const [initialTokens] = useState(() => new Set(tokens.map(t => t.id)));
@@ -58,7 +59,7 @@ export function CoTTerminal({ cycleId, onEmotionChange }: Props) {
           <div className="w-3 h-3 rounded-full bg-yellow-500" />
           <div className="w-3 h-3 rounded-full bg-green-500" />
           <span className="ml-2 text-xs text-arena-muted uppercase tracking-widest">
-            Turena OS // CoT Stream
+            Turena OS // CoT Stream ({agentId})
           </span>
         </div>
         <div className="flex items-center gap-3">

@@ -197,6 +197,61 @@ class TestSettleCycle:
         mantle_mod._nonce = None  # cleanup
 
 
+class TestCommitPrediction:
+    @pytest.mark.asyncio
+    async def test_commit_prediction(self):
+        mantle_mod._nonce = None
+        mock_w3 = MagicMock()
+        mock_w3.eth.get_transaction_count = AsyncMock(return_value=0)
+        mock_w3.eth.send_raw_transaction = AsyncMock(return_value=b"\x12" * 32)
+        mock_w3.solidity_keccak = MagicMock(return_value=b"hash")
+
+        mock_contract = MagicMock()
+        mock_contract.functions.commit.return_value.build_transaction = AsyncMock(return_value={"data": "0x"})
+        mock_w3.eth.contract = MagicMock(return_value=mock_contract)
+
+        mock_account = MagicMock()
+        mock_account.address = "0x" + "aa" * 20
+        signed = MagicMock()
+        signed.raw_transaction = b"\x00" * 100
+        mock_account.sign_transaction = MagicMock(return_value=signed)
+
+        with patch("app.services.mantle.get_w3", return_value=mock_w3), \
+             patch("app.services.mantle.get_account", return_value=mock_account), \
+             patch("app.services.mantle.AsyncWeb3") as MockAsyncWeb3:
+            MockAsyncWeb3.to_checksum_address = MagicMock(return_value="0x" + "00" * 20)
+            result = await mantle_mod.commit_prediction(1, 0, "LONG", 100, 123)
+
+        assert isinstance(result, str)
+        mantle_mod._nonce = None
+
+class TestRevealPrediction:
+    @pytest.mark.asyncio
+    async def test_reveal_prediction(self):
+        mantle_mod._nonce = None
+        mock_w3 = MagicMock()
+        mock_w3.eth.get_transaction_count = AsyncMock(return_value=0)
+        mock_w3.eth.send_raw_transaction = AsyncMock(return_value=b"\x34" * 32)
+
+        mock_contract = MagicMock()
+        mock_contract.functions.reveal.return_value.build_transaction = AsyncMock(return_value={"data": "0x"})
+        mock_w3.eth.contract = MagicMock(return_value=mock_contract)
+
+        mock_account = MagicMock()
+        mock_account.address = "0x" + "aa" * 20
+        signed = MagicMock()
+        signed.raw_transaction = b"\x00" * 100
+        mock_account.sign_transaction = MagicMock(return_value=signed)
+
+        with patch("app.services.mantle.get_w3", return_value=mock_w3), \
+             patch("app.services.mantle.get_account", return_value=mock_account), \
+             patch("app.services.mantle.AsyncWeb3") as MockAsyncWeb3:
+            MockAsyncWeb3.to_checksum_address = MagicMock(return_value="0x" + "00" * 20)
+            result = await mantle_mod.reveal_prediction(1, 0, "LONG", 100, 123, True)
+
+        assert isinstance(result, str)
+        mantle_mod._nonce = None
+
 class TestABIs:
     """Tests for ABI constants."""
 
@@ -207,3 +262,19 @@ class TestABIs:
     def test_escrow_abi_is_list(self):
         assert isinstance(mantle_mod.ESCROW_ABI, list)
         assert len(mantle_mod.ESCROW_ABI) == 1
+        
+    def test_prediction_registry_abi_loads(self):
+        # Even if file is missing, fallback handles it
+        assert isinstance(mantle_mod.PREDICTION_REGISTRY_ABI, list)
+        
+    def test_abi_fallback(self):
+        with patch("os.path.exists", return_value=False):
+            # We can't trivially reload the module inside the test to hit the 'else' branch,
+            # but we can manually trigger the branch logic to get coverage on it.
+            # Actually, because Python modules only evaluate at import, we'll manually emulate the branch.
+            from importlib import reload
+            import app.services.mantle as m
+            reload(m)
+            assert isinstance(m.PREDICTION_REGISTRY_ABI, list)
+            assert m.PREDICTION_REGISTRY_ABI == []
+            reload(mantle_mod) # restore normal state

@@ -1,0 +1,58 @@
+[
+  {
+    "timestamp_ms": 1500,
+    "persona": "Doomer",
+    "avatar": "🔴",
+    "handle": "@Permabear",
+    "message": "Here we go again, it's gonna long the top..."
+  },
+  {
+    "timestamp_ms": 3200,
+    "persona": "Quant",
+    "avatar": "🤖",
+    "handle": "@ArbGod",
+    "message": "Wait, did you see that commit hash? I think it's faking."
+  },
+  {
+    "timestamp_ms": 5100,
+    "persona": "Permabull",
+    "avatar": "🐂",
+    "handle": "@UpOnly",
+    "message": "Nah, it's just processing the funding rate. LONG incoming!"
+  },
+  {
+    "timestamp_ms": 8000,
+    "persona": "Retail",
+    "avatar": "🐵",
+    "handle": "@Ape77",
+    "message": "I'm betting my whole stack against it this round 🎲"
+  },
+  {
+    "timestamp_ms": 11500,
+    "persona": "Doomer",
+    "avatar": "🔴",
+    "handle": "@Permabear",
+    "message": "LMAO it self-corrected! The confidence interval just tanked."
+  },
+  {
+    "timestamp_ms": 14000,
+    "persona": "Quant",
+    "avatar": "🤖",
+    "handle": "@ArbGod",
+    "message": "That's exactly why you don't bet against the mirror engine."
+  },
+  {
+    "timestamp_ms": 18000,
+    "persona": "Permabull",
+    "avatar": "🐂",
+    "handle": "@UpOnly",
+    "message": "Giga-brain play right there. 🧠🔥"
+  },
+  {
+    "timestamp_ms": 22000,
+    "persona": "Retail",
+    "avatar": "🐵",
+    "handle": "@Ape77",
+    "message": "RIP my stack. Should have trusted the AI."
+  }
+]

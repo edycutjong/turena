@@ -22,10 +22,17 @@ contract TuringAgent8004 is ERC721, Ownable {
         uint256 consecutiveLosses;
         string  currentStrategy;    // JSON-encoded strategy params
         string  emotionState;       // CONFIDENT | CAUTIOUS | ANXIOUS | TILTED | MELTDOWN
+        
+        // Mantle Mirror Metrics
+        uint256 honestyScore;       // Starts at 100, drops on dishonest reveals
+        uint256 totalReveals;
+        uint256 honestReveals;
+        uint256 accurateReveals;
     }
 
     mapping(uint256 => AgentStats) public agentStats;
     uint256 private _nextTokenId;
+    address public predictionRegistry;
 
     event TradeRecorded(uint256 indexed tokenId, bool win, int256 pnl);
     event SelfCorrection(
@@ -44,11 +51,21 @@ contract TuringAgent8004 is ERC721, Ownable {
 
     constructor() ERC721("TuringAgent", "TAGT") Ownable(msg.sender) {}
 
+    function setPredictionRegistry(address _registry) external onlyOwner {
+        predictionRegistry = _registry;
+    }
+
+    modifier onlyOwnerOrRegistry() {
+        require(msg.sender == owner() || msg.sender == predictionRegistry, "Not authorized");
+        _;
+    }
+
     function mint(address to) external onlyOwner returns (uint256) {
         uint256 tokenId = _nextTokenId++;
         _safeMint(to, tokenId);
         agentStats[tokenId].eloRating    = 1200;
         agentStats[tokenId].emotionState = "CONFIDENT";
+        agentStats[tokenId].honestyScore = 100;
         return tokenId;
     }
 
@@ -101,9 +118,36 @@ contract TuringAgent8004 is ERC721, Ownable {
         emit EmotionalStateUpdated(tokenId, emotionState, s.hubrisLevel, s.tiltLevel);
     }
 
+    function recordReveal(
+        uint256 tokenId,
+        bool isHonest,
+        bool isAccurate
+    ) external onlyOwnerOrRegistry {
+        AgentStats storage s = agentStats[tokenId];
+        s.totalReveals++;
+        
+        if (isHonest) {
+            s.honestReveals++;
+            // Rebuild honesty score gradually if previously lost
+            if (s.honestyScore < 100) s.honestyScore += 2;
+            if (s.honestyScore > 100) s.honestyScore = 100;
+        } else {
+            // Heavy penalty for lying
+            s.honestyScore = s.honestyScore > 25 ? s.honestyScore - 25 : 0;
+        }
+
+        if (isAccurate) {
+            s.accurateReveals++;
+        }
+    }
+
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         _requireOwned(tokenId);
         AgentStats memory s = agentStats[tokenId];
+        
+        uint256 accuracy = s.totalReveals == 0 ? 0 : (s.accurateReveals * 100) / s.totalReveals;
+        uint256 revealRate = s.totalTrades == 0 ? 0 : (s.totalReveals * 100) / s.totalTrades;
+
         // Dynamic on-chain metadata — readable by anyone via RPC or Mantlescan
         return string(abi.encodePacked(
             'data:application/json;utf8,{"name":"TuringAgent #', _toString(tokenId),
@@ -117,7 +161,10 @@ contract TuringAgent8004 is ERC721, Ownable {
             '{"trait_type":"Hubris Level","value":', _toString(s.hubrisLevel), '},',
             '{"trait_type":"Tilt Level","value":', _toString(s.tiltLevel), '},',
             '{"trait_type":"Consecutive Losses","value":', _toString(s.consecutiveLosses), '},',
-            '{"trait_type":"Emotion","value":"', s.emotionState, '"}',
+            '{"trait_type":"Emotion","value":"', s.emotionState, '"},',
+            '{"trait_type":"Honesty Score","value":', _toString(s.honestyScore), '},',
+            '{"trait_type":"Accuracy %","value":', _toString(accuracy), '},',
+            '{"trait_type":"Reveal Rate %","value":', _toString(revealRate), '}',
             ']}'
         ));
     }

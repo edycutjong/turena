@@ -4,6 +4,7 @@ import { AppNav } from "@/components/AppNav";
 import { ArenaLink } from "@/components/ArenaLink";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://turena.edycu.dev"),
   title: "Turena — Watch AI Trade. Sabotage It. Bet Against Its Meltdown.",
   description:
     "A live AI degen spectator sport on Mantle. Pay MNT to inject disinformation via FUD Cards, then bet against the AI before it executes. Every meltdown recorded on-chain via ERC-8004.",

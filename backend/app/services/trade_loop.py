@@ -7,8 +7,9 @@ import asyncpg
 from .db import get_pool, insert_cot_token
 from .deepseek import stream_initial_analysis, stream_verdict
 from .bybit import fetch_market_context, place_order, get_pnl
-from .mantle import record_trade, record_emotional_state, settle_cycle
+from .mantle import record_trade, record_emotional_state, settle_cycle, commit_prediction, reveal_prediction
 from .correction import run_self_correction
+import random
 
 READING_WINDOW  = 0    # Phase 1 ends when AI says "Awaiting crowd sentiment"
 SABOTAGE_WINDOW = 20   # seconds for Phase 2 — betting + FUD cards
@@ -141,6 +142,15 @@ async def run_cycle(manual: bool = False) -> dict:
     symbol    = "MNTUSDT"
     bybit_side = "buy" if action == "long" else "sell"
 
+    # ── Mantle Mirror Commit ────────────────────────────────────────────────
+    mirror_action = action.upper()
+    mirror_confidence = int(intent_data.get("confidence", 0.5) * 100)
+    mirror_nonce = random.randint(1, 9999999)
+    try:
+        await commit_prediction(cycle_number, TOKEN_ID, mirror_action, mirror_confidence, mirror_nonce)
+    except Exception as e:
+        print(f"[mantle-mirror] commit failed: {e}")
+
     # ── Settlement ──────────────────────────────────────────────────────────
     order = await place_order(symbol, bybit_side)
     entry_price = order.get("price") or order.get("average") or 0
@@ -161,6 +171,11 @@ async def run_cycle(manual: bool = False) -> dict:
         "UPDATE trade_cycles SET result=$1, pnl_mnt=$2, tx_hash=$3, phase='SETTLED' WHERE id=$4",
         "win" if win else "loss", pnl, tx_hash, cycle_id,
     )
+
+    try:
+        await reveal_prediction(cycle_number, TOKEN_ID, mirror_action, mirror_confidence, mirror_nonce, win)
+    except Exception as e:
+        print(f"[mantle-mirror] reveal failed: {e}")
 
     await pool.execute(
         """INSERT INTO agent_state (agent_id, total_trades, total_pnl, win_rate, current_params, emotion_state, consecutive_losses)

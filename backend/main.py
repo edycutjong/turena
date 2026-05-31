@@ -20,18 +20,27 @@ async def _auto_cycle_loop():
         await asyncio.sleep(10)  # brief pause between cycles
 
 
+_spectator_task: asyncio.Task | None = None
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Auto-cycle starts only if AUTO_CYCLE=true env var is set
     import os
     global _auto_cycle_task
+    global _spectator_task
+    
     if os.getenv("AUTO_CYCLE", "false").lower() == "true":
         _auto_cycle_task = asyncio.create_task(_auto_cycle_loop())
         print("[auto-cycle] started")
+        
+    from app.services.spectator import run_spectator_loop
+    _spectator_task = asyncio.create_task(run_spectator_loop())
+    
     yield
     if _auto_cycle_task:
         _auto_cycle_task.cancel()
-
+    if _spectator_task:
+        _spectator_task.cancel()
 
 app = FastAPI(title="Turena Backend", version="0.1.0", lifespan=lifespan)
 

@@ -16,9 +16,10 @@
 ---
 
 <div align="center">
-  <img src="docs/readme_hero.png" alt="Turena — The Turing Arena" width="800">
+  <img src="src/app/icon.svg" width="128" alt="Turena Icon">
   <h1>TURENA</h1>
   <h3>⚔️ The Turing Arena</h3>
+  <img src="docs/readme_hero.png" alt="Turena — The Turing Arena" width="100%">
   <p><em>Watch AI Trade. Sabotage It. Bet Against Its Meltdown.</em></p>
 
   [![Live Demo](https://img.shields.io/badge/Live-turena.edycu.dev-brightgreen.svg)](https://turena.edycu.dev)
@@ -242,6 +243,39 @@ curl -X POST https://turena-production.up.railway.app/agent/run-cycle
 # Open /arena — watch phases: AI reading → sabotage window → AI verdict
 # Play a FUD card during the sabotage window, then place a counter-trade bet
 ```
+
+---
+
+## 🧪 Testing & CI
+
+**6-stage pipeline:** Quality → Security → Build → E2E → Performance → Deploy
+
+```bash
+# ── Code Quality ────────────────────────────
+npm run lint          # ESLint
+npm run typecheck     # TypeScript check
+npm run test          # Run tests
+npm run test:coverage # Coverage report
+npm run ci            # Full quality gate
+
+# ── Advanced Testing ────────────────────────
+npm run e2e           # Playwright E2E tests
+npm run e2e:ui        # Playwright interactive mode
+npm run lighthouse    # Lighthouse CI audit
+
+# ── Security ────────────────────────────────
+make security-scan    # npm audit + license check
+```
+
+| Layer | Tool | Status |
+|---|---|---|
+| Code Quality | ESLint + TypeScript | ✅ |
+| Unit Testing | Vitest (Coverage tracked) | ✅ |
+| E2E Testing | Playwright (3 suites) | ✅ |
+| Security (SAST) | CodeQL | ✅ |
+| Security (SCA) | Dependabot + npm audit | ✅ |
+| Secret Scanning | TruffleHog | ✅ |
+| Performance | Lighthouse CI | ✅ |
 
 ---
 

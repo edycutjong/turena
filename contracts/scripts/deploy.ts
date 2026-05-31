@@ -15,9 +15,9 @@ async function main() {
   const balance = await ethers.provider.getBalance(deployer.address);
   console.log("Wallet balance:", ethers.formatEther(balance), "MNT");
 
-  // Bankroll: 50 MNT on mainnet, 1000 MNT on testnet, overrideable via env
+  // Bankroll: 50 MNT on mainnet, 500 MNT on testnet, overrideable via env
   const isMainnet = network.name === "mantleMainnet";
-  const defaultBankroll = isMainnet ? "50" : "1000";
+  const defaultBankroll = isMainnet ? "50" : "500";
   const bankrollMNT = ethers.parseEther(
     process.env.DEPLOY_BANKROLL_MNT ?? defaultBankroll
   );
@@ -43,14 +43,23 @@ async function main() {
   const escrowAddr = await escrow.getAddress();
   console.log("CounterTradeEscrow:", escrowAddr);
 
+  // Deploy PredictionRegistry (Mantle Mirror Engine V2)
+  const Registry = await ethers.getContractFactory("PredictionRegistry");
+  const registry = await Registry.deploy(agentAddr);
+  await registry.waitForDeployment();
+  const registryAddr = await registry.getAddress();
+  console.log("PredictionRegistry:", registryAddr);
+
   // Mint agent NFT token #0 to deployer
   const tx = await agent.mint(deployer.address);
   await tx.wait();
   console.log("Agent NFT minted — token ID: 0");
 
   console.log("\n--- Add to .env ---");
+  console.log(`PREDICTION_REGISTRY_ADDRESS=${registryAddr}`);
   console.log(`TURING_AGENT_ADDRESS=${agentAddr}`);
   console.log(`ESCROW_ADDRESS=${escrowAddr}`);
+  console.log(`NEXT_PUBLIC_PREDICTION_REGISTRY_ADDRESS=${registryAddr}`);
   console.log(`NEXT_PUBLIC_TURING_AGENT_ADDRESS=${agentAddr}`);
   console.log(`NEXT_PUBLIC_ESCROW_ADDRESS=${escrowAddr}`);
 }

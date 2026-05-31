@@ -9,7 +9,7 @@ import { MarketChart } from "@/components/MarketChart";
 import { TradeHistory } from "@/components/TradeHistory";
 import { AgentProfile } from "@/components/AgentProfile";
 import { SelfCorrectionOverlay } from "@/components/SelfCorrectionOverlay";
-import { LiveChat } from "@/components/LiveChat";
+import { SpectatorChat } from "@/components/SpectatorChat";
 import { FudCardPanel } from "@/components/FudCardPanel";
 import { TugOfWarBar } from "@/components/TugOfWarBar";
 import { SabotageFeed } from "@/components/SabotageFeed";
@@ -229,11 +229,18 @@ export default function ArenaPage() {
 
         {/* Right — CoT Terminal + Live Chat */}
         <div className="flex flex-col flex-1 gap-2 min-h-[400px] md:min-h-0 arena-panel arena-panel-d2" style={{ minWidth: 0 }}>
-          <div className="flex-1 min-h-0">
-            <CoTTerminal cycleId={cycle?.id ?? null} onEmotionChange={setCotEmotion} />
+          <div className="flex flex-1 gap-2 min-h-0">
+             {/* Split Screen AI 1 */}
+             <div className="flex-1 min-w-0">
+                <CoTTerminal cycleId={cycle?.id ?? null} onEmotionChange={setCotEmotion} agentId="Agent-007" />
+             </div>
+             {/* Split Screen AI 2 */}
+             <div className="flex-1 min-w-0 hidden lg:block">
+                <CoTTerminal cycleId={cycle?.id ?? null} agentId="Agent-404" />
+             </div>
           </div>
-          <div className="h-48">
-            <LiveChat />
+          <div className="h-48 shrink-0 border border-zinc-800 rounded overflow-hidden">
+            <SpectatorChat isLiveMode={false} />
           </div>
         </div>
       </div>

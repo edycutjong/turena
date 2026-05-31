@@ -37,44 +37,62 @@ class TestLifespan:
     async def test_lifespan_auto_cycle_enabled(self):
         import main as main_mod
         original_task = main_mod._auto_cycle_task
+        original_spectator = main_mod._spectator_task
 
         with patch.dict(os.environ, {"AUTO_CYCLE": "true"}), \
-             patch("main._auto_cycle_loop", new_callable=AsyncMock) as _mock_loop:
-            # Create a mock task
+             patch("main._auto_cycle_loop", new_callable=AsyncMock), \
+             patch("app.services.spectator.run_spectator_loop", new_callable=AsyncMock):
             mock_task = MagicMock()
             mock_task.cancel = MagicMock()
-            with patch("main.asyncio.create_task", side_effect=lambda c: c.close() or mock_task):
+            with patch("main.asyncio.create_task", return_value=mock_task):
                 async with main_mod.lifespan(main_mod.app):
                     assert main_mod._auto_cycle_task is mock_task
+                    assert main_mod._spectator_task is mock_task
 
-            mock_task.cancel.assert_called_once()
+            assert mock_task.cancel.call_count == 2
 
         main_mod._auto_cycle_task = original_task
+        main_mod._spectator_task = original_spectator
 
     @pytest.mark.asyncio
     async def test_lifespan_auto_cycle_disabled(self):
         import main as main_mod
         original_task = main_mod._auto_cycle_task
+        original_spectator = main_mod._spectator_task
         main_mod._auto_cycle_task = None
 
-        with patch.dict(os.environ, {"AUTO_CYCLE": "false"}):
-            async with main_mod.lifespan(main_mod.app):
-                assert main_mod._auto_cycle_task is None
+        with patch.dict(os.environ, {"AUTO_CYCLE": "false"}), \
+             patch("app.services.spectator.run_spectator_loop", new_callable=AsyncMock):
+            mock_task = MagicMock()
+            with patch("main.asyncio.create_task", return_value=mock_task):
+                async with main_mod.lifespan(main_mod.app):
+                    assert main_mod._auto_cycle_task is None
+                    assert main_mod._spectator_task is mock_task
+            
+            assert mock_task.cancel.call_count == 1
 
         main_mod._auto_cycle_task = original_task
+        main_mod._spectator_task = original_spectator
 
     @pytest.mark.asyncio
     async def test_lifespan_no_task_to_cancel(self):
         import main as main_mod
         original_task = main_mod._auto_cycle_task
+        original_spectator = main_mod._spectator_task
         main_mod._auto_cycle_task = None
+        main_mod._spectator_task = None
 
-        with patch.dict(os.environ, {}, clear=False):
+        with patch.dict(os.environ, {}, clear=False), \
+             patch("app.services.spectator.run_spectator_loop", new_callable=AsyncMock):
             os.environ.pop("AUTO_CYCLE", None)
-            async with main_mod.lifespan(main_mod.app):
-                pass  # no task created
+            mock_task = MagicMock()
+            with patch("main.asyncio.create_task", return_value=mock_task):
+                async with main_mod.lifespan(main_mod.app):
+                    pass
+            assert mock_task.cancel.call_count == 1
 
         main_mod._auto_cycle_task = original_task
+        main_mod._spectator_task = original_spectator
 
 
 class TestAutoCycleLoop:

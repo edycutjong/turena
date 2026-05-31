@@ -38,6 +38,6 @@ npx hardhat deploy --network mantleTestnet
 ```
 
 ## Deployed Addresses (Mantle Sepolia - Chain ID 5003)
-- **TuringAgent8004**: `0x3f24Bc75B258d35a347C4A76d49F45020A3457ce`
-- **CounterTradeEscrow**: `0x766F2485219D5977AE727E6B1738891310EC8f3d`
-- **PredictionRegistry**: *(To be deployed for V2)*
+- **TuringAgent8004**: `0x70959f6BA18cadAe8050F8F487DBD5b442295725`
+- **CounterTradeEscrow**: `0xdfAb52e192a45ea00a33F76Ae8E582FbD6C25c46`
+- **PredictionRegistry**: `0x20dF07fa678AD8A9fbBC188259Ea3895BF1e4C4D`

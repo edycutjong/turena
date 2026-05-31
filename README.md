@@ -105,8 +105,9 @@ Both contracts deployed and **source-verified** on Mantle Sepolia (Chain ID `500
 
 | Contract | Address | Explorer | Verified Source |
 |---|---|---|---|
-| `TuringAgent8004` | `0x3f24Bc75B258d35a347C4A76d49F45020A3457ce` | [Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce) | [Sourcify ✅](https://repo.sourcify.dev/contracts/full_match/5003/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce/) |
-| `CounterTradeEscrow` | `0x766F2485219D5977AE727E6B1738891310EC8f3d` | [Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x766F2485219D5977AE727E6B1738891310EC8f3d) | [Sourcify ✅](https://repo.sourcify.dev/contracts/full_match/5003/0x766F2485219D5977AE727E6B1738891310EC8f3d/) |
+| `PredictionRegistry` | `0x20dF07fa678AD8A9fbBC188259Ea3895BF1e4C4D` | [Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x20dF07fa678AD8A9fbBC188259Ea3895BF1e4C4D) | [Sourcify ✅](https://repo.sourcify.dev/contracts/full_match/5003/0x20dF07fa678AD8A9fbBC188259Ea3895BF1e4C4D/) |
+| `TuringAgent8004` | `0x70959f6BA18cadAe8050F8F487DBD5b442295725` | [Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0x70959f6BA18cadAe8050F8F487DBD5b442295725) | [Sourcify ✅](https://repo.sourcify.dev/contracts/full_match/5003/0x70959f6BA18cadAe8050F8F487DBD5b442295725/) |
+| `CounterTradeEscrow` | `0xdfAb52e192a45ea00a33F76Ae8E582FbD6C25c46` | [Mantlescan ↗](https://sepolia.mantlescan.xyz/address/0xdfAb52e192a45ea00a33F76Ae8E582FbD6C25c46) | [Sourcify ✅](https://repo.sourcify.dev/contracts/full_match/5003/0xdfAb52e192a45ea00a33F76Ae8E582FbD6C25c46/) |
 
 **On-chain proof of live activity (verifiable by judges):**
 
@@ -114,7 +115,7 @@ Both contracts deployed and **source-verified** on Mantle Sepolia (Chain ID `500
 |---|---|---|
 | `SelfCorrection` fired | [`0x13cc6958…`](https://sepolia.mantlescan.xyz/tx/0x13cc6958f0d66e7f52aba0ccc4fe1aeaffc8c56e1bf6f1e0cfc28f50cd9c70be) | AI adjusted `confidence_threshold` 0.7 → 0.75 on-chain |
 | `placeBet` (human) | [`0x3d37eed3…`](https://sepolia.mantlescan.xyz/tx/0x3d37eed32f926c410b2fcda68019ca88c68d68a8b0488adbdecbbd09e5e0bc26) | Real human bet placed against AI during live session |
-| 30+ `recordTrade` txs | [TuringAgent history ↗](https://sepolia.mantlescan.xyz/address/0x3f24Bc75B258d35a347C4A76d49F45020A3457ce) | Continuous autonomous trading on Mantle Sepolia |
+| 30+ `recordTrade` txs | [TuringAgent history ↗](https://sepolia.mantlescan.xyz/address/0x70959f6BA18cadAe8050F8F487DBD5b442295725) | Continuous autonomous trading on Mantle Sepolia |
 
 ---
 
@@ -287,8 +288,9 @@ make security-scan    # npm audit + license check
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key — safe for browser |
-| `NEXT_PUBLIC_TURING_AGENT_ADDRESS` | `0x3f24Bc75B258d35a347C4A76d49F45020A3457ce` |
-| `NEXT_PUBLIC_ESCROW_ADDRESS` | `0x766F2485219D5977AE727E6B1738891310EC8f3d` |
+| `NEXT_PUBLIC_PREDICTION_REGISTRY_ADDRESS` | `0x20dF07fa678AD8A9fbBC188259Ea3895BF1e4C4D` |
+| `NEXT_PUBLIC_TURING_AGENT_ADDRESS` | `0x70959f6BA18cadAe8050F8F487DBD5b442295725` |
+| `NEXT_PUBLIC_ESCROW_ADDRESS` | `0xdfAb52e192a45ea00a33F76Ae8E582FbD6C25c46` |
 | `NEXT_PUBLIC_BACKEND_URL` | Railway URL — client-side cycle trigger |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-side only, never exposed to browser |
 | `BACKEND_URL` | Railway URL — server-side price proxy |

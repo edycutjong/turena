@@ -13,7 +13,7 @@ interface ChatMessage {
   created_at: string;
 }
 
-export function SpectatorChat({ isLiveMode = false }: { isLiveMode?: boolean }) {
+export function SpectatorChat({}: { isLiveMode?: boolean }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const cycle = useActiveCycle();
   const [bullishPercent, setBullishPercent] = useState(50);
@@ -66,7 +66,7 @@ export function SpectatorChat({ isLiveMode = false }: { isLiveMode?: boolean }) 
       
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg) => (
-          <div key={msg.id || msg.created_at || Math.random()} className="flex gap-2 animate-in fade-in slide-in-from-bottom-2">
+          <div key={msg.id || msg.created_at} className="flex gap-2 animate-in fade-in slide-in-from-bottom-2">
             <div className="text-xl">
               {msg.sentiment === "BULLISH" ? "🚀" : msg.sentiment === "BEARISH" ? "🐻" : msg.sentiment === "TROLL" ? "🤡" : "👀"}
             </div>

@@ -114,7 +114,7 @@ Both contracts deployed and **source-verified** on Mantle Sepolia (Chain ID `500
 | Event | Tx Hash | What it proves |
 |---|---|---|
 | `SelfCorrection` fired | [`0x13cc6958…`](https://sepolia.mantlescan.xyz/tx/0x13cc6958f0d66e7f52aba0ccc4fe1aeaffc8c56e1bf6f1e0cfc28f50cd9c70be) | AI adjusted `confidence_threshold` 0.7 → 0.75 on-chain |
-| `placeBet` (human) | [`0x3d37eed3…`](https://sepolia.mantlescan.xyz/tx/0x3d37eed32f926c410b2fcda68019ca88c68d68a8b0488adbdecbbd09e5e0bc26) | Real human bet placed against AI during live session |
+| `placeBet` (human) | [`0x8f7e2154…`](https://sepolia.mantlescan.xyz/tx/0x8f7e2154fdba04ecb992c2edd01ae8983e063d37dce9e4f513cf7c643e8c7164) | Real human bet placed against AI during live session |
 | 30+ `recordTrade` txs | [TuringAgent history ↗](https://sepolia.mantlescan.xyz/address/0x70959f6BA18cadAe8050F8F487DBD5b442295725) | Continuous autonomous trading on Mantle Sepolia |
 
 ---

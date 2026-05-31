@@ -5,10 +5,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    exclude: ['contracts/**', 'backend/**', 'node_modules/**', 'dist/**', '.next/**'],
+    exclude: ['contracts/**', 'backend/**', 'node_modules/**', 'dist/**', '.next/**', 'e2e/**'],
     coverage: {
       provider: 'v8',
-      exclude: ['contracts/**', 'backend/**', 'node_modules/**', 'dist/**', '.next/**', '*.config.*']
+      exclude: ['contracts/**', 'backend/**', 'node_modules/**', 'dist/**', '.next/**', '*.config.*', 'e2e/**']
     }
   },
   resolve: {

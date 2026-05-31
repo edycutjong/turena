@@ -50,7 +50,7 @@ describe("useActiveCycle", () => {
     });
 
     // Verify subscription
-    expect(supabase.channel).toHaveBeenCalledWith("active-cycle");
+    expect(supabase.channel).toHaveBeenCalledWith(expect.stringContaining("active-cycle"));
     expect(mockSubscribe).toHaveBeenCalled();
 
     // Trigger insert

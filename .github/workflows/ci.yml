@@ -10,6 +10,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: "dummy_anon_key"
+  NEXT_PUBLIC_TURING_AGENT_ADDRESS: "0x0000000000000000000000000000000000000000"
+
 jobs:
   frontend-quality:
     name: "Stage 1 · Frontend Quality"

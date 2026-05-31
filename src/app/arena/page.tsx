@@ -240,7 +240,7 @@ export default function ArenaPage() {
              </div>
           </div>
           <div className="h-48 shrink-0 border border-zinc-800 rounded overflow-hidden">
-            <SpectatorChat isLiveMode={false} />
+            <SpectatorChat />
           </div>
         </div>
       </div>

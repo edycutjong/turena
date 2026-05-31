@@ -13,7 +13,7 @@ interface ChatMessage {
   created_at: string;
 }
 
-export function SpectatorChat({}: { isLiveMode?: boolean }) {
+export function SpectatorChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const cycle = useActiveCycle();
   const [bullishPercent, setBullishPercent] = useState(50);
@@ -32,7 +32,7 @@ export function SpectatorChat({}: { isLiveMode?: boolean }) {
       });
 
     // Subscribe
-    const channel = supabase.channel(`chat-${cycle.id}`)
+    const channel = supabase.channel(`chat-${cycle.id}-${Math.random().toString(36).slice(2, 8)}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "spectator_chat", filter: `cycle_id=eq.${cycle.id}` },
@@ -50,7 +50,7 @@ export function SpectatorChat({}: { isLiveMode?: boolean }) {
   }, [cycle?.id]);
 
   return (
-    <div className="w-80 h-full border-l border-zinc-800 bg-zinc-950 flex flex-col font-mono text-sm">
+    <div className="w-full h-full border-l border-zinc-800 bg-zinc-950 flex flex-col font-mono text-sm">
       <div className="p-4 border-b border-zinc-800">
         <h3 className="text-zinc-100 font-bold mb-2">LIVE ARENA CHAT</h3>
         <div className="flex items-center gap-2">

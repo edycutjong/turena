@@ -1,7 +1,7 @@
 .PHONY: test test-fe test-be up down build logs prune clean nuke ci
 
 # Run all tests with coverage for both frontend and backend
-test: test-fe test-be
+test: test-fe test-be test-contracts
 
 # Run frontend tests with coverage
 test-fe:
@@ -10,6 +10,10 @@ test-fe:
 # Run backend tests with coverage
 test-be:
 	cd backend && .venv/bin/pytest --cov
+
+# Run contracts tests
+test-contracts:
+	cd contracts && npx hardhat test
 
 # Docker compose commands
 up:

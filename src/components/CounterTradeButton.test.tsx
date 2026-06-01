@@ -1,25 +1,7 @@
-import { vi } from "vitest";
-
-vi.hoisted(() => {
-  process.env.NEXT_PUBLIC_ESCROW_ADDRESS = "0xescrow";
-});
-
-import { render, fireEvent, act, waitFor } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { render, fireEvent, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CounterTradeButton } from "./CounterTradeButton";
 import { placeBetTx } from "@/lib/escrow";
-
-vi.mock("framer-motion", () => ({
-  motion: {
-    button: ({ children, onClick, disabled, className }: any) => (
-      <button onClick={onClick} disabled={disabled} className={className}>
-        {children}
-      </button>
-    ),
-    div: ({ children, className }: any) => <div className={className}>{children}</div>,
-  },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
 
 vi.mock("@/lib/escrow", () => ({
   placeBetTx: vi.fn(),
@@ -27,153 +9,117 @@ vi.mock("@/lib/escrow", () => ({
 }));
 
 describe("CounterTradeButton", () => {
+  const mockOnConnect = vi.fn();
+  const mockOnBetSuccess = vi.fn();
+  const defaultProps = {
+    isOpen: true,
+    deepSeekPool: 10.0,
+    openAIPool: 4.0,
+    cycleNumber: 1,
+    walletAddress: "0xwallet" as const,
+    onConnect: mockOnConnect,
+    onBetSuccess: mockOnBetSuccess,
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("renders Connect Wallet when walletAddress is null, and calls onConnect on click", () => {
-    const onConnect = vi.fn();
-    const { getByText } = render(
-      <CounterTradeButton
-        isOpen={true}
-        totalPool={10}
-        againstPool={4}
-        cycleNumber={5}
-        walletAddress={null}
-        onConnect={onConnect}
-        onBetSuccess={vi.fn()}
-      />
-    );
-
-    const btn = getByText("Connect Wallet");
-    expect(btn).toBeTruthy();
-
-    fireEvent.click(btn);
-    expect(onConnect).toHaveBeenCalled();
+  it("renders correctly in idle state", () => {
+    const { getByText } = render(<CounterTradeButton {...defaultProps} />);
+    expect(getByText("⚡ Place Bet")).toBeTruthy();
+    expect(getByText("DeepSeek")).toBeTruthy();
+    expect(getByText("10.0 MNT")).toBeTruthy();
+    expect(getByText("OpenAI")).toBeTruthy();
+    expect(getByText("4.0 MNT")).toBeTruthy();
   });
 
-  it("renders Waiting when wallet is connected but window is closed", () => {
-    const { getByText } = render(
-      <CounterTradeButton
-        isOpen={false}
-        totalPool={10}
-        againstPool={4}
-        cycleNumber={5}
-        walletAddress="0xwallet"
-        onConnect={vi.fn()}
-        onBetSuccess={vi.fn()}
-      />
-    );
-
-    expect(getByText("Waiting…")).toBeTruthy();
-    const btn = getByText("Waiting…");
-    fireEvent.click(btn); // should do nothing
+  it("calls onConnect if wallet is not connected", () => {
+    const { getByText } = render(<CounterTradeButton {...defaultProps} walletAddress={null} />);
+    fireEvent.click(getByText("Connect Wallet"));
+    expect(mockOnConnect).toHaveBeenCalled();
   });
 
-  it("handles bet dialog flow: confirm, change amount, place tx success", async () => {
-    const onBetSuccess = vi.fn();
-    vi.mocked(placeBetTx).mockResolvedValue("0xhash1234567890abcdef");
+  it("goes through the bet flow successfully for DeepSeek", async () => {
+    vi.mocked(placeBetTx).mockResolvedValue("0xhash123");
+    const { getByText, getByRole, queryByText } = render(<CounterTradeButton {...defaultProps} />);
 
-    const { getByText, getByRole, queryByText } = render(
-      <CounterTradeButton
-        isOpen={true}
-        totalPool={10}
-        againstPool={4}
-        cycleNumber={5}
-        walletAddress="0xwallet"
-        onConnect={vi.fn()}
-        onBetSuccess={onBetSuccess}
-      />
-    );
+    // Click Place Bet
+    fireEvent.click(getByText("⚡ Place Bet"));
+    expect(getByText("Who Wins This Cycle?")).toBeTruthy();
 
-    // Initial click opens confirm panel
-    const actionBtn = getByText("⚡ Counter Trade");
-    fireEvent.click(actionBtn);
+    // Click DeepSeek
+    fireEvent.click(getByText("DeepSeek", { selector: 'button' }));
+    expect(getByText("Bet on DeepSeek")).toBeTruthy();
 
-    expect(getByText("Bet against AI")).toBeTruthy();
-    const confirmBtn = getByText("Confirm");
-    const cancelBtn = getByText("Cancel");
+    // Confirm
+    fireEvent.click(getByText("Confirm"));
+    expect(getByText("Confirming in Wallet...")).toBeTruthy();
 
-    // Click cancel resets dialog
-    fireEvent.click(cancelBtn);
-    expect(getByText("⚡ Counter Trade")).toBeTruthy();
+    await waitFor(() => {
+      expect(placeBetTx).toHaveBeenCalledWith(1, 1, 1, expect.any(String));
+      expect(mockOnBetSuccess).toHaveBeenCalledWith("0xhash123");
+      expect(getByText(/0xhash123/)).toBeTruthy();
+    });
+  });
 
-    // Re-open
-    fireEvent.click(getByText("⚡ Counter Trade"));
+  it("handles bet error", async () => {
+    vi.mocked(placeBetTx).mockRejectedValue(new Error("RPC Error"));
+    const { getByText, getByRole } = render(<CounterTradeButton {...defaultProps} />);
 
-    // Set amount below min
-    const input = getByRole("spinbutton");
-    fireEvent.change(input, { target: { value: "0.2" } });
+    fireEvent.click(getByText("⚡ Place Bet"));
+    fireEvent.click(getByText("OpenAI", { selector: 'button' }));
     fireEvent.click(getByText("Confirm"));
 
-    expect(getByText("Bet must be between 0.5 and 2 MNT")).toBeTruthy();
+    await waitFor(() => {
+      expect(getByText("RPC Error")).toBeTruthy();
+    });
+
+    // Dismiss error
     fireEvent.click(getByText("Dismiss"));
+    expect(getByText("⚡ Place Bet")).toBeTruthy();
+  });
 
-    // Wait for the error view to dismiss
-    await waitFor(() => {
-      expect(queryByText("Bet must be between 0.5 and 2 MNT")).toBeNull();
-    });
+  it("handles invalid bet amount", () => {
+    const { getByText, getByRole } = render(<CounterTradeButton {...defaultProps} />);
 
-    // Re-open and place success
-    fireEvent.click(getByText("⚡ Counter Trade"));
-    const newInput = getByRole("spinbutton");
-    fireEvent.change(newInput, { target: { value: "1.5" } });
+    // Click Place Bet
+    fireEvent.click(getByText("⚡ Place Bet"));
     
+    // Click DeepSeek
+    fireEvent.click(getByText("DeepSeek", { selector: 'button' }));
+
+    // Change input
+    const input = getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '0.1' } });
+    
+    // Confirm
     fireEvent.click(getByText("Confirm"));
 
-    await waitFor(() => {
-      expect(placeBetTx).toHaveBeenCalledWith(5, 1.5, "0xescrow");
-      expect(onBetSuccess).toHaveBeenCalledWith("0xhash1234567890abcdef");
-      expect(getByText("✓ Bet Placed")).toBeTruthy();
-      expect(getByText("0xhash1234… View on Explorer ↗")).toBeTruthy();
-    });
+    // Should show error
+    expect(getByText("Bet must be between 0.5 and 50 MNT")).toBeTruthy();
   });
 
-  it("handles bet tx failure", async () => {
-    vi.mocked(placeBetTx).mockRejectedValue(new Error("RPC Timeout"));
-
-    const { getByText, getByRole } = render(
-      <CounterTradeButton
-        isOpen={true}
-        totalPool={10}
-        againstPool={4}
-        cycleNumber={5}
-        walletAddress="0xwallet"
-        onConnect={vi.fn()}
-        onBetSuccess={vi.fn()}
-      />
-    );
-
-    // Open confirm
-    fireEvent.click(getByText("⚡ Counter Trade"));
-
-    // Place bet
-    fireEvent.click(getByText("Confirm"));
-
-    await waitFor(() => {
-      expect(getByText("RPC Timeout")).toBeTruthy();
-    });
+  it("does nothing if clicked when closed", () => {
+    const { getByText } = render(<CounterTradeButton {...defaultProps} isOpen={false} />);
+    expect(getByText("Waiting…")).toBeTruthy();
+    fireEvent.click(getByText("Waiting…"));
+    // Ensure betState doesn't change to "pick"
+    expect(() => getByText("Who Wins This Cycle?")).toThrow();
   });
 
-  it("handles bet tx fallback text on generic rejection error", async () => {
-    vi.mocked(placeBetTx).mockRejectedValue("Generic error object");
+  it("does nothing if clicked when cycleNumber is null", () => {
+    const { getByText } = render(<CounterTradeButton {...defaultProps} cycleNumber={null} />);
+    fireEvent.click(getByText("⚡ Place Bet"));
+    expect(() => getByText("Who Wins This Cycle?")).toThrow();
+  });
 
-    const { getByText } = render(
-      <CounterTradeButton
-        isOpen={true}
-        totalPool={10}
-        againstPool={4}
-        cycleNumber={5}
-        walletAddress="0xwallet"
-        onConnect={vi.fn()}
-        onBetSuccess={vi.fn()}
-      />
-    );
+  it("handles non-Error rejection", async () => {
+    vi.mocked(placeBetTx).mockRejectedValue("Some weird string error");
+    const { getByText } = render(<CounterTradeButton {...defaultProps} />);
 
-    // Open confirm
-    fireEvent.click(getByText("⚡ Counter Trade"));
-
-    // Place bet
+    fireEvent.click(getByText("⚡ Place Bet"));
+    fireEvent.click(getByText("OpenAI", { selector: 'button' }));
     fireEvent.click(getByText("Confirm"));
 
     await waitFor(() => {
@@ -181,39 +127,17 @@ describe("CounterTradeButton", () => {
     });
   });
 
-  it("does not proceed if cycleNumber becomes null when confirm is clicked", () => {
-    const { getByText, rerender } = render(
-      <CounterTradeButton
-        isOpen={true}
-        totalPool={10}
-        againstPool={4}
-        cycleNumber={5}
-        walletAddress="0xwallet"
-        onConnect={vi.fn()}
-        onBetSuccess={vi.fn()}
-      />
-    );
-
-    // Open confirm
-    fireEvent.click(getByText("⚡ Counter Trade"));
-
-    // Change cycleNumber to null
-    rerender(
-      <CounterTradeButton
-        isOpen={true}
-        totalPool={10}
-        againstPool={4}
-        cycleNumber={null}
-        walletAddress="0xwallet"
-        onConnect={vi.fn()}
-        onBetSuccess={vi.fn()}
-      />
-    );
-
-    // Click confirm
+  it("does nothing if confirmed when cycleNumber becomes null", () => {
+    const { getByText, rerender } = render(<CounterTradeButton {...defaultProps} />);
+    fireEvent.click(getByText("⚡ Place Bet"));
+    fireEvent.click(getByText("DeepSeek", { selector: 'button' }));
+    
+    // Now remove cycle number
+    rerender(<CounterTradeButton {...defaultProps} cycleNumber={null} />);
+    
     fireEvent.click(getByText("Confirm"));
-
-    // placeBetTx should not have been called
+    
+    // Should not call placeBetTx
     expect(placeBetTx).not.toHaveBeenCalled();
   });
 });

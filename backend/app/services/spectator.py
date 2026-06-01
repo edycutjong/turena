@@ -1,6 +1,5 @@
 import asyncio
 import os
-import json
 import random
 from openai import AsyncOpenAI
 from pydantic import BaseModel

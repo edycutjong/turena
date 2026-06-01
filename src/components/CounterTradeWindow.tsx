@@ -59,7 +59,7 @@ export default function CounterTradeWindow({ activeCycle }: { activeCycle: Trade
       ) : (
         <div className="space-y-8 w-full max-w-md bg-slate-900/50 p-8 rounded-2xl border border-slate-800 backdrop-blur-sm relative overflow-hidden">
           {/* Top warning bar */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-orange-500 to-red-500"></div>
+          <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-red-500 via-orange-500 to-red-500"></div>
 
           <div>
             <h2 className="text-slate-400 text-sm uppercase tracking-widest mb-2">Agent Intent Detected</h2>

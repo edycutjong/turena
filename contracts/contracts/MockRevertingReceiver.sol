@@ -17,8 +17,8 @@ contract MockRevertingReceiver {
         activeCycleId = _cycleId;
     }
 
-    function placeBet(uint256 cycleId, bool forAI) external payable {
-        escrow.placeBet{value: msg.value}(cycleId, forAI);
+    function placeBet(uint256 cycleId, uint8 agentChoice) external payable {
+        escrow.placeBet{value: msg.value}(cycleId, agentChoice);
     }
 
     function claim(uint256 cycleId) external {

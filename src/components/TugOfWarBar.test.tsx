@@ -1,12 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { TugOfWarBar } from "./TugOfWarBar";
-import { useSabotageEvents } from "@/hooks/useSabotageEvents";
 import { useCounterTrades } from "@/hooks/useCounterTrades";
-
-vi.mock("@/hooks/useSabotageEvents", () => ({
-  useSabotageEvents: vi.fn(),
-}));
 
 vi.mock("@/hooks/useCounterTrades", () => ({
   useCounterTrades: vi.fn(),
@@ -20,36 +15,46 @@ vi.mock("framer-motion", () => ({
 
 describe("TugOfWarBar", () => {
   it("renders null when cycleId is null and pool values are zero", () => {
-    vi.mocked(useSabotageEvents).mockReturnValue({ totalMnt: 0 } as any);
-    vi.mocked(useCounterTrades).mockReturnValue({ totalPool: 0 } as any);
+    vi.mocked(useCounterTrades).mockReturnValue({ deepSeekPool: 0, openAIPool: 0 } as any);
 
     const { container } = render(<TugOfWarBar cycleId={null} />);
     expect(container.firstChild).toBeNull();
   });
 
   it("renders with 50/50 layout when cycleId is present but pool values are zero", () => {
-    vi.mocked(useSabotageEvents).mockReturnValue({ totalMnt: 0 } as any);
-    vi.mocked(useCounterTrades).mockReturnValue({ totalPool: 0 } as any);
+    vi.mocked(useCounterTrades).mockReturnValue({ deepSeekPool: 0, openAIPool: 0 } as any);
 
     const { getByText, queryByText } = render(<TugOfWarBar cycleId="cycle-1" />);
 
-    expect(getByText("AI 50%")).toBeTruthy();
-    expect(getByText("Tug of War")).toBeTruthy();
-    expect(getByText("Humans 50%")).toBeTruthy();
-    expect(getByText("0.00 MNT vs AI")).toBeTruthy();
-    expect(queryByText("sabotage")).toBeNull();
+    expect(getByText("DeepSeek 50%")).toBeTruthy();
+    expect(getByText("Pool Balance")).toBeTruthy();
+    expect(getByText("OpenAI 50%")).toBeTruthy();
+    expect(getByText("Total: 0.00 MNT")).toBeTruthy();
   });
 
-  it("renders with calculated percentages and pool details when bets and sabotage are present", () => {
-    vi.mocked(useSabotageEvents).mockReturnValue({ totalMnt: 5 } as any); // sabotage MNT
-    vi.mocked(useCounterTrades).mockReturnValue({ totalPool: 10 } as any); // bet MNT
+  it("renders with calculated percentages and pool details when bets are present", () => {
+    vi.mocked(useCounterTrades).mockReturnValue({ deepSeekPool: 15, openAIPool: 5 } as any); // total = 20
 
-    // total = 15. humanPct = Math.round((15 / 16) * 100) = 94%. aiPct = 6%.
+    // deepSeekPct = (15/20) * 100 = 75%. openAIPct = 25%.
     const { getByText } = render(<TugOfWarBar cycleId="cycle-1" />);
 
-    expect(getByText("AI 6%")).toBeTruthy();
-    expect(getByText("Humans 94%")).toBeTruthy();
-    expect(getByText("5.0 MNT sabotage · 10.00 MNT bets")).toBeTruthy();
-    expect(getByText("15.00 MNT vs AI")).toBeTruthy();
+    expect(getByText("DeepSeek 75%")).toBeTruthy();
+    expect(getByText("OpenAI 25%")).toBeTruthy();
+    expect(getByText("15.00 MNT")).toBeTruthy(); // DeepSeek pool
+    expect(getByText("5.00 MNT")).toBeTruthy(); // OpenAI pool
+    expect(getByText("Total: 20.00 MNT")).toBeTruthy();
+  });
+
+  it("renders tie indicator when pools are equal and greater than 0", () => {
+    vi.mocked(useCounterTrades).mockReturnValue({ deepSeekPool: 10, openAIPool: 10 } as any);
+
+    const { getByText, container } = render(<TugOfWarBar cycleId="cycle-1" />);
+
+    expect(getByText("DeepSeek 50%")).toBeTruthy();
+    expect(getByText("OpenAI 50%")).toBeTruthy();
+    
+    // Test that the tie indicator is rendered (it has the animate-pulse class)
+    const tieIndicator = container.querySelector(".animate-pulse");
+    expect(tieIndicator).not.toBeNull();
   });
 });

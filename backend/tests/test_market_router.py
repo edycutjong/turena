@@ -26,6 +26,10 @@ class MockAsyncClientSuccess:
                     "a": [["0.651", "150"]]
                 }
             })
+        if "gateio.ws" in args[0]:
+            return MockResponse([
+                {"last": "0.65", "highest_bid": "0.649", "lowest_ask": "0.651"}
+            ])
         return MockResponse({
             "result": {
                 "list": [{"lastPrice": "0.65", "bid1Price": "0.649", "ask1Price": "0.651"}]
@@ -93,7 +97,23 @@ class TestMarketRouterPrice:
         assert data["price"] == 0.63
 
     @pytest.mark.asyncio
-    async def test_price_last_resort_mock(self):
+    async def test_price_fallback_gateio(self):
+        with patch("app.routers.market.httpx.AsyncClient", new=MockAsyncClientSuccess), \
+             patch("app.routers.market._coingecko_price", new_callable=AsyncMock, side_effect=Exception("err")):
+            # We need Bybit to fail, but Gate.io to succeed. We can just mock _bybit_spot_price to raise.
+            with patch("app.routers.market._bybit_spot_price", new_callable=AsyncMock, side_effect=Exception("err")):
+                from main import app
+                transport = ASGITransport(app=app)
+                async with AsyncClient(transport=transport, base_url="http://test") as client:
+                    resp = await client.get("/market/price")
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["source"] == "gateio-fallback"
+        assert data["price"] == 0.65
+
+    @pytest.mark.asyncio
+    async def test_price_all_fail(self):
         with patch("app.routers.market.httpx.AsyncClient", new=MockAsyncClientError), \
              patch("app.routers.market._coingecko_price", new_callable=AsyncMock, side_effect=Exception("err")):
             from main import app
@@ -101,10 +121,9 @@ class TestMarketRouterPrice:
             async with AsyncClient(transport=transport, base_url="http://test") as client:
                 resp = await client.get("/market/price")
 
-        assert resp.status_code == 200
+        assert resp.status_code == 503
         data = resp.json()
-        assert data["source"] == "mock-fallback"
-        assert 0.62 <= data["price"] <= 0.64
+        assert data["detail"] == "All pricing sources failed"
 
 
 class TestMarketRouterOrderbook:

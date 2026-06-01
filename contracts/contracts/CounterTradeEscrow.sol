@@ -5,97 +5,114 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
- * @title CounterTradeEscrow
- * @notice Humans bet against the AI's bankroll.
- *         AI wins → human stake added to bankroll.
- *         Human wins → paid out from bankroll.
- *         Bankroll solvency enforced before every bet.
+ * @title ModelWarsEscrow
+ * @notice Pari-mutuel betting on AI agents (DeepSeek vs OpenAI).
+ *         If an AI wins, its bettors take a proportional share of the opposing pool.
+ *         If there is a draw, everyone can claim their original bet back.
  */
 contract CounterTradeEscrow is Ownable, ReentrancyGuard {
-    struct Cycle {
-        uint256 forAI;
-        uint256 againstAI;
-        bool    settled;
-        bool    aiWon;
-    }
+    // 0 = Pending, 1 = DeepSeek (Agent 0) won, 2 = OpenAI (Agent 1) won, 3 = Draw
+    enum Winner { Pending, DeepSeek, OpenAI, Draw }
 
-    uint256 public bankroll;
+    struct Cycle {
+        uint256 deepSeekPool;
+        uint256 openAIPool;
+        Winner  winner;
+        bool    settled;
+    }
 
     struct BetInfo {
         uint256 amount;
-        bool forAI;
+        uint8   agentChoice; // 1 for DeepSeek, 2 for OpenAI
     }
 
     mapping(uint256 => Cycle) public cycles;
     mapping(uint256 => mapping(address => BetInfo)) public bets;
 
-    event BankrollFunded(uint256 amount, uint256 newBalance);
-    event BetPlaced(uint256 indexed cycleId, address indexed bettor, uint256 amount, bool forAI);
-    event CycleSettled(uint256 indexed cycleId, bool aiWon);
+    event BetPlaced(uint256 indexed cycleId, address indexed bettor, uint256 amount, uint8 agentChoice);
+    event CycleSettled(uint256 indexed cycleId, Winner winner);
     event Claimed(uint256 indexed cycleId, address indexed bettor, uint256 payout);
 
-    constructor() payable Ownable(msg.sender) {
-        bankroll = msg.value;
-        if (msg.value > 0) emit BankrollFunded(msg.value, bankroll);
-    }
+    constructor() payable Ownable(msg.sender) {}
 
-    receive() external payable {
-        bankroll += msg.value;
-        emit BankrollFunded(msg.value, bankroll);
-    }
+    // Allow contract to receive funds just in case
+    receive() external payable {}
 
-    function placeBet(uint256 cycleId, bool forAI) external payable {
+    /**
+     * @notice Place a bet on an agent for a given cycle.
+     * @param cycleId The ID of the trade cycle
+     * @param agentChoice 1 for DeepSeek, 2 for OpenAI
+     */
+    function placeBet(uint256 cycleId, uint8 agentChoice) external payable {
         require(msg.value > 0, "Bet must be > 0");
         require(!cycles[cycleId].settled, "Cycle already settled");
         require(bets[cycleId][msg.sender].amount == 0, "Already bet this cycle");
-        // Solvency: bankroll must be able to cover a payout if human wins
-        require(bankroll >= msg.value, "Bankroll too low to accept bet");
+        require(agentChoice == 1 || agentChoice == 2, "Invalid agent choice");
 
         bets[cycleId][msg.sender] = BetInfo({
             amount: msg.value,
-            forAI: forAI
+            agentChoice: agentChoice
         });
         
-        if (forAI) {
-            cycles[cycleId].forAI += msg.value;
+        if (agentChoice == 1) {
+            cycles[cycleId].deepSeekPool += msg.value;
         } else {
-            cycles[cycleId].againstAI += msg.value;
+            cycles[cycleId].openAIPool += msg.value;
         }
-        emit BetPlaced(cycleId, msg.sender, msg.value, forAI);
+        emit BetPlaced(cycleId, msg.sender, msg.value, agentChoice);
     }
 
-    function settle(uint256 cycleId, bool aiWon) external onlyOwner {
+    /**
+     * @notice Settle the cycle, declaring the winner.
+     * @param cycleId The ID of the trade cycle
+     * @param winner 1 for DeepSeek, 2 for OpenAI, 3 for Draw
+     */
+    function settle(uint256 cycleId, uint8 winner) external onlyOwner {
         Cycle storage c = cycles[cycleId];
         require(!c.settled, "Already settled");
+        require(winner >= 1 && winner <= 3, "Invalid winner status");
+        
         c.settled = true;
-        c.aiWon   = aiWon;
+        c.winner = Winner(winner);
 
-        if (aiWon) {
-            // AI wins: all bets against AI go into bankroll
-            bankroll += c.againstAI;
-        } else {
-            // Human wins: bankroll pays out against-AI bettors (2x)
-            uint256 payout = c.againstAI * 2;
-            require(bankroll >= payout, "Bankroll insolvent");
-            bankroll -= payout;
-            // Bets for AI are forfeited to bankroll
-            bankroll += c.forAI;
-        }
-        emit CycleSettled(cycleId, aiWon);
+        emit CycleSettled(cycleId, c.winner);
     }
 
+    /**
+     * @notice Claim payout if the bettor's chosen agent won, or refund if draw.
+     */
     function claim(uint256 cycleId) external nonReentrant {
         Cycle storage c = cycles[cycleId];
         require(c.settled, "Cycle not settled");
-        BetInfo memory betInfo = bets[cycleId][msg.sender];
-        require(betInfo.amount > 0, "No bet found");
-
-        bets[cycleId][msg.sender].amount = 0;
+        
+        BetInfo storage betInfo = bets[cycleId][msg.sender];
+        require(betInfo.amount > 0, "No bet found or already claimed");
 
         uint256 payout = 0;
-        if (!c.aiWon && !betInfo.forAI) {
-            // Caller gets 2x if they bet against AI and AI lost
-            payout = betInfo.amount * 2;
+        uint256 amount = betInfo.amount;
+        uint8 choice = betInfo.agentChoice;
+
+        // Prevent re-entrancy / double claiming
+        betInfo.amount = 0;
+
+        if (c.winner == Winner.Draw) {
+            // Draw: Refund exactly the bet amount
+            payout = amount;
+        } else if (c.winner == Winner.DeepSeek && choice == 1) {
+            // DeepSeek won
+            if (c.openAIPool == 0) {
+                payout = amount; // No losers to take from
+            } else {
+                // Proportional share of the opposing pool
+                payout = amount + (amount * c.openAIPool) / c.deepSeekPool;
+            }
+        } else if (c.winner == Winner.OpenAI && choice == 2) {
+            // OpenAI won
+            if (c.deepSeekPool == 0) {
+                payout = amount;
+            } else {
+                payout = amount + (amount * c.deepSeekPool) / c.openAIPool;
+            }
         }
 
         if (payout > 0) {

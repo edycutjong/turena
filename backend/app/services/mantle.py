@@ -25,7 +25,7 @@ async def _next_nonce(w3: AsyncWeb3, address: str) -> Nonce:
 
 # Minimal ABIs — only functions we call
 AGENT_ABI = json.loads('[{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"win","type":"bool"},{"name":"pnl","type":"int256"}],"name":"recordTrade","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"param","type":"string"},{"name":"oldVal","type":"uint256"},{"name":"newVal","type":"uint256"},{"name":"regretScore","type":"uint256"},{"name":"newStrategy","type":"string"}],"name":"recordSelfCorrection","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"tokenId","type":"uint256"},{"name":"emotionState","type":"string"}],"name":"recordEmotionalState","outputs":[],"stateMutability":"nonpayable","type":"function"}]')
-ESCROW_ABI = json.loads('[{"inputs":[{"name":"cycleId","type":"uint256"},{"name":"aiWon","type":"bool"}],"name":"settle","outputs":[],"stateMutability":"nonpayable","type":"function"}]')
+ESCROW_ABI = json.loads('[{"inputs":[{"name":"cycleId","type":"uint256"},{"name":"winner","type":"uint8"}],"name":"settle","outputs":[],"stateMutability":"nonpayable","type":"function"}]')
 
 registry_abi_path = os.path.join(os.path.dirname(__file__), "..", "..", "abi", "PredictionRegistry.json")
 if os.path.exists(registry_abi_path):
@@ -96,12 +96,12 @@ async def record_emotional_state(token_id: int, emotion_state: str) -> str:
     return tx_hash.hex()
 
 
-async def settle_cycle(cycle_id: int, ai_won: bool) -> str:
+async def settle_cycle(cycle_id: int, winner: int) -> str:
     w3 = get_w3()
     account = get_account(w3)
     addr = AsyncWeb3.to_checksum_address(os.environ["ESCROW_ADDRESS"])
     contract = w3.eth.contract(address=addr, abi=ESCROW_ABI)
-    tx = await contract.functions.settle(cycle_id, ai_won).build_transaction({
+    tx = await contract.functions.settle(cycle_id, winner).build_transaction({
         "from": account.address,
         "nonce": await _next_nonce(w3, account.address),
     })

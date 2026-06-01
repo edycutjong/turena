@@ -16,10 +16,6 @@ router = APIRouter()
 EVAL_WINDOW_SECONDS = 30  # evaluate P&L this many seconds after execution
 
 
-class MockOutcomeRequest(BaseModel):
-    cycle_id: str
-    outcome: str = "loss"
-
 
 @router.get("/status")
 async def get_status():
@@ -185,35 +181,3 @@ async def play_sabotage_card(body: SabotageRequest):
     return {"status": "card played", "card_type": body.card_type, "cycle_id": body.cycle_id}
 
 
-@router.post("/mock-outcome")
-async def mock_outcome(body: MockOutcomeRequest):
-    """Force an artificial trade result for demo recording. DEMO_MODE=true only."""
-    if os.getenv("DEMO_MODE", "false").lower() != "true":
-        raise HTTPException(403, "mock-outcome requires DEMO_MODE=true")
-
-    pool = await get_pool()
-    row = await pool.fetchrow("SELECT * FROM trade_cycles WHERE id = $1", body.cycle_id)
-    if not row:
-        raise HTTPException(404, "Cycle not found")
-
-    win = body.outcome == "win"
-    pnl = 3.0 if win else -3.0
-
-    tx_hash = await record_trade(token_id=0, win=win, pnl_wei=int(pnl * 1e18))
-    await pool.execute(
-        "UPDATE trade_cycles SET result=$1, pnl_mnt=$2, tx_hash=$3 WHERE id=$4",
-        body.outcome, pnl, tx_hash, body.cycle_id,
-    )
-
-    if not win:
-        params_row = await pool.fetchrow(
-            "SELECT current_params FROM agent_state WHERE agent_id = 'agent-0'"
-        )
-        params = json.loads(params_row["current_params"] if params_row else "{}")
-        correction = await run_self_correction(pool, body.cycle_id, 0, pnl, params)
-        await pool.execute(
-            "UPDATE trade_cycles SET self_corrected = true WHERE id = $1", body.cycle_id
-        )
-        return {"outcome": body.outcome, "tx_hash": tx_hash, "correction": correction}
-
-    return {"outcome": body.outcome, "tx_hash": tx_hash}

@@ -26,7 +26,7 @@ describe("proxy middleware", () => {
   });
 
   it("redirects to /blocked when country is GB", () => {
-    const req = new NextRequest("http://localhost:3000/api/agent/trade-loop");
+    const req = new NextRequest("http://localhost:3000/arena/trade-loop");
     (req as any).geo = { country: "GB" };
     const res = proxy(req);
     expect(res.status).toBe(307);

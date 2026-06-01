@@ -2,7 +2,7 @@ import random
 import httpx
 import ccxt.async_support as ccxt
 import os
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 
@@ -66,10 +66,23 @@ async def get_price(symbol: str = "MNTUSDT"):
     except Exception:
         pass
 
-    # 3. Last resort mock
-    base = 0.63
-    price = round(base + (random.random() - 0.5) * 0.004, 6)
-    return {"symbol": symbol, "price": price, "bid": round(price * 0.9998, 6), "ask": round(price * 1.0002, 6), "source": "mock-fallback"}
+    # 3. Gate.io fallback
+    try:
+        gate_symbol = "MNT_USDT" if symbol == "MNTUSDT" else symbol
+        async with httpx.AsyncClient(timeout=6) as client:
+            r = await client.get(f"https://api.gateio.ws/api/v4/spot/tickers?currency_pair={gate_symbol}")
+            r.raise_for_status()
+            data = r.json()
+            if data and len(data) > 0:
+                ticker = data[0]
+                price = float(ticker["last"])
+                bid = float(ticker["highest_bid"]) if ticker.get("highest_bid") else round(price * 0.9998, 6)
+                ask = float(ticker["lowest_ask"]) if ticker.get("lowest_ask") else round(price * 1.0002, 6)
+                return {"symbol": symbol, "price": price, "bid": bid, "ask": ask, "source": "gateio-fallback"}
+    except Exception:
+        pass
+        
+    raise HTTPException(status_code=503, detail="All pricing sources failed")
 
 
 @router.get("/orderbook")

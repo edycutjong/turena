@@ -38,8 +38,8 @@ export function useCounterTrades(cycleId: string | null) {
     return () => { supabase.removeChannel(channel); };
   }, [cycleId]);
 
-  const totalPool = trades.reduce((sum, t) => sum + t.amount_mnt, 0);
-  const againstPool = trades.filter((t) => t.position === "against").reduce((sum, t) => sum + t.amount_mnt, 0);
+  const deepSeekPool = trades.filter((t) => t.position === "for").reduce((sum, t) => sum + t.amount_mnt, 0);
+  const openAIPool = trades.filter((t) => t.position === "against").reduce((sum, t) => sum + t.amount_mnt, 0);
 
-  return { trades, totalPool, againstPool };
+  return { trades, deepSeekPool, openAIPool };
 }

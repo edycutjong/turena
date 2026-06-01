@@ -266,6 +266,71 @@ class TestRunCycle:
         # We can just check that any call had "reasoning"
         assert any(call[0][3] == "reasoning" for call in mock_insert.call_args_list)
 
+
+    @pytest.mark.asyncio
+    async def test_winner_deepseek(self):
+        mock_pool = AsyncMock()
+        mock_pool.fetchrow = AsyncMock(side_effect=[{"next": 8}])
+        async def mock_initial(*args):
+            yield ("reasoning", "...")
+            yield ("analysis_complete", "...")
+        async def mock_verdict_ds(*args):
+            yield ("intent", '{"action": "long"}')
+        async def mock_verdict_oa(*args):
+            yield ("intent", '{"action": "short"}')
+
+        with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
+             patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
+             patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
+             patch("app.services.trade_loop.ds_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.oa_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.ds_verdict", side_effect=mock_verdict_ds), \
+             patch("app.services.trade_loop.oa_verdict", side_effect=mock_verdict_oa), \
+             patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
+             patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o8", "price": 0.65}), \
+             patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=1.0), \
+             patch("app.services.trade_loop.record_trade", new_callable=AsyncMock, return_value="0x1"), \
+             patch("app.services.trade_loop.reveal_prediction", new_callable=AsyncMock), \
+             patch("app.services.trade_loop.settle_cycle", new_callable=AsyncMock) as mock_settle, \
+             patch("app.services.trade_loop.asyncio.sleep", new_callable=AsyncMock):
+            
+            result = await tl_mod.run_cycle()
+            # DeepSeek long, OA short, PnL=1.0 -> DS PnL=1.0, OA PnL=-1.0 -> Winner DS (1)
+            assert result["win"] is True
+            mock_settle.assert_called_with(8, 1)
+
+    @pytest.mark.asyncio
+    async def test_winner_openai(self):
+        mock_pool = AsyncMock()
+        mock_pool.fetchrow = AsyncMock(side_effect=[{"next": 9}, {"current_params": "{}"}])
+        async def mock_initial(*args):
+            yield ("reasoning", "...")
+            yield ("analysis_complete", "...")
+        async def mock_verdict_ds(*args):
+            yield ("intent", '{"action": "long"}')
+        async def mock_verdict_oa(*args):
+            yield ("intent", '{"action": "short"}')
+
+        with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
+             patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
+             patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
+             patch("app.services.trade_loop.ds_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.oa_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.ds_verdict", side_effect=mock_verdict_ds), \
+             patch("app.services.trade_loop.oa_verdict", side_effect=mock_verdict_oa), \
+             patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
+             patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o9", "price": 0.65}), \
+             patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=-1.0), \
+             patch("app.services.trade_loop.record_trade", new_callable=AsyncMock, return_value="0x1"), \
+             patch("app.services.trade_loop.reveal_prediction", new_callable=AsyncMock), \
+             patch("app.services.trade_loop.settle_cycle", new_callable=AsyncMock) as mock_settle, \
+             patch("app.services.trade_loop.run_self_correction", new_callable=AsyncMock, return_value={"param": "x"}), \
+             patch("app.services.trade_loop.asyncio.sleep", new_callable=AsyncMock):
+            
+            result = await tl_mod.run_cycle()
+            # DeepSeek long, OA short, PnL=-1.0 -> DS PnL=-1.0, OA PnL=1.0 -> Winner OA (2)
+            assert result["win"] is False
+            mock_settle.assert_called_with(9, 2)
     @pytest.mark.asyncio
     async def test_order_with_no_price_or_average(self):
         """When order has neither 'price' nor 'average', entry_price = 0."""

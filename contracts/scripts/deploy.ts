@@ -15,20 +15,6 @@ async function main() {
   const balance = await ethers.provider.getBalance(deployer.address);
   console.log("Wallet balance:", ethers.formatEther(balance), "MNT");
 
-  // Bankroll: 50 MNT on mainnet, 500 MNT on testnet, overrideable via env
-  const isMainnet = network.name === "mantleMainnet";
-  const defaultBankroll = isMainnet ? "50" : "500";
-  const bankrollMNT = ethers.parseEther(
-    process.env.DEPLOY_BANKROLL_MNT ?? defaultBankroll
-  );
-  console.log("Bankroll:      ", ethers.formatEther(bankrollMNT), "MNT");
-
-  if (balance < bankrollMNT) {
-    throw new Error(
-      `Insufficient balance. Need at least ${ethers.formatEther(bankrollMNT)} MNT, have ${ethers.formatEther(balance)} MNT`
-    );
-  }
-
   // Deploy TuringAgent8004
   const Agent = await ethers.getContractFactory("TuringAgent8004");
   const agent = await Agent.deploy();
@@ -36,9 +22,9 @@ async function main() {
   const agentAddr = await agent.getAddress();
   console.log("TuringAgent8004:", agentAddr);
 
-  // Deploy CounterTradeEscrow with initial bankroll
+  // Deploy CounterTradeEscrow (No initial bankroll needed for Pari-Mutuel)
   const Escrow = await ethers.getContractFactory("CounterTradeEscrow");
-  const escrow = await Escrow.deploy({ value: bankrollMNT });
+  const escrow = await Escrow.deploy({ value: 0 });
   await escrow.waitForDeployment();
   const escrowAddr = await escrow.getAddress();
   console.log("CounterTradeEscrow:", escrowAddr);
@@ -50,10 +36,15 @@ async function main() {
   const registryAddr = await registry.getAddress();
   console.log("PredictionRegistry:", registryAddr);
 
-  // Mint agent NFT token #0 to deployer
-  const tx = await agent.mint(deployer.address);
-  await tx.wait();
-  console.log("Agent NFT minted — token ID: 0");
+  // Mint agent NFT token #0 (DeepSeek) to deployer
+  const tx1 = await agent.mint(deployer.address);
+  await tx1.wait();
+  console.log("Agent NFT minted — token ID: 0 (DeepSeek)");
+
+  // Mint agent NFT token #1 (OpenAI) to deployer
+  const tx2 = await agent.mint(deployer.address);
+  await tx2.wait();
+  console.log("Agent NFT minted — token ID: 1 (OpenAI)");
 
   console.log("\n--- Add to .env ---");
   console.log(`PREDICTION_REGISTRY_ADDRESS=${registryAddr}`);

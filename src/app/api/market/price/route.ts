@@ -32,17 +32,26 @@ async function fromCoinGecko() {
   };
 }
 
-function mockPrice(symbol: string) {
-  const base = 0.63;
-  const jitter = (Math.random() - 0.5) * 0.004;
-  const price = parseFloat((base + jitter).toFixed(6));
+async function fromGateIO(symbol: string) {
+  // Gate.io uses MNT_USDT format
+  const gateSymbol = symbol === "MNTUSDT" ? "MNT_USDT" : symbol;
+  const res = await fetch(
+    `https://api.gateio.ws/api/v4/spot/tickers?currency_pair=${gateSymbol}`,
+    { next: { revalidate: 0 }, signal: AbortSignal.timeout(5000) }
+  );
+  if (!res.ok) throw new Error(`gateio ${res.status}`);
+  const data = await res.json();
+  if (!data || data.length === 0) throw new Error("no price from gateio");
+  
+  const ticker = data[0];
+  const price = parseFloat(ticker.last);
   return {
     symbol,
     price,
-    bid: parseFloat((price * 0.9998).toFixed(6)),
-    ask: parseFloat((price * 1.0002).toFixed(6)),
-    change: 0,
-    source: "mock-fallback",
+    bid: parseFloat(ticker.highest_bid) || parseFloat((price * 0.9998).toFixed(6)),
+    ask: parseFloat(ticker.lowest_ask) || parseFloat((price * 1.0002).toFixed(6)),
+    change: parseFloat(ticker.change_percentage) || 0,
+    source: "gateio-fallback",
   };
 }
 
@@ -55,8 +64,11 @@ export async function GET(req: NextRequest) {
     try {
       return NextResponse.json(await fromCoinGecko());
     } catch {
-      // CoinGecko rate-limited or unreachable — return mock so the chart renders
-      return NextResponse.json(mockPrice(symbol));
+      try {
+        return NextResponse.json(await fromGateIO(symbol));
+      } catch {
+        return NextResponse.json({ error: "All pricing sources failed" }, { status: 503 });
+      }
     }
   }
 }

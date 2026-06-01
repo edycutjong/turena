@@ -5,9 +5,7 @@ const BLOCKED_COUNTRIES = ["US", "GB"];
 export default function proxy(req: NextRequest) {
   // Only block the arena and API betting routes — landing page stays accessible
   const { pathname } = req.nextUrl;
-  const isRestricted =
-    pathname.startsWith("/arena") ||
-    pathname.startsWith("/api/agent");
+  const isRestricted = pathname.startsWith("/arena");
 
   if (!isRestricted) return NextResponse.next();
 
@@ -20,5 +18,5 @@ export default function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/arena/:path*", "/api/agent/:path*"],
+  matcher: ["/arena/:path*"],
 };

@@ -49,10 +49,10 @@ describe('escrow.ts', () => {
 
     it('throws error if MetaMask is not found', async () => {
       Object.defineProperty(global, 'window', { value: { ethereum: undefined }, writable: true });
-      await expect(placeBetTx(1, 10, mockContractAddress)).rejects.toThrow('MetaMask not found');
+      await expect(placeBetTx(1, 1, 10, mockContractAddress)).rejects.toThrow('MetaMask not found');
       
       Object.defineProperty(global, 'window', { value: undefined, writable: true });
-      await expect(placeBetTx(1, 10, mockContractAddress)).rejects.toThrow('MetaMask not found');
+      await expect(placeBetTx(1, 1, 10, mockContractAddress)).rejects.toThrow('MetaMask not found');
     });
 
     it('creates a wallet client, switches chain, and calls writeContract', async () => {
@@ -67,7 +67,7 @@ describe('escrow.ts', () => {
         writeContract: mockWriteContract,
       } as any);
 
-      const hash = await placeBetTx(1, 10, mockContractAddress);
+      const hash = await placeBetTx(1, 1, 10, mockContractAddress);
 
       expect(viem.custom).toHaveBeenCalledWith(window.ethereum);
       expect(viem.createWalletClient).toHaveBeenCalledWith({
@@ -82,7 +82,7 @@ describe('escrow.ts', () => {
         address: mockContractAddress,
         abi: expect.any(Array),
         functionName: 'placeBet',
-        args: [BigInt(1), false],
+        args: [BigInt(1), 1],
         value: viem.parseEther('10'),
         account: '0xAccount',
       });
@@ -104,7 +104,7 @@ describe('escrow.ts', () => {
         writeContract: mockWriteContract,
       } as any);
 
-      const hash = await placeBetTx(1, 10, mockContractAddress);
+      const hash = await placeBetTx(1, 1, 10, mockContractAddress);
 
       expect(mockSwitchChain).toHaveBeenCalled();
       expect(mockAddChain).toHaveBeenCalledWith({ chain: MANTLE_TESTNET });

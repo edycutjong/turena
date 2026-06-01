@@ -28,7 +28,7 @@ export const ESCROW_ABI = [
     stateMutability: "payable",
     inputs: [
       { name: "cycleId", type: "uint256" },
-      { name: "forAI",   type: "bool" },
+      { name: "agentChoice", type: "uint8" },
     ],
     outputs: [],
   },
@@ -57,6 +57,7 @@ export function getPublicClient() {
 
 export async function placeBetTx(
   cycleNumber: number,
+  agentChoice: 1 | 2,
   amountMnt: number,
   contractAddress: Address,
 ): Promise<`0x${string}`> {
@@ -78,7 +79,7 @@ export async function placeBetTx(
     address: contractAddress,
     abi: ESCROW_ABI,
     functionName: "placeBet",
-    args: [BigInt(cycleNumber), false],
+    args: [BigInt(cycleNumber), agentChoice],
     value: parseEther(amountMnt.toString()),
     account,
   });

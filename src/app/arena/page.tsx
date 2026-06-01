@@ -30,7 +30,7 @@ const WINDOW_SECONDS = 20;
 export default function ArenaPage() {
   const cycle = useActiveCycle();
   const agentState = useAgentState(AGENT_ID);
-  const { totalPool, againstPool } = useCounterTrades(cycle?.id ?? null);
+  const { deepSeekPool, openAIPool } = useCounterTrades(cycle?.id ?? null);
   const { address: walletAddress, connected, connect } = useWallet();
 
   const [windowStartedAt, setWindowStartedAt] = useState<Date | null>(null);
@@ -217,8 +217,8 @@ export default function ArenaPage() {
           <IntentAnnouncement intent={intent} visible={windowOpen} />
           <CounterTradeButton
             isOpen={windowOpen}
-            totalPool={totalPool}
-            againstPool={againstPool}
+            deepSeekPool={deepSeekPool}
+            openAIPool={openAIPool}
             cycleNumber={cycle?.cycle_number ?? null}
             walletAddress={walletAddress ?? null}
             onConnect={connect}

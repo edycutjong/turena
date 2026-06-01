@@ -1,6 +1,5 @@
 "use client";
 import { motion } from "framer-motion";
-import { useSabotageEvents } from "@/hooks/useSabotageEvents";
 import { useCounterTrades } from "@/hooks/useCounterTrades";
 
 interface Props {
@@ -8,15 +7,13 @@ interface Props {
 }
 
 export function TugOfWarBar({ cycleId }: Props) {
-  const { totalMnt: sabotageMnt } = useSabotageEvents(cycleId);
-  const { totalPool: betMnt } = useCounterTrades(cycleId);
+  const { deepSeekPool, openAIPool } = useCounterTrades(cycleId);
 
-  const total = sabotageMnt + betMnt;
-  // sabotage = humans sabotaging AI (orange side)
-  // bets = humans betting against AI (red side)
-  // Both are "against AI" — split into two colors on the human side
-  const humanPct = total > 0 ? Math.min(100, Math.round(((sabotageMnt + betMnt) / (total + 1)) * 100)) : 50;
-  const aiPct    = 100 - humanPct;
+  const total = deepSeekPool + openAIPool;
+  
+  // Calculate percentages (default to 50/50 if no bets)
+  const deepSeekPct = total > 0 ? Math.round((deepSeekPool / total) * 100) : 50;
+  const openAIPct = 100 - deepSeekPct;
 
   if (total === 0 && !cycleId) return null;
 
@@ -24,46 +21,46 @@ export function TugOfWarBar({ cycleId }: Props) {
     <div className="px-4 py-3 glass rounded-xl border border-arena-border">
       <div className="flex items-center justify-between mb-2">
         <span className="font-terminal text-xs text-arena-cyan uppercase tracking-widest">
-          AI {aiPct}%
+          DeepSeek {deepSeekPct}%
         </span>
-        <span className="font-terminal text-xs text-arena-muted uppercase tracking-widest">
-          Tug of War
+        <span className="font-terminal text-[10px] text-arena-muted uppercase tracking-widest">
+          Pool Balance
         </span>
-        <span className="font-terminal text-xs text-orange-400 uppercase tracking-widest">
-          Humans {humanPct}%
+        <span className="font-terminal text-xs text-arena-purple uppercase tracking-widest">
+          OpenAI {openAIPct}%
         </span>
       </div>
 
-      <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden flex">
-        {/* AI side (cyan) */}
-        <motion.div
-          className="h-full bg-gradient-to-r from-arena-cyan to-cyan-500"
-          animate={{ width: `${aiPct}%` }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+      <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden flex relative">
+        {/* Left Side (DeepSeek) */}
+        <motion.div 
+          className="h-full bg-linear-to-r from-arena-cyan/80 to-arena-cyan"
+          animate={{ width: `${deepSeekPct}%` }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
         />
-        {/* Sabotage (orange) */}
-        <motion.div
-          className="h-full bg-gradient-to-r from-orange-500 to-red-500"
-          animate={{ width: `${total > 0 ? Math.round((sabotageMnt / (total + 1)) * 100) : 25}%` }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+        
+        {/* Right Side (OpenAI) */}
+        <motion.div 
+          className="h-full bg-linear-to-r from-arena-purple to-arena-purple/80"
+          animate={{ width: `${openAIPct}%` }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
         />
-        {/* Counter-bets (red) */}
-        <motion.div
-          className="h-full bg-gradient-to-r from-red-600 to-red-800 flex-1"
-        />
+
+        {/* Tie indicator (only when tied exactly 50/50 and both have bets) */}
+        {deepSeekPct === 50 && openAIPct === 50 && total > 0 && (
+          <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-linear-to-r from-arena-cyan to-arena-purple z-10 animate-pulse shadow-[0_0_10px_#fff]" />
+        )}
       </div>
 
       <div className="flex items-center justify-between mt-2">
-        <span className="font-terminal text-[10px] text-arena-muted">
-          AI bankroll
+        <span className="font-terminal text-[10px] text-arena-cyan tabular-nums">
+          {deepSeekPool.toFixed(2)} MNT
         </span>
-        {total > 0 && (
-          <span className="font-terminal text-[10px] text-orange-400 tabular-nums">
-            {sabotageMnt.toFixed(1)} MNT sabotage · {betMnt.toFixed(2)} MNT bets
-          </span>
-        )}
         <span className="font-terminal text-[10px] text-arena-muted">
-          {total.toFixed(2)} MNT vs AI
+          Total: {total.toFixed(2)} MNT
+        </span>
+        <span className="font-terminal text-[10px] text-arena-purple tabular-nums">
+          {openAIPool.toFixed(2)} MNT
         </span>
       </div>
     </div>

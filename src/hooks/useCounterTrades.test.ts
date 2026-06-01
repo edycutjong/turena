@@ -18,7 +18,7 @@ describe("useCounterTrades", () => {
 
   it("does nothing if cycleId is null", () => {
     const { result } = renderHook(() => useCounterTrades(null));
-    expect(result.current).toEqual({ trades: [], totalPool: 0, againstPool: 0 });
+    expect(result.current).toEqual({ trades: [], deepSeekPool: 0, openAIPool: 0 });
     expect(supabase.from).not.toHaveBeenCalled();
     expect(supabase.channel).not.toHaveBeenCalled();
   });
@@ -50,8 +50,8 @@ describe("useCounterTrades", () => {
       expect(result.current.trades).toEqual(mockTrades);
     });
     
-    expect(result.current.totalPool).toBe(150);
-    expect(result.current.againstPool).toBe(50);
+    expect(result.current.deepSeekPool).toBe(100);
+    expect(result.current.openAIPool).toBe(50);
 
     const newTrade = { id: 3, amount_mnt: 25, position: "against" };
     act(() => {
@@ -62,8 +62,8 @@ describe("useCounterTrades", () => {
       expect(result.current.trades).toEqual([...mockTrades, newTrade]);
     });
     
-    expect(result.current.totalPool).toBe(175);
-    expect(result.current.againstPool).toBe(75);
+    expect(result.current.deepSeekPool).toBe(100);
+    expect(result.current.openAIPool).toBe(75);
 
     unmount();
     expect(supabase.removeChannel).toHaveBeenCalled();

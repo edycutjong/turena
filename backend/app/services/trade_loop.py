@@ -132,18 +132,11 @@ async def run_cycle(manual: bool = False) -> dict:
 
     await pool.execute("UPDATE trade_cycles SET intent = $1 WHERE id = $2", json.dumps(intent_ds), cycle_id)
 
-    # Execution (Only DS executes for real)
+    # Execution
     action_ds = intent_ds.get("action", "long")
     action_oa = intent_oa.get("action", "long")
     
-    mirror_action = action_ds.upper()
-    mirror_confidence = int(intent_ds.get("confidence", 0.5) * 100)
-    mirror_nonce = random.randint(1, 9999999)
-    try:
-        await commit_prediction(cycle_number, TOKEN_ID, mirror_action, mirror_confidence, mirror_nonce)
-    except Exception:
-        pass
-
+    # We execute DS on Bybit. OA is paper-traded to avoid "opposing direction" exchange errors
     order = await place_order("MNTUSDT", "buy" if action_ds == "long" else "sell")
     entry_price = order.get("price") or order.get("average") or 0
 
@@ -152,26 +145,48 @@ async def run_cycle(manual: bool = False) -> dict:
         json.dumps({**intent_ds, "bybit_order_id": order.get("id")}), cycle_id,
     )
 
+    # Mirror Engine
+    mirror_action = action_ds.upper()
+    mirror_confidence = int(intent_ds.get("confidence", 0.5) * 100)
+    mirror_nonce = random.randint(1, 9999999)
+    try:
+        await commit_prediction(cycle_number, 0, mirror_action, mirror_confidence, mirror_nonce)
+    except Exception as e:
+        print(f"Commit prediction failed: {e}")
+
     await asyncio.sleep(EVAL_WINDOW)
 
     pnl_ds = await get_pnl(order.get("id", ""), "MNTUSDT", "buy" if action_ds == "long" else "sell", entry_price)
     win_ds = pnl_ds > 0
-    tx_hash = await record_trade(TOKEN_ID, win_ds, int(pnl_ds * 1e18))
+    
+    # Calculate OA's PnL
+    pnl_oa = pnl_ds if action_oa == action_ds else -pnl_ds
+    win_oa = pnl_oa > 0
+
+    # Determine Winner
+    if pnl_ds > pnl_oa:
+        winner = 1 # DeepSeek
+        cycle_result = 'ds_win'
+    elif pnl_oa > pnl_ds:
+        winner = 2 # OpenAI
+        cycle_result = 'oa_win'
+    else:
+        winner = 3 # Draw
+        cycle_result = 'draw'
+
+    tx_hash_ds = ""
+    try:
+        tx_hash_ds = await record_trade(0, win_ds, int(pnl_ds * 1e18))
+        await record_trade(1, win_oa, int(pnl_oa * 1e18))
+        await settle_cycle(cycle_number, winner)
+        await reveal_prediction(cycle_number, 0, mirror_action, mirror_confidence, mirror_nonce, win_ds)
+    except Exception as e:
+        print(f"Mantle transaction failed: {e}")
 
     await pool.execute(
         "UPDATE trade_cycles SET result=$1, pnl_mnt=$2, tx_hash=$3, phase='SETTLED' WHERE id=$4",
-        "win" if win_ds else "loss", pnl_ds, tx_hash, cycle_id,
+        cycle_result, pnl_ds, tx_hash_ds, cycle_id,
     )
-
-    try:
-        await reveal_prediction(cycle_number, TOKEN_ID, mirror_action, mirror_confidence, mirror_nonce, win_ds)
-        await settle_cycle(cycle_number, win_ds)
-    except Exception:
-        pass
-
-    # Shadow update for OA (Paper Trading using same entry price since they theoretically entered at same time)
-    pnl_oa = pnl_ds if action_oa == action_ds else -pnl_ds
-    win_oa = pnl_oa > 0
 
     for aid, pnl, win, emotion, losses in [('agent-0', pnl_ds, win_ds, emotion_ds, losses_ds), ('agent-1', pnl_oa, win_oa, emotion_oa, losses_oa)]:
         await pool.execute(
@@ -199,6 +214,6 @@ async def run_cycle(manual: bool = False) -> dict:
         "cycle_number": cycle_number,
         "win":          win_ds,
         "pnl":          pnl_ds,
-        "tx_hash":      tx_hash,
+        "tx_hash":      tx_hash_ds,
         "correction":   correction,
     }

@@ -47,21 +47,24 @@ describe("api/market/price route", () => {
     expect(data.change).toBe(-2.3);
   });
 
-  it("returns price from mock if both backend and coingecko fail", async () => {
+  it("returns price from gateio if both backend and coingecko fail", async () => {
     vi.spyOn(global, "fetch")
       // First call (backend) fails
       .mockResolvedValueOnce({ ok: false, status: 500 } as any)
       // Second call (coingecko) fails
-      .mockResolvedValueOnce({ ok: false, status: 500 } as any);
-
-    vi.spyOn(Math, "random").mockReturnValue(0.5); // price = 0.63 + 0 = 0.63
+      .mockResolvedValueOnce({ ok: false, status: 500 } as any)
+      // Third call (gateio) succeeds
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ([{ last: "0.65", highest_bid: "0.64", lowest_ask: "0.66", change_percentage: "-1.5" }]),
+      } as any);
 
     const req = new NextRequest("http://localhost:3000/api/market/price?symbol=MNTUSDT");
     const res = await GET(req);
     expect(res.status).toBe(200);
     const data = await res.json();
-    expect(data.price).toBe(0.63);
-    expect(data.source).toBe("mock-fallback");
+    expect(data.price).toBe(0.65);
+    expect(data.source).toBe("gateio-fallback");
   });
 
   it("defaults to symbol MNTUSDT if not specified", async () => {
@@ -96,7 +99,7 @@ describe("api/market/price route", () => {
     expect(data.source).toBe("coingecko-fallback");
   });
 
-  it("falls to mock if coingecko response has ok status but missing price field", async () => {
+  it("falls to gateio if coingecko response has ok status but missing price field", async () => {
     vi.spyOn(global, "fetch")
       // Backend fails
       .mockResolvedValueOnce({ ok: false } as any)
@@ -104,15 +107,31 @@ describe("api/market/price route", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ mantle: {} }),
+      } as any)
+      // Gateio succeeds
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ([{ last: "0.65" }]),
       } as any);
-
-    vi.spyOn(Math, "random").mockReturnValue(0.5);
 
     const req = new NextRequest("http://localhost:3000/api/market/price");
     const res = await GET(req);
     expect(res.status).toBe(200);
     const data = await res.json();
-    expect(data.price).toBe(0.63);
-    expect(data.source).toBe("mock-fallback");
+    expect(data.price).toBe(0.65);
+    expect(data.source).toBe("gateio-fallback");
+  });
+
+  it("returns 503 error if backend, coingecko, and gateio fail", async () => {
+    vi.spyOn(global, "fetch")
+      .mockResolvedValueOnce({ ok: false, status: 500 } as any)
+      .mockResolvedValueOnce({ ok: false, status: 500 } as any)
+      .mockResolvedValueOnce({ ok: false, status: 500 } as any);
+
+    const req = new NextRequest("http://localhost:3000/api/market/price?symbol=MNTUSDT");
+    const res = await GET(req);
+    expect(res.status).toBe(503);
+    const data = await res.json();
+    expect(data.error).toBe("All pricing sources failed");
   });
 });

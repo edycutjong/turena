@@ -5,6 +5,12 @@ test.describe('Responsive layout', () => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/arena');
     
+    // Accept disclaimer if present
+    const disclaimerButton = page.getByRole('button', { name: 'I Understand & Agree' });
+    if (await disclaimerButton.isVisible()) {
+      await disclaimerButton.click();
+    }
+    
     // Check there is no horizontal scroll
     const overflow = await page.evaluate(() => {
       return document.documentElement.scrollWidth > window.innerWidth;
@@ -15,6 +21,12 @@ test.describe('Responsive layout', () => {
   test('Arena renders correctly on desktop', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/arena');
+    
+    // Accept disclaimer if present
+    const disclaimerButton = page.getByRole('button', { name: 'I Understand & Agree' });
+    if (await disclaimerButton.isVisible()) {
+      await disclaimerButton.click();
+    }
     
     // Check main elements are visible
     await expect(page.locator('.arena-panel').first()).toBeVisible();

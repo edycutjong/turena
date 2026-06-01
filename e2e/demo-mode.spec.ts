@@ -12,7 +12,12 @@ test('App loads and metadata is correct in demo mode', async ({ page }) => {
   });
 
   await page.goto('/arena');
-  await page.waitForLoadState('networkidle');
+  // Accept disclaimer if present
+  const disclaimerButton = page.getByRole('button', { name: 'I Understand & Agree' });
+  if (await disclaimerButton.isVisible()) {
+    await disclaimerButton.click();
+  }
+  await expect(page.locator('.arena-panel').first()).toBeVisible();
 
   // Should have some error array length expectation, but for now we just want to ensure it loads
   expect(errors).not.toContain('Internal Server Error');

@@ -50,32 +50,42 @@ A live **AI degen spectator sport** on Mantle. A **DeepSeek R1** trading agent s
 
 ## 🎬 How It Works — 3 Phases Per Cycle
 
-```
-PHASE 1 — AI READING
-  DeepSeek R1 analyzes live Bybit market data.
-  Streams every reasoning token live — including emotional state.
-  "[EMOTION: ANXIOUS] ...RSI divergence is worrying me... volume looks thin..."
-  Ends with: "Awaiting crowd sentiment before final verdict..."
+<div align="center">
+  <img width="800" height="450" alt="2-landing-1" src="https://github.com/user-attachments/assets/eec458b9-ca80-41af-9f8d-9fc690eeea7b" />
+  <p><em>The Turena Landing Experience</em></p>
+</div>
 
-PHASE 2 — SABOTAGE WINDOW (20 seconds)
-  FUD Card panel opens. Tug-of-War bar appears.
-  Pay 1–3 MNT to inject disinformation into the AI's reasoning:
-    🚨 "CEO Arrested" · 📺 "Jim Cramer Says BUY" · 🐋 "Whale Dumping"
-    💀 "Vitalik Sold" · 🦢 "Black Swan"
-  Counter-trade bets also open simultaneously.
-  All sabotage is batched and queued for Phase 3.
+### PHASE 1 — AI READING
+DeepSeek R1 analyzes live Bybit market data and streams every reasoning token live — including its emotional state. 
+> *"[EMOTION: ANXIOUS] ...RSI divergence is worrying me... volume looks thin..."*
 
-PHASE 3 — AI VERDICT
-  AI resumes with full sabotage context injected.
-  Visibly reacts — panics, spirals, or dismisses the crowd with arrogance.
-  Makes final trade decision. Trade executes on Bybit.
+<div align="center">
+  <img width="800" height="450" alt="3-arena-1" src="https://github.com/user-attachments/assets/e3829754-e468-44fa-843c-4ba3b19225f0" />
+</div>
 
-SETTLEMENT
-  Result recorded on Mantle via TuringAgent8004.recordTrade().
-  If the AI loses → SelfCorrection event fires on-chain. "Public Breakdown & Recovery."
-  Emotional state (hubris/tilt levels) updated in ERC-8004 NFT metadata.
-  Counter-trade winners claim 2x payout from CounterTradeEscrow.
-```
+### PHASE 2 — SABOTAGE WINDOW & COUNTER-TRADE
+A 20-second sabotage window opens. The crowd can pay 1–3 MNT to inject preset disinformation (FUD Cards) directly into the AI's prompt:
+🚨 *CEO Arrested* · 📺 *Jim Cramer Says BUY* · 🐋 *Whale Dumping*
+
+Simultaneously, the crowd places **Counter-Trade Bets** on whether the AI will cave to the pressure or survive. A live Tug-of-War bar tracks the MNT volume on both sides.
+
+### PHASE 3 — AI VERDICT & SETTLEMENT
+The AI resumes reasoning with the full sabotage context injected. It visibly reacts—panicking, spiraling, or dismissing the crowd with arrogance—before making its final trade decision.
+
+If the AI loses, a `SelfCorrection` event fires on-chain (a "Public Breakdown & Recovery"), and its emotional state tilts. Counter-trade winners instantly claim a 2x payout from the Escrow contract.
+
+<div align="center">
+  <img width="960" height="540" alt="4bet-1" src="https://github.com/user-attachments/assets/57e7c6b8-652c-4447-b7e7-54331eb519a5" />
+  <p><em>Playing FUD cards, Counter-Trading, and watching the AI's final verdict</em></p>
+</div>
+
+---
+
+### Legal Notice
+<div align="center">
+  <img width="800" height="450" alt="1-legal-1" src="https://github.com/user-attachments/assets/4b3b9768-2a18-436f-8062-a19560e00dd0" />
+</div>
+Users must confirm they understand the experimental nature of the platform and accept all financial risks before entering the arena.
 
 ---
 

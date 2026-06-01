@@ -134,4 +134,32 @@ describe("api/market/price route", () => {
     const data = await res.json();
     expect(data.error).toBe("All pricing sources failed");
   });
+  it("uses provided symbol for gateio fallback if not MNTUSDT", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch")
+      .mockResolvedValueOnce({ ok: false } as any)
+      .mockResolvedValueOnce({ ok: false } as any)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ([{ last: "123.45" }]),
+      } as any);
+
+    const req = new NextRequest("http://localhost:3000/api/market/price?symbol=BTC_USDT");
+    const res = await GET(req);
+    expect(res.status).toBe(200);
+    expect(fetchSpy).toHaveBeenNthCalledWith(3, "https://api.gateio.ws/api/v4/spot/tickers?currency_pair=BTC_USDT", expect.any(Object));
+  });
+
+  it("fails gateio fallback if response data is empty", async () => {
+    vi.spyOn(global, "fetch")
+      .mockResolvedValueOnce({ ok: false } as any)
+      .mockResolvedValueOnce({ ok: false } as any)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ([]),
+      } as any);
+
+    const req = new NextRequest("http://localhost:3000/api/market/price?symbol=MNTUSDT");
+    const res = await GET(req);
+    expect(res.status).toBe(503);
+  });
 });

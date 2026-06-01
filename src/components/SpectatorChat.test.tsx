@@ -1,4 +1,4 @@
-import { render, act } from "@testing-library/react";
+import { render, act, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SpectatorChat } from "./SpectatorChat";
 import { useActiveCycle } from "@/hooks/useActiveCycle";
@@ -24,6 +24,7 @@ vi.mock("@/lib/supabase", () => {
     eq: vi.fn().mockImplementation(() => builder),
     order: vi.fn().mockImplementation(() => builder),
     limit: vi.fn().mockImplementation(() => builder),
+    insert: vi.fn().mockResolvedValue({}),
     then: vi.fn().mockImplementation((onfulfilled) => {
       return Promise.resolve({ data: (global as any).mockChatData }).then(onfulfilled);
     }),
@@ -157,5 +158,61 @@ describe("SpectatorChat", () => {
     });
     expect(renderResult.getByText("LIVE ARENA CHAT")).toBeTruthy();
     expect(renderResult.queryByText("🚀")).toBeNull();
+  });
+
+  it("allows user to input text and send message", async () => {
+    vi.mocked(useActiveCycle).mockReturnValue({ id: "cycle-99" } as any);
+    let renderResult: any;
+    await act(async () => {
+      renderResult = render(<SpectatorChat />);
+    });
+
+    const input = renderResult.getByPlaceholderText("Send a message...") as HTMLInputElement;
+    const button = renderResult.getByRole("button", { name: "Chat" }) as HTMLButtonElement;
+
+    // Initial state: button should be disabled
+    expect(button.disabled).toBe(true);
+
+    // Type a message
+    await act(async () => {
+      fireEvent.change(input, { target: { value: "Hello world" } });
+    });
+
+    expect(button.disabled).toBe(false);
+
+    // Form submit
+    await act(async () => {
+      fireEvent.click(button);
+    });
+
+    // Check supabase insert was called correctly (builder.insert)
+    const mockSupabase: any = supabase;
+    expect(mockSupabase.from().insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        cycle_id: "cycle-99",
+        message: "Hello world",
+        sentiment: "NEUTRAL",
+      })
+    );
+
+    // Input should be cleared
+    expect(input.value).toBe("");
+  });
+  it("does nothing if form submitted with empty input or missing cycle", async () => {
+    vi.mocked(useActiveCycle).mockReturnValue(null);
+    let renderResult: any;
+    await act(async () => {
+      renderResult = render(<SpectatorChat />);
+    });
+
+    const form = renderResult.container.querySelector("form");
+    const mockSupabase: any = supabase;
+    mockSupabase.from().insert.mockClear();
+
+    await act(async () => {
+      fireEvent.submit(form!);
+    });
+
+    expect(mockSupabase.from().insert).not.toHaveBeenCalled();
   });
 });

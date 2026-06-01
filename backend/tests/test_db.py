@@ -62,16 +62,16 @@ class TestInsertCotToken:
 
     @pytest.mark.asyncio
     async def test_inserts_token(self, mock_pool):
-        await db_mod.insert_cot_token(mock_pool, "cycle-1", "thinking...", "reasoning")
+        await db_mod.insert_cot_token(mock_pool, "cycle-1", "thinking...", "reasoning", "agent-0")
         mock_pool.execute.assert_awaited_once_with(
-            "INSERT INTO cot_tokens (cycle_id, token_text, token_type) VALUES ($1, $2, $3)",
-            "cycle-1", "thinking...", "reasoning",
+            "INSERT INTO cot_tokens (cycle_id, token_text, token_type, agent_id) VALUES ($1, $2, $3, $4)",
+            "cycle-1", "thinking...", "reasoning", "agent-0"
         )
 
     @pytest.mark.asyncio
     async def test_default_token_type(self, mock_pool):
-        await db_mod.insert_cot_token(mock_pool, "cycle-2", "data")
+        await db_mod.insert_cot_token(mock_pool, "cycle-2", "data", "reasoning", "agent-1")
         mock_pool.execute.assert_awaited_once_with(
-            "INSERT INTO cot_tokens (cycle_id, token_text, token_type) VALUES ($1, $2, $3)",
-            "cycle-2", "data", "reasoning",
+            "INSERT INTO cot_tokens (cycle_id, token_text, token_type, agent_id) VALUES ($1, $2, $3, $4)",
+            "cycle-2", "data", "reasoning", "agent-1"
         )

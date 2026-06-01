@@ -20,7 +20,7 @@ interface Props {
 }
 
 export function CoTTerminal({ cycleId, agentId = "agent-0", onEmotionChange }: Props) {
-  const tokens = useCoTStream(cycleId);
+  const tokens = useCoTStream(cycleId, agentId);
   const endRef = useRef<HTMLDivElement>(null);
   const [initialTokens] = useState(() => new Set(tokens.map(t => t.id)));
   const [emotion, setEmotion] = useState<EmotionState>("CONFIDENT");

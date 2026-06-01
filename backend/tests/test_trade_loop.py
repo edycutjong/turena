@@ -28,12 +28,15 @@ class TestRunCycle:
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="price data"), \
              patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
-             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
-             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.ds_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.oa_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.ds_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.oa_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o1", "price": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=2.5), \
              patch("app.services.trade_loop.record_trade", new_callable=AsyncMock, return_value="0xabc"), \
+             patch("app.services.trade_loop.reveal_prediction", new_callable=AsyncMock), \
              patch("app.services.trade_loop.settle_cycle", new_callable=AsyncMock), \
              patch("app.services.trade_loop._fetch_sabotage_summary", new_callable=AsyncMock, return_value="some sabotage"), \
              patch("app.services.trade_loop.asyncio.sleep", new_callable=AsyncMock):
@@ -65,12 +68,15 @@ class TestRunCycle:
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
              patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
-             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
-             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.ds_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.oa_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.ds_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.oa_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o2", "average": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=-3.0), \
              patch("app.services.trade_loop.record_trade", new_callable=AsyncMock, return_value="0xdef"), \
+             patch("app.services.trade_loop.reveal_prediction", new_callable=AsyncMock), \
              patch("app.services.trade_loop.settle_cycle", new_callable=AsyncMock), \
              patch("app.services.trade_loop.run_self_correction", new_callable=AsyncMock, return_value=correction_result), \
              patch("app.services.trade_loop.asyncio.sleep", new_callable=AsyncMock):
@@ -98,12 +104,15 @@ class TestRunCycle:
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
              patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
-             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
-             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.ds_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.oa_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.ds_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.oa_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o3", "price": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=1.0), \
              patch("app.services.trade_loop.record_trade", new_callable=AsyncMock, return_value="0x111"), \
+             patch("app.services.trade_loop.reveal_prediction", new_callable=AsyncMock), \
              patch("app.services.trade_loop.settle_cycle", new_callable=AsyncMock), \
              patch("app.services.trade_loop.asyncio.sleep", new_callable=AsyncMock):
 
@@ -128,12 +137,15 @@ class TestRunCycle:
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
              patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
-             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
-             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.ds_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.oa_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.ds_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.oa_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o4", "price": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=0.5), \
              patch("app.services.trade_loop.record_trade", new_callable=AsyncMock, return_value="0x222"), \
+             patch("app.services.trade_loop.reveal_prediction", new_callable=AsyncMock), \
              patch("app.services.trade_loop.settle_cycle", new_callable=AsyncMock, side_effect=Exception("no bets")), \
              patch("app.services.trade_loop.asyncio.sleep", new_callable=AsyncMock):
 
@@ -159,12 +171,15 @@ class TestRunCycle:
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
              patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
-             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
-             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.ds_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.oa_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.ds_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.oa_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o5"}) as mock_place, \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=1.0), \
              patch("app.services.trade_loop.record_trade", new_callable=AsyncMock, return_value="0x333"), \
+             patch("app.services.trade_loop.reveal_prediction", new_callable=AsyncMock), \
              patch("app.services.trade_loop.settle_cycle", new_callable=AsyncMock), \
              patch("app.services.trade_loop.asyncio.sleep", new_callable=AsyncMock):
 
@@ -193,12 +208,15 @@ class TestRunCycle:
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
              patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
-             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
-             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.ds_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.oa_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.ds_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.oa_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o6", "price": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=-1.0), \
              patch("app.services.trade_loop.record_trade", new_callable=AsyncMock, return_value="0x444"), \
+             patch("app.services.trade_loop.reveal_prediction", new_callable=AsyncMock), \
              patch("app.services.trade_loop.settle_cycle", new_callable=AsyncMock), \
              patch("app.services.trade_loop.run_self_correction", new_callable=AsyncMock, return_value=correction_result), \
              patch("app.services.trade_loop.asyncio.sleep", new_callable=AsyncMock):
@@ -226,12 +244,15 @@ class TestRunCycle:
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
              patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
-             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
-             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.ds_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.oa_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.ds_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.oa_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock) as mock_insert, \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o7", "price": 0.65}), \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=1.0), \
              patch("app.services.trade_loop.record_trade", new_callable=AsyncMock, return_value="0x555"), \
+             patch("app.services.trade_loop.reveal_prediction", new_callable=AsyncMock), \
              patch("app.services.trade_loop.settle_cycle", new_callable=AsyncMock), \
              patch("app.services.trade_loop.asyncio.sleep", new_callable=AsyncMock):
 
@@ -264,12 +285,15 @@ class TestRunCycle:
         with patch("app.services.trade_loop.get_pool", new_callable=AsyncMock, return_value=mock_pool), \
              patch("app.services.trade_loop.fetch_market_context", new_callable=AsyncMock, return_value="data"), \
              patch("app.services.trade_loop._get_consecutive_losses", new_callable=AsyncMock, return_value=0), \
-             patch("app.services.trade_loop.stream_initial_analysis", side_effect=mock_initial), \
-             patch("app.services.trade_loop.stream_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.ds_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.oa_initial", side_effect=mock_initial), \
+             patch("app.services.trade_loop.ds_verdict", side_effect=mock_verdict), \
+             patch("app.services.trade_loop.oa_verdict", side_effect=mock_verdict), \
              patch("app.services.trade_loop.insert_cot_token", new_callable=AsyncMock), \
              patch("app.services.trade_loop.place_order", new_callable=AsyncMock, return_value={"id": "o8"}) as _mock_place, \
              patch("app.services.trade_loop.get_pnl", new_callable=AsyncMock, return_value=0.0) as mock_pnl, \
              patch("app.services.trade_loop.record_trade", new_callable=AsyncMock, return_value="0x666"), \
+             patch("app.services.trade_loop.reveal_prediction", new_callable=AsyncMock), \
              patch("app.services.trade_loop.settle_cycle", new_callable=AsyncMock), \
              patch("app.services.trade_loop.run_self_correction", new_callable=AsyncMock, return_value={"param": "x"}), \
              patch("app.services.trade_loop.asyncio.sleep", new_callable=AsyncMock):
@@ -285,14 +309,14 @@ class TestGetConsecutiveLosses:
     async def test_get_consecutive_losses_with_row(self):
         mock_pool = AsyncMock()
         mock_pool.fetchrow = AsyncMock(return_value={"streak": 3})
-        result = await tl_mod._get_consecutive_losses(mock_pool)
+        result = await tl_mod._get_consecutive_losses(mock_pool, "agent-0")
         assert result == 3
 
     @pytest.mark.asyncio
     async def test_get_consecutive_losses_no_row(self):
         mock_pool = AsyncMock()
         mock_pool.fetchrow = AsyncMock(return_value=None)
-        result = await tl_mod._get_consecutive_losses(mock_pool)
+        result = await tl_mod._get_consecutive_losses(mock_pool, "agent-0")
         assert result == 0
 
 class TestFetchSabotageSummary:

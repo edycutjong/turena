@@ -20,7 +20,7 @@ describe("useCoTStream", () => {
   });
 
   it("does nothing if cycleId is null", () => {
-    const { result } = renderHook(() => useCoTStream(null));
+    const { result } = renderHook(() => useCoTStream(null, "agent-0"));
     expect(result.current).toEqual([]);
     expect(supabase.channel).not.toHaveBeenCalled();
   });
@@ -35,7 +35,7 @@ describe("useCoTStream", () => {
     
     vi.mocked(supabase.channel).mockReturnValue({ on: mockOn } as any);
 
-    const { result, unmount, rerender } = renderHook(({ id }) => useCoTStream(id), {
+    const { result, unmount, rerender } = renderHook(({ id }) => useCoTStream(id, "agent-0"), {
       initialProps: { id: "cycle-1" }
     });
 
@@ -85,7 +85,7 @@ describe("useCoTStream", () => {
     const initialData = [{ id: 100, token: "initial" }];
     (supabase as any).order.mockResolvedValueOnce({ data: initialData });
 
-    const { result } = renderHook(() => useCoTStream("cycle-1"));
+    const { result } = renderHook(() => useCoTStream("cycle-1", "agent-0"));
     
     await waitFor(() => {
       expect(result.current).toEqual(initialData);
@@ -104,6 +104,33 @@ describe("useCoTStream", () => {
 
     await waitFor(() => {
       expect(result.current).toEqual([...initialData, newToken]);
+    });
+  });
+
+  it("ignores tokens intended for a different agent", async () => {
+    let insertCallback: any;
+    const mockOn = vi.fn().mockImplementation((event, filter, cb) => {
+      insertCallback = cb;
+      return { subscribe: vi.fn() };
+    });
+    vi.mocked(supabase.channel).mockReturnValue({ on: mockOn } as any);
+
+    const { result } = renderHook(() => useCoTStream("cycle-1", "agent-0"));
+
+    // Fire an event with a different agent_id
+    const otherToken = { id: 200, agent_id: "agent-1", token: "other" };
+    act(() => {
+      insertCallback({ new: otherToken });
+    });
+
+    // Fire an event with the correct agent_id
+    const correctToken = { id: 201, agent_id: "agent-0", token: "correct" };
+    act(() => {
+      insertCallback({ new: correctToken });
+    });
+
+    await waitFor(() => {
+      expect(result.current).toEqual([correctToken]);
     });
   });
 });

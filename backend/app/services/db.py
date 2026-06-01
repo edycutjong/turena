@@ -26,8 +26,8 @@ def _build_params() -> dict:
     }
 
 
-async def insert_cot_token(pool: asyncpg.Pool, cycle_id: str, text: str, token_type: str = "reasoning"):
+async def insert_cot_token(pool: asyncpg.Pool, cycle_id: str, text: str, token_type: str = "reasoning", agent_id: str = "agent-0"):
     await pool.execute(
-        "INSERT INTO cot_tokens (cycle_id, token_text, token_type) VALUES ($1, $2, $3)",
-        cycle_id, text, token_type,
+        "INSERT INTO cot_tokens (cycle_id, token_text, token_type, agent_id) VALUES ($1, $2, $3, $4)",
+        cycle_id, text, token_type, agent_id
     )

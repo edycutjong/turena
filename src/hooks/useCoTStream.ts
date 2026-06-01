@@ -5,7 +5,7 @@ import type { Database } from "@/lib/database.types";
 
 type CotToken = Database["public"]["Tables"]["cot_tokens"]["Row"];
 
-export function useCoTStream(cycleId: string | null) {
+export function useCoTStream(cycleId: string | null, agentId: string) {
   const [tokens, setTokens] = useState<CotToken[]>([]);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
@@ -23,6 +23,8 @@ export function useCoTStream(cycleId: string | null) {
       .from("cot_tokens")
       .select("*")
       .eq("cycle_id", cycleId)
+      // Wait, agent_id might not exist in type definitions yet if we didn't run generate types, so we ts-ignore it for now if needed, but it's any anyway.
+      .eq("agent_id", agentId)
       .order("id", { ascending: true })
       .then(({ data }) => {
         const rows = data as CotToken[] | null;
@@ -32,7 +34,7 @@ export function useCoTStream(cycleId: string | null) {
         }
       });
     const channel = supabase
-      .channel(`cot-${cycleId}-${Math.random().toString(36).slice(2, 8)}`)
+      .channel(`cot-${cycleId}-${agentId}-${Math.random().toString(36).slice(2, 8)}`)
       .on(
         "postgres_changes",
         {
@@ -42,18 +44,19 @@ export function useCoTStream(cycleId: string | null) {
           filter: `cycle_id=eq.${cycleId}`,
         },
         (payload) => {
-          const token = payload.new as CotToken;
+          const token = payload.new as CotToken & { agent_id: string };
+          if (token.agent_id && token.agent_id !== agentId) return;
           // Guard against duplicates between the initial fetch and realtime stream
           if (seenIds.has(token.id)) return;
           seenIds.add(token.id);
-          setTokens((prev) => [...prev, token]);
+          setTokens((prev) => [...prev, token as CotToken]);
         }
       )
       .subscribe();
 
     channelRef.current = channel;
     return () => { supabase.removeChannel(channel); };
-  }, [cycleId]);
+  }, [cycleId, agentId]);
 
   return tokens;
 }

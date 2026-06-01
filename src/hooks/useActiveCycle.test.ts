@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useActiveCycle } from "./useActiveCycle";
 import { supabase } from "@/lib/supabase";
@@ -55,14 +55,18 @@ describe("useActiveCycle", () => {
 
     // Trigger insert
     const newCycle = { id: 2, result: "pending" };
-    insertCallback({ new: newCycle });
+    act(() => {
+      insertCallback({ new: newCycle });
+    });
     await waitFor(() => {
       expect(result.current).toEqual(newCycle);
     });
 
     // Trigger update
     const updatedCycle = { id: 2, result: "resolved" };
-    updateCallback({ new: updatedCycle });
+    act(() => {
+      updateCallback({ new: updatedCycle });
+    });
     await waitFor(() => {
       expect(result.current).toEqual(updatedCycle);
     });
@@ -101,7 +105,9 @@ describe("useActiveCycle", () => {
 
     // Trigger update with unmatched id
     const updatedCycle = { id: 99, result: "resolved" };
-    updateCallback({ new: updatedCycle });
+    act(() => {
+      updateCallback({ new: updatedCycle });
+    });
     await waitFor(() => {
       expect(result.current).toBeNull();
     });

@@ -50,6 +50,15 @@ describe("TuringAgent8004", function () {
     expect(stats.consecutiveLosses).to.equal(0n);
   });
 
+  it("Should cap hubris at 100 on consecutive wins", async function () {
+    // Win 11 times in a row
+    for (let i = 0; i < 11; i++) {
+      await agentIdentity.recordTrade(agentId, true, 0);
+    }
+    const stats = await agentIdentity.agentStats(agentId);
+    expect(stats.hubrisLevel).to.equal(100n);
+  });
+
   it("Should correctly record a losing trade and adjust tilt/hubris", async function () {
     // Give it some hubris first
     await agentIdentity.recordTrade(agentId, true, 0); // hubris = 10
@@ -68,6 +77,30 @@ describe("TuringAgent8004", function () {
     expect(stats.hubrisLevel).to.equal(10n); // 30 - 20
     expect(stats.consecutiveLosses).to.equal(1n);
     expect(stats.tiltLevel).to.equal(25n); // 1 * 25
+  });
+
+  it("Should handle losing trade when ELO rating goes near or below 10", async function () {
+    // Lose 125 times. Elo starts at 1200, loses 10 each time.
+    // It should stop dropping when Elo rating becomes <= 10.
+    for (let i = 0; i < 125; i++) {
+      await agentIdentity.recordTrade(agentId, false, 0);
+    }
+    const stats = await agentIdentity.agentStats(agentId);
+    // Since it drops 10 per loss, 120 losses makes it exactly 0. 
+    // The conditional check is "if (s.eloRating > 10) s.eloRating -= 10;"
+    // So if eloRating is 10, it will not decrease.
+    expect(stats.eloRating).to.be.lte(10n);
+  });
+
+  it("Should drop hubris directly to 0 if hubris is <= 20 when losing", async function () {
+    // Win once -> hubris is 10
+    await agentIdentity.recordTrade(agentId, true, 0);
+    
+    // Lose once -> hubris is 10 <= 20, so it drops to 0
+    await agentIdentity.recordTrade(agentId, false, 0);
+    
+    const stats = await agentIdentity.agentStats(agentId);
+    expect(stats.hubrisLevel).to.equal(0n);
   });
 
   it("Should cap tilt at 100 after 4 consecutive losses", async function () {
@@ -122,6 +155,43 @@ describe("TuringAgent8004", function () {
     expect(stats.honestyScore).to.equal(77n); // 75 + 2
   });
 
+  it("Should gradually build honesty score to exactly 100 and cap it", async function () {
+    // dishonest reveal drops to 75
+    await agentIdentity.connect(registry).recordReveal(agentId, false, false);
+
+    // 12 honest reveals brings it to 99 (75 + 24)
+    for (let i = 0; i < 12; i++) {
+      await agentIdentity.connect(registry).recordReveal(agentId, true, false);
+    }
+    let stats = await agentIdentity.agentStats(agentId);
+    expect(stats.honestyScore).to.equal(99n);
+
+    // 13th honest reveal brings it to 101, which caps it at 100
+    await agentIdentity.connect(registry).recordReveal(agentId, true, false);
+    stats = await agentIdentity.agentStats(agentId);
+    expect(stats.honestyScore).to.equal(100n);
+  });
+
+  it("Should drop honesty score to 0 and not below on consecutive lies", async function () {
+    // lies 4 times: 100 -> 75 -> 50 -> 25 -> 0
+    for (let i = 0; i < 4; i++) {
+      await agentIdentity.connect(registry).recordReveal(agentId, false, false);
+    }
+    let stats = await agentIdentity.agentStats(agentId);
+    expect(stats.honestyScore).to.equal(0n);
+
+    // 5th lie should remain 0
+    await agentIdentity.connect(registry).recordReveal(agentId, false, false);
+    stats = await agentIdentity.agentStats(agentId);
+    expect(stats.honestyScore).to.equal(0n);
+  });
+
+  it("Should reject recordReveal calls from unauthorized addresses", async function () {
+    await expect(
+      agentIdentity.connect(user).recordReveal(agentId, true, true)
+    ).to.be.revertedWith("Not authorized");
+  });
+
   it("Should dynamically update tokenURI with correct metadata", async function () {
     await agentIdentity.recordTrade(agentId, true, 0);
     await agentIdentity.recordEmotionalState(agentId, "CONFIDENT");
@@ -137,5 +207,54 @@ describe("TuringAgent8004", function () {
   it("Should prevent unauthorized users from recording trades", async function () {
     await expect(agentIdentity.connect(user).recordTrade(agentId, true, 0))
       .to.be.revertedWithCustomError(agentIdentity, "OwnableUnauthorizedAccount");
+  });
+
+  it("Should prevent non-owners from calling setPredictionRegistry", async function () {
+    await expect(
+      agentIdentity.connect(user).setPredictionRegistry(user.address)
+    ).to.be.revertedWithCustomError(agentIdentity, "OwnableUnauthorizedAccount");
+  });
+
+  it("Should prevent non-owners from minting", async function () {
+    await expect(
+      agentIdentity.connect(user).mint(user.address)
+    ).to.be.revertedWithCustomError(agentIdentity, "OwnableUnauthorizedAccount");
+  });
+
+  it("Should prevent non-owners from recording self corrections", async function () {
+    await expect(
+      agentIdentity.connect(user).recordSelfCorrection(agentId, "p", 0, 1, 0, "")
+    ).to.be.revertedWithCustomError(agentIdentity, "OwnableUnauthorizedAccount");
+  });
+
+  it("Should prevent non-owners from recording emotional state", async function () {
+    await expect(
+      agentIdentity.connect(user).recordEmotionalState(agentId, "TILTED")
+    ).to.be.revertedWithCustomError(agentIdentity, "OwnableUnauthorizedAccount");
+  });
+
+  it("Should allow owner to call recordReveal directly", async function () {
+    await agentIdentity.recordReveal(agentId, true, true);
+    const stats = await agentIdentity.agentStats(agentId);
+    expect(stats.totalReveals).to.equal(1n);
+    expect(stats.honestReveals).to.equal(1n);
+  });
+
+  it("Should generate tokenURI when there are no trades and no reveals", async function () {
+    // Brand new minted token has 0 trades, 0 reveals.
+    const freshTokenId = 1n;
+    await agentIdentity.mint(user.address);
+    const uri = await agentIdentity.tokenURI(freshTokenId);
+    expect(uri).to.include('"trait_type":"Accuracy %","value":0');
+    expect(uri).to.include('"trait_type":"Reveal Rate %","value":0');
+  });
+
+  it("Should generate tokenURI when there are active reveals", async function () {
+    // Record a trade, then a reveal, then call tokenURI to test non-zero divisions
+    await agentIdentity.recordTrade(agentId, true, 0);
+    await agentIdentity.recordReveal(agentId, true, true);
+    const uri = await agentIdentity.tokenURI(agentId);
+    expect(uri).to.include('"trait_type":"Accuracy %","value":100');
+    expect(uri).to.include('"trait_type":"Reveal Rate %","value":100');
   });
 });

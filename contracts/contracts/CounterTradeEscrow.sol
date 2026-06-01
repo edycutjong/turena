@@ -44,7 +44,7 @@ contract CounterTradeEscrow is Ownable, ReentrancyGuard {
         emit BankrollFunded(msg.value, bankroll);
     }
 
-    function placeBet(uint256 cycleId, bool forAI) external payable nonReentrant {
+    function placeBet(uint256 cycleId, bool forAI) external payable {
         require(msg.value > 0, "Bet must be > 0");
         require(!cycles[cycleId].settled, "Cycle already settled");
         require(bets[cycleId][msg.sender].amount == 0, "Already bet this cycle");

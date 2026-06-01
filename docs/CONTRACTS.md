@@ -32,6 +32,48 @@ contract TuringAgent8004 is ERC721 {
 }
 ```
 
+## `PredictionRegistry.sol` — Mantle Mirror Commit-Reveal Engine
+
+The core transparency engine for the AI's intent. The agent commits a cryptographic hash of its intended direction, confidence, and a secret nonce before executing a trade. After execution, it reveals the inputs. The registry verifies the hash, proves the AI didn't change its mind mid-trade, and updates the `TuringAgent8004` honesty score on-chain.
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract PredictionRegistry is Ownable {
+    TuringAgent8004 public agentIdentity;
+
+    struct Prediction {
+        bytes32 commitHash;
+        bool revealed;
+    }
+    
+    // cycleId => agentId => Prediction
+    mapping(uint256 => mapping(uint256 => Prediction)) public predictions;
+
+    event Committed(uint256 indexed cycleId, uint256 indexed agentId, bytes32 hash);
+    event Revealed(
+        uint256 indexed cycleId, 
+        uint256 indexed agentId, 
+        string direction, 
+        uint256 confidence, 
+        uint256 nonce, 
+        bool isHonest, 
+        bool isAccurate
+    );
+
+    function commit(uint256 cycleId, uint256 agentId, bytes32 hash) external; // onlyOwner
+    function reveal(
+        uint256 cycleId,
+        uint256 agentId,
+        string calldata direction,
+        uint256 confidence,
+        uint256 nonce,
+        bool wasProfitable
+    ) external; // onlyOwner
+}
+```
+
 ## `CounterTradeEscrow.sol` — Betting Escrow with Bankroll
 
 Humans bet against the AI's bankroll. If the AI wins, human stakes are added to the pool. If the human wins, payout comes from the bankroll. `placeBet` reverts if the bankroll cannot cover the bet — ensuring provable solvency.

@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useAgentState } from "./useAgentState";
 import { supabase } from "@/lib/supabase";
@@ -45,7 +45,9 @@ describe("useAgentState", () => {
     expect(mockSubscribe).toHaveBeenCalled();
 
     const updatedState = { agent_id: "agent-1", name: "Agent 1 Updated" };
-    updateCallback({ new: updatedState });
+    act(() => {
+      updateCallback({ new: updatedState });
+    });
     await waitFor(() => {
       expect(result.current).toEqual(updatedState);
     });

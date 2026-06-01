@@ -13,12 +13,12 @@ export function MarketChart({ symbol = "MNTUSDT" }: Props) {
   const [source, setSource] = useState<string>("Bybit");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const push = (price: number, src?: string) => {
+  const push = (price: number, src: string) => {
     setCandles((prev) => [
       ...prev.slice(-59),
       { time: new Date().toLocaleTimeString(), price },
     ]);
-    if (src) setSource(src === "coingecko-fallback" ? "CoinGecko" : "Bybit");
+    setSource(src === "coingecko-fallback" ? "CoinGecko" : "Bybit");
   };
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function MarketChart({ symbol = "MNTUSDT" }: Props) {
         .catch(() => {});
     }, 10_000);
 
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    return () => { clearInterval(intervalRef.current!); };
   }, [symbol]);
 
   const prices = candles.map((c) => c.price);

@@ -1,6 +1,6 @@
 # Turena — Database Schema (Supabase PostgreSQL)
 
-Full schema definition: [`db/schema.sql`](../db/schema.sql)
+Full schema definition: [`supabase/migrations/`](../supabase/migrations/)
 
 ## Tables
 
@@ -17,6 +17,7 @@ Full schema definition: [`db/schema.sql`](../db/schema.sql)
 | `pnl_mnt` | `numeric` | Profit/Loss in MNT |
 | `self_corrected` | `boolean` | Whether a correction was triggered |
 | `tx_hash` | `text` | Mantle transaction hash |
+| `sabotage_started_at` | `timestamptz` | When the 20s Sabotage Phase began |
 | `created_at` | `timestamptz` | Timestamp |
 
 ### `counter_trades`
@@ -44,6 +45,29 @@ Full schema definition: [`db/schema.sql`](../db/schema.sql)
 | `new_value` | `numeric` | Updated parameter value |
 | `regret_score` | `numeric` | Calculated opportunity cost |
 | `tx_hash` | `text` | Mantle SelfCorrection event tx |
+| `created_at` | `timestamptz` | Timestamp |
+
+### `sabotage_events`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | `uuid` | Primary key |
+| `cycle_id` | `uuid` | FK → `trade_cycles.id` |
+| `card_type` | `text` | e.g. `fake_news`, `fud` |
+| `prompt_injection` | `text` | The injected FUD text |
+| `sender_address` | `text` | Player wallet address |
+| `mnt_paid` | `numeric` | Amount paid in MNT |
+| `created_at` | `timestamptz` | Timestamp |
+
+### `spectator_chat`
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | `uuid` | Primary key |
+| `cycle_id` | `uuid` | FK → `trade_cycles.id` |
+| `username` | `text` | Simulated user name |
+| `message` | `text` | Chat message |
+| `sentiment` | `text` | `BULLISH`, `BEARISH`, `NEUTRAL`, `TROLL` |
 | `created_at` | `timestamptz` | Timestamp |
 
 ### `agent_state`

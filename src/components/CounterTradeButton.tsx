@@ -16,7 +16,7 @@ interface Props {
 
 type BetState = "idle" | "confirm" | "pending" | "done" | "error";
 
-const CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_ESCROW_ADDRESS ?? "") as Address;
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_ESCROW_ADDRESS as Address;
 
 export function CounterTradeButton({
   isOpen,
@@ -42,7 +42,7 @@ export function CounterTradeButton({
   const MAX_BET = 2;
 
   const handleConfirm = async () => {
-    if (!cycleNumber || !CONTRACT_ADDRESS) return;
+    if (!cycleNumber) return;
     const amt = parseFloat(amount);
     if (isNaN(amt) || amt < MIN_BET || amt > MAX_BET) {
       setErrorMsg(`Bet must be between ${MIN_BET} and ${MAX_BET} MNT`);

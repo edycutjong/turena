@@ -24,7 +24,7 @@ import { AppNav } from "@/components/AppNav";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TURING_AGENT_ADDRESS;
 const AGENT_ID = "agent-0";
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://turena-production.up.railway.app";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 const WINDOW_SECONDS = 20;
 
 export default function ArenaPage() {
@@ -44,10 +44,9 @@ export default function ArenaPage() {
   // Reset CoT emotion on each new cycle so stale MELTDOWN doesn't linger
   const prevCycleForEmotionRef = useRef<string | null>(null);
   useEffect(() => {
-    if (cycle?.id !== prevCycleForEmotionRef.current) {
-      prevCycleForEmotionRef.current = cycle?.id ?? null;
-      setCotEmotion(null);
-    }
+    prevCycleForEmotionRef.current = cycle?.id ?? null;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCotEmotion(null);
   }, [cycle?.id]);
 
   // displayEmotion: CoT stream wins if available; fall back to last settled emotion from DB

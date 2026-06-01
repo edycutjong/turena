@@ -8,7 +8,7 @@ graph TB
         LP["Landing Page (SSR)"]
         AD["Arena Dashboard (Client)"]
         COT["CoT Terminal Component"]
-        TMR["15s Timer Component"]
+        TMR["20s Timer Component"]
         CHT["Chart Component (Bybit)"]
         BET["Counter-Trade Button"]
         NFT["ERC-8004 Stats Panel"]
@@ -69,7 +69,9 @@ This pattern is simpler, more reliable, and gives a free persistent log of every
 |--------|-----------|---------|
 | CoT token | `postgres_changes` on `cot_tokens INSERT` | `{token_text, token_type, cycle_id}` |
 | Trade intent | `cot_tokens` where `token_type='intent'` | `{action, asset, confidence}` |
-| Timer start | `trade_cycles INSERT` | `{id, cycle_number, created_at}` |
+| Cycle start | `trade_cycles INSERT` | `{id, cycle_number, created_at}` |
+| Sabotage window | `trade_cycles UPDATE` | `{sabotage_started_at}` |
+| FUD played | `sabotage_events INSERT` | `{card_type, prompt_injection, mnt_paid}` |
 | Trade executed | `trade_cycles UPDATE` | `{result, tx_hash, pnl_mnt}` |
 | Self-correction | `self_corrections INSERT` | `{parameter_changed, old_value, new_value, regret_score}` |
 | Bet placed | `counter_trades INSERT` | `{wallet_address, amount_mnt, position}` |

@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useCounterTrades } from "./useCounterTrades";
 import { supabase } from "@/lib/supabase";
@@ -54,7 +54,9 @@ describe("useCounterTrades", () => {
     expect(result.current.againstPool).toBe(50);
 
     const newTrade = { id: 3, amount_mnt: 25, position: "against" };
-    insertCallback({ new: newTrade });
+    act(() => {
+      insertCallback({ new: newTrade });
+    });
     
     await waitFor(() => {
       expect(result.current.trades).toEqual([...mockTrades, newTrade]);

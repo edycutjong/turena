@@ -13,7 +13,7 @@ class TestNextNonce:
     async def test_uses_on_chain_nonce_when_none(self):
         mantle_mod._nonce = None
         mock_w3 = MagicMock()
-        mock_w3.eth.get_transaction_count = AsyncMock(side_effect=[5, 3])
+        mock_w3.eth.get_transaction_count = AsyncMock(return_value=5)
 
         with patch("app.services.mantle.AsyncWeb3") as MockAW3:
             MockAW3.to_checksum_address = MagicMock(return_value="0xAbc")
@@ -26,7 +26,7 @@ class TestNextNonce:
     async def test_uses_on_chain_when_higher(self):
         mantle_mod._nonce = 3
         mock_w3 = MagicMock()
-        mock_w3.eth.get_transaction_count = AsyncMock(side_effect=[10, 8])
+        mock_w3.eth.get_transaction_count = AsyncMock(return_value=10)
 
         with patch("app.services.mantle.AsyncWeb3") as MockAW3:
             MockAW3.to_checksum_address = MagicMock(return_value="0xAbc")
@@ -39,7 +39,7 @@ class TestNextNonce:
     async def test_uses_cached_nonce_when_higher(self):
         mantle_mod._nonce = 20
         mock_w3 = MagicMock()
-        mock_w3.eth.get_transaction_count = AsyncMock(side_effect=[5, 5])
+        mock_w3.eth.get_transaction_count = AsyncMock(return_value=5)
 
         with patch("app.services.mantle.AsyncWeb3") as MockAW3:
             MockAW3.to_checksum_address = MagicMock(return_value="0xAbc")

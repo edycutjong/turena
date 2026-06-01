@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useCoTStream } from "./useCoTStream";
 import { supabase } from "@/lib/supabase";
@@ -44,13 +44,17 @@ describe("useCoTStream", () => {
     expect(mockSubscribe).toHaveBeenCalled();
 
     const token1 = { id: 1, token: "hello" };
-    insertCallback({ new: token1 });
+    act(() => {
+      insertCallback({ new: token1 });
+    });
     await waitFor(() => {
       expect(result.current).toEqual([token1]);
     });
 
     const token2 = { id: 2, token: " world" };
-    insertCallback({ new: token2 });
+    act(() => {
+      insertCallback({ new: token2 });
+    });
     await waitFor(() => {
       expect(result.current).toEqual([token1, token2]);
     });
@@ -88,11 +92,15 @@ describe("useCoTStream", () => {
     });
 
     // Fire a duplicate event (should be ignored)
-    insertCallback({ new: { id: 100, token: "initial" } });
+    act(() => {
+      insertCallback({ new: { id: 100, token: "initial" } });
+    });
     
     // Fire a new, unique event
     const newToken = { id: 101, token: "new" };
-    insertCallback({ new: newToken });
+    act(() => {
+      insertCallback({ new: newToken });
+    });
 
     await waitFor(() => {
       expect(result.current).toEqual([...initialData, newToken]);

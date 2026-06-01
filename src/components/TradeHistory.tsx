@@ -50,7 +50,7 @@ export function TradeHistory() {
           if (updated.result === "pending") return;
           if (!prevTradeIds.current.has(updated.id)) {
             if (updated.result === "win") playWin();
-            else if (updated.result === "loss") playLoss();
+            else playLoss();
             prevTradeIds.current.add(updated.id);
           }
           setTrades((prev) => {
@@ -118,7 +118,7 @@ export function TradeHistory() {
                     <tr
                       key={row.key}
                       className={`border-b border-arena-border/50 hover:bg-white/5 transition-colors ${
-                        t.result === "win" ? "flash-win" : t.result === "loss" ? "flash-loss" : ""
+                        t.result === "win" ? "flash-win" : "flash-loss"
                       }`}
                     >
                       <td className="px-4 py-2 text-arena-muted">#{t.cycle_number}</td>

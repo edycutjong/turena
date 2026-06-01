@@ -18,8 +18,7 @@ export function ConfettiBurst({ type, onDone }: Props) {
   useEffect(() => {
     if (!type) return;
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -62,8 +61,7 @@ export function ConfettiBurst({ type, onDone }: Props) {
     let frame = 0;
 
     function draw() {
-      if (!ctx || !canvas) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx!.clearRect(0, 0, canvas.width, canvas.height);
       let alive = 0;
 
       for (const p of particles) {
@@ -75,27 +73,27 @@ export function ConfettiBurst({ type, onDone }: Props) {
         if (p.alpha <= 0) continue;
         alive++;
 
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, p.alpha);
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        ctx.fillStyle = p.color;
+        ctx!.save();
+        ctx!.globalAlpha = Math.max(0, p.alpha);
+        ctx!.translate(p.x, p.y);
+        ctx!.rotate(p.rot);
+        ctx!.fillStyle = p.color;
 
         if (p.shape === "circle") {
-          ctx.beginPath();
-          ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
-          ctx.fill();
+          ctx!.beginPath();
+          ctx!.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+          ctx!.fill();
         } else {
-          ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+          ctx!.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
         }
-        ctx.restore();
+        ctx!.restore();
       }
 
       frame++;
       if (alive > 0 && frame < 220) {
         rafRef.current = requestAnimationFrame(draw);
       } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx!.clearRect(0, 0, canvas.width, canvas.height);
         onDone?.();
       }
     }

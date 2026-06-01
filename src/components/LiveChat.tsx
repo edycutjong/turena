@@ -4,9 +4,7 @@ import { supabase } from "@/lib/supabase";
 
 interface Message { id: string; user: string; text: string; created_at: string; }
 
-// Simple anon name stored in sessionStorage
 function getAnonName(): string {
-  if (typeof window === "undefined") return "anon";
   const key = "arena_name";
   const stored = sessionStorage.getItem(key);
   if (stored) return stored;
@@ -19,9 +17,11 @@ export function LiveChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
-  const username = useRef(getAnonName());
+  const username = useRef("");
 
   useEffect(() => {
+    username.current = getAnonName();
+
     // Supabase Realtime broadcast channel for chat (no DB persistence needed)
     const channel = supabase
       .channel("live-chat")

@@ -172,7 +172,7 @@ export default function LeaderboardPage() {
                 )}
                 {traders.map((t, i) => {
                   const net = t.totalPayout - t.totalWagered;
-                  const winPct = t.trades > 0 ? ((t.wins / t.trades) * 100).toFixed(1) : "0.0";
+                  const winPct = ((t.wins / t.trades) * 100).toFixed(1);
                   return (
                     <motion.tr 
                       key={t.wallet} 

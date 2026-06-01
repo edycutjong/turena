@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useSelfCorrections } from "./useSelfCorrections";
 import { supabase } from "@/lib/supabase";
@@ -45,7 +45,9 @@ describe("useSelfCorrections", () => {
     expect(result.current.latest).toBeNull();
 
     const newCorrection = { id: 2, reason: "new" };
-    insertCallback({ new: newCorrection });
+    act(() => {
+      insertCallback({ new: newCorrection });
+    });
     
     await waitFor(() => {
       expect(result.current.corrections).toEqual([newCorrection, ...mockData]);

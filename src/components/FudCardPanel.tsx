@@ -63,8 +63,8 @@ interface Props {
   isOpen: boolean;
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://turena-production.up.railway.app";
-const ESCROW_ADDRESS = process.env.NEXT_PUBLIC_ESCROW_ADDRESS as Address | undefined;
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+const ESCROW_ADDRESS = process.env.NEXT_PUBLIC_ESCROW_ADDRESS as Address;
 
 export function FudCardPanel({ cycleId, isOpen }: Props) {
   const { address, connected, connect } = useWallet();
@@ -75,7 +75,6 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const playCard = useCallback(async (card: (typeof FUD_CARDS)[number]) => {
-    if (!cycleId || !connected || !address) return;
     setError(null);
     setPending(card.id);
     setThrowing({ id: card.id, randomX: (Math.random() - 0.5) * 40 });
@@ -85,19 +84,17 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
     try {
       // 1. Plain transfer to escrow receive() — MNT added to AI bankroll, emits BankrollFunded.
       //    Not a bet: saboteur gets no payout, AI's war chest grows.
-      if (ESCROW_ADDRESS) {
-        await sendSabotageTx(card.cost, ESCROW_ADDRESS);
-      }
+      await sendSabotageTx(card.cost, ESCROW_ADDRESS);
 
       // 2. Record sabotage in DB so backend injects it into the verdict prompt
       const res = await fetch(`${BACKEND_URL}/agent/sabotage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          cycle_id: cycleId,
+          cycle_id: cycleId!,
           card_type: card.label,
           prompt_injection: card.prompt,
-          sender_address: address,
+          sender_address: address!,
           mnt_paid: card.cost,
         }),
       });
@@ -112,7 +109,7 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
     } finally {
       setPending(null);
     }
-  }, [cycleId, connected, address]);
+  }, [cycleId, address]);
 
   if (!isOpen) return null;
 
@@ -185,7 +182,7 @@ export function FudCardPanel({ cycleId, isOpen }: Props) {
                   {isThrowing && (
                     <motion.span
                       initial={{ opacity: 1, y: 0, x: 0, scale: 1 }}
-                      animate={{ opacity: 0, y: -80, x: throwing?.randomX ?? 0, scale: 0.4 }}
+                      animate={{ opacity: 0, y: -80, x: throwing!.randomX, scale: 0.4 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.55, ease: "easeOut" }}
                       className="absolute inset-0 flex items-center justify-center text-3xl pointer-events-none z-10"

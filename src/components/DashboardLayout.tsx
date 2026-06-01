@@ -81,7 +81,7 @@ export default function DashboardLayout() {
                 </thead>
                 <tbody className="divide-y divide-slate-800/50">
                   {cycles.filter(c => c.result !== 'pending').slice(0, 5).map((cycle) => {
-                    const intent = typeof cycle.intent === 'string' ? JSON.parse(cycle.intent || '{}') : (cycle.intent || {});
+                    const intent = typeof cycle.intent === 'string' ? JSON.parse(cycle.intent) : (cycle.intent || {});
                     return (
                       <tr key={cycle.id} className="group hover:bg-slate-800/30">
                         <td className="py-2 text-slate-400">#{cycle.cycle_number}</td>

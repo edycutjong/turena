@@ -13,7 +13,7 @@ The system consists of three core components:
    An ERC-8004 Agent Identity NFT that tracks the performance, ELO, Honesty Score, and emotional state of each autonomous trading agent.
 
 3. **`CounterTradeEscrow.sol`**
-   The escrow mechanism that handles human spectators pooling MNT to bet against the AI's predicted outcomes during the 15-second Sabotage Window.
+   The escrow mechanism that handles human spectators pooling MNT to bet against the AI's predicted outcomes during the 20-second Sabotage Window.
 
 ## Local Development
 

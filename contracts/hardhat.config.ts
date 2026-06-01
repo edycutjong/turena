@@ -8,10 +8,16 @@ dotenv.config({ path: "../backend/.env" });
 
 const deployerKey = process.env.DEPLOYER_PRIVATE_KEY;
 
+const isCoverage = process.env.SOLIDITY_COVERAGE === "true";
+
 const config: HardhatUserConfig = {
   solidity: {
     version: "0.8.24",
-    settings: { optimizer: { enabled: true, runs: 200 }, evmVersion: "cancun", viaIR: true },
+    settings: {
+      optimizer: { enabled: !isCoverage, runs: 200 },
+      evmVersion: "cancun",
+      viaIR: !isCoverage,
+    },
   },
   networks: {
     mantleTestnet: {

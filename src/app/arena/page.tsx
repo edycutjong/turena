@@ -238,7 +238,7 @@ export default function ArenaPage() {
                 <CoTTerminal cycleId={cycle?.id ?? null} agentId="agent-1" />
              </div>
           </div>
-          <div className="h-48 shrink-0 border border-zinc-800 rounded overflow-hidden">
+          <div className="h-64 shrink-0 border border-zinc-800 rounded overflow-hidden">
             <SpectatorChat />
           </div>
         </div>

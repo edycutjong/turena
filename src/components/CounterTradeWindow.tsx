@@ -17,9 +17,9 @@ export default function CounterTradeWindow({ activeCycle }: { activeCycle: Trade
       return;
     }
 
-    // When intent appears, start 15s timer
+    // When intent appears, start 20s timer
     // We use a simple local interval since the backend enforces the exact timing
-    setTimeLeft(15);
+    setTimeLeft(20);
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -85,7 +85,7 @@ export default function CounterTradeWindow({ activeCycle }: { activeCycle: Trade
             <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-red-500 transition-all duration-1000 ease-linear"
-                style={{ width: `${(timeLeft / 15) * 100}%` }}
+                style={{ width: `${(timeLeft / 20) * 100}%` }}
               ></div>
             </div>
           </div>

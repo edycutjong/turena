@@ -55,7 +55,7 @@ describe("CounterTradeWindow", () => {
     expect(getByText("SHORT")).toBeTruthy();
     expect(getByText("MNT")).toBeTruthy();
     expect(getByText("Confidence: 85.0%")).toBeTruthy();
-    expect(getByText("00:15")).toBeTruthy();
+    expect(getByText("00:20")).toBeTruthy();
 
     const actionBtn = getByText("Bet Against AI");
     expect(actionBtn).toBeTruthy();
@@ -64,7 +64,7 @@ describe("CounterTradeWindow", () => {
     act(() => {
       vi.advanceTimersByTime(5000);
     });
-    expect(getByText("00:10")).toBeTruthy();
+    expect(getByText("00:15")).toBeTruthy();
 
     // Click Bet
     fireEvent.click(actionBtn);
@@ -93,11 +93,11 @@ describe("CounterTradeWindow", () => {
     expect(getByText("LONG")).toBeTruthy();
     expect(getByText("BTC")).toBeTruthy();
     expect(getByText("Confidence: 99.0%")).toBeTruthy();
-    expect(getByText("00:15")).toBeTruthy();
+    expect(getByText("00:20")).toBeTruthy();
 
-    // Advance 15 seconds to expire timer
+    // Advance 20 seconds to expire timer
     act(() => {
-      vi.advanceTimersByTime(15000);
+      vi.advanceTimersByTime(20000);
     });
 
     expect(getByText("00:00")).toBeTruthy();

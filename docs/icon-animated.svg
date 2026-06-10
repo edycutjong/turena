@@ -1,0 +1,185 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="iconTitle iconDesc" onclick="togglePause()" style="cursor: pointer;">
+  <title id="iconTitle">Turena</title>
+  <desc id="iconDesc">Animated arena icon — an AI nexus at the center of a spectator arena, with neural data flowing inward, counter-trade arrows, and a countdown ring.</desc>
+  <script>
+    let isPaused = false;
+    function togglePause() {
+      var svg = document.querySelector('svg');
+      if (isPaused) {
+        svg.unpauseAnimations();
+        isPaused = false;
+      } else {
+        svg.pauseAnimations();
+        isPaused = true;
+      }
+    }
+  </script>
+  <defs>
+    <!-- Brand gradient with CSS var fallback for standalone rasterization -->
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--primary, #06B6D4)"/>
+      <stop offset="100%" stop-color="var(--accent, #A855F7)"/>
+    </linearGradient>
+
+    <!-- Animated gradient that drifts the hue along the brand axis -->
+    <linearGradient id="brandGradLive" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06B6D4">
+        <animate attributeName="stop-color" values="#06B6D4; #3B82F6; #A855F7; #06B6D4" dur="8s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" stop-color="#A855F7">
+        <animate attributeName="stop-color" values="#A855F7; #06B6D4; #3B82F6; #A855F7" dur="8s" repeatCount="indefinite"/>
+      </stop>
+    </linearGradient>
+
+    <!-- Inner glow filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Outer ambient glow -->
+    <filter id="ambientGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="24" result="ambient"/>
+      <feFlood flood-color="var(--primary, #06B6D4)" flood-opacity="0.3"/>
+      <feComposite in2="ambient" operator="in" result="coloredGlow"/>
+      <feMerge>
+        <feMergeNode in="coloredGlow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Mask for the inner cutout -->
+    <mask id="arenaSlots">
+      <rect width="512" height="512" fill="white"/>
+      <!-- Spectator slots — radial cutouts around the arena -->
+      <circle cx="256" cy="100" r="18" fill="black"/>
+      <circle cx="256" cy="412" r="18" fill="black"/>
+      <circle cx="100" cy="256" r="18" fill="black"/>
+      <circle cx="412" cy="256" r="18" fill="black"/>
+      <circle cx="146" cy="146" r="14" fill="black"/>
+      <circle cx="366" cy="146" r="14" fill="black"/>
+      <circle cx="146" cy="366" r="14" fill="black"/>
+      <circle cx="366" cy="366" r="14" fill="black"/>
+    </mask>
+  </defs>
+
+  <!-- Ambient glow background with eased pulse -->
+  <circle cx="256" cy="256" r="220" fill="url(#brandGradLive)" opacity="0.12" filter="url(#ambientGlow)">
+    <animate attributeName="opacity" values="0.08; 0.18; 0.08" dur="4s" repeatCount="indefinite"
+      calcMode="spline" keyTimes="0; 0.5; 1" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+  </circle>
+
+  <!-- Outer arena ring -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="url(#brandGrad)" stroke-width="6" opacity="0.3"/>
+  <circle cx="256" cy="256" r="195" fill="none" stroke="url(#brandGrad)" stroke-width="2" opacity="0.15">
+    <animate attributeName="r" values="195; 198; 195" dur="4s" repeatCount="indefinite"
+      calcMode="spline" keyTimes="0; 0.5; 1" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+    <animate attributeName="opacity" values="0.15; 0.3; 0.15" dur="4s" repeatCount="indefinite"
+      calcMode="spline" keyTimes="0; 0.5; 1" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+  </circle>
+
+  <!-- Main arena hexagonal shape -->
+  <g filter="url(#glow)" mask="url(#arenaSlots)">
+    <g transform-origin="256 256">
+      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="20s" repeatCount="indefinite"/>
+      <polygon
+        points="256,56 436,160 436,352 256,456 76,352 76,160"
+        fill="none"
+        stroke="url(#brandGradLive)"
+        stroke-width="5"
+        stroke-linejoin="round"
+      >
+        <animate attributeName="opacity" values="0.8; 1; 0.8" dur="2s" repeatCount="indefinite"
+          calcMode="spline" keyTimes="0; 0.5; 1" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+      </polygon>
+    </g>
+  </g>
+
+  <!-- Inner brain/AI node — central nexus -->
+  <circle cx="256" cy="256" r="52" fill="url(#brandGradLive)" opacity="0.15">
+    <animate attributeName="r" values="52; 56; 52" dur="2s" repeatCount="indefinite"
+      calcMode="spline" keyTimes="0; 0.5; 1" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+    <animate attributeName="opacity" values="0.15; 0.25; 0.15" dur="2s" repeatCount="indefinite"
+      calcMode="spline" keyTimes="0; 0.5; 1" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+  </circle>
+  <circle cx="256" cy="256" r="42" fill="none" stroke="url(#brandGrad)" stroke-width="3">
+    <animate attributeName="r" values="42; 45; 42" dur="2s" repeatCount="indefinite"
+      calcMode="spline" keyTimes="0; 0.5; 1" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+  </circle>
+  <circle cx="256" cy="256" r="16" fill="url(#brandGradLive)">
+    <animate attributeName="r" values="16; 19; 16" dur="1.5s" repeatCount="indefinite"
+      calcMode="spline" keyTimes="0; 0.5; 1" keySplines="0.34 1.56 0.64 1; 0.4 0 0.6 1"/>
+  </circle>
+
+  <!-- Neural connections from center to arena vertices -->
+  <g stroke="url(#brandGrad)" stroke-width="1.5" opacity="0.4">
+    <line x1="256" y1="256" x2="256" y2="100"/>
+    <line x1="256" y1="256" x2="412" y2="256"/>
+    <line x1="256" y1="256" x2="256" y2="412"/>
+    <line x1="256" y1="256" x2="100" y2="256"/>
+    <line x1="256" y1="256" x2="366" y2="146"/>
+    <line x1="256" y1="256" x2="366" y2="366"/>
+    <line x1="256" y1="256" x2="146" y2="366"/>
+    <line x1="256" y1="256" x2="146" y2="146"/>
+  </g>
+
+  <!-- Data flow overlays — staggered pulses ripple clockwise toward the AI core -->
+  <g stroke="url(#brandGradLive)" stroke-width="3" stroke-dasharray="10 146" stroke-linecap="round">
+    <!-- top -->
+    <line x1="256" y1="100" x2="256" y2="256"><animate attributeName="stroke-dashoffset" values="156; 0" dur="1.5s" begin="0s" repeatCount="indefinite"/></line>
+    <!-- top-right -->
+    <line x1="366" y1="146" x2="256" y2="256"><animate attributeName="stroke-dashoffset" values="156; 0" dur="1.5s" begin="0.19s" repeatCount="indefinite"/></line>
+    <!-- right -->
+    <line x1="412" y1="256" x2="256" y2="256"><animate attributeName="stroke-dashoffset" values="156; 0" dur="1.5s" begin="0.38s" repeatCount="indefinite"/></line>
+    <!-- bottom-right -->
+    <line x1="366" y1="366" x2="256" y2="256"><animate attributeName="stroke-dashoffset" values="156; 0" dur="1.5s" begin="0.56s" repeatCount="indefinite"/></line>
+    <!-- bottom -->
+    <line x1="256" y1="412" x2="256" y2="256"><animate attributeName="stroke-dashoffset" values="156; 0" dur="1.5s" begin="0.75s" repeatCount="indefinite"/></line>
+    <!-- bottom-left -->
+    <line x1="146" y1="366" x2="256" y2="256"><animate attributeName="stroke-dashoffset" values="156; 0" dur="1.5s" begin="0.94s" repeatCount="indefinite"/></line>
+    <!-- left -->
+    <line x1="100" y1="256" x2="256" y2="256"><animate attributeName="stroke-dashoffset" values="156; 0" dur="1.5s" begin="1.13s" repeatCount="indefinite"/></line>
+    <!-- top-left -->
+    <line x1="146" y1="146" x2="256" y2="256"><animate attributeName="stroke-dashoffset" values="156; 0" dur="1.5s" begin="1.31s" repeatCount="indefinite"/></line>
+  </g>
+
+  <!-- Spectator node dots (outer ring positions) with eased twinkle -->
+  <g fill="url(#brandGrad)">
+    <circle cx="256" cy="100" r="8"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" begin="0s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/></circle>
+    <circle cx="256" cy="412" r="8"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" begin="0.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/></circle>
+    <circle cx="100" cy="256" r="8"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" begin="0.4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/></circle>
+    <circle cx="412" cy="256" r="8"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" begin="0.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/></circle>
+    <circle cx="146" cy="146" r="6"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" begin="0.1s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/></circle>
+    <circle cx="366" cy="146" r="6"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" begin="0.3s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/></circle>
+    <circle cx="146" cy="366" r="6"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" begin="0.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/></circle>
+    <circle cx="366" cy="366" r="6"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" begin="0.7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/></circle>
+  </g>
+
+  <!-- Counter-trade indicator — opposing arrows at 3 o'clock and 9 o'clock -->
+  <g stroke="url(#brandGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7">
+    <!-- Right arrow (AI direction) -->
+    <polyline points="300,240 320,256 300,272">
+      <animateTransform attributeName="transform" type="translate" values="0,0; 6,0; 0,0" dur="1s" repeatCount="indefinite"
+        calcMode="spline" keyTimes="0; 0.5; 1" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+    </polyline>
+    <!-- Left arrow (Human counter-trade) -->
+    <polyline points="212,240 192,256 212,272">
+      <animateTransform attributeName="transform" type="translate" values="0,0; -6,0; 0,0" dur="1s" repeatCount="indefinite"
+        calcMode="spline" keyTimes="0; 0.5; 1" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"/>
+    </polyline>
+  </g>
+
+  <!-- Timer ring — 20-second counter-trade countdown.
+       Outer dashed ring counter-rotates against the arena; an arc sweeps to depict the countdown depleting. -->
+  <g transform-origin="256 256">
+    <animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="20s" repeatCount="indefinite"/>
+    <path d="M 256 72 A 184 184 0 1 1 255.99 72" fill="none" stroke="url(#brandGrad)"
+      stroke-width="3" stroke-dasharray="12 8" opacity="0.25"/>
+  </g>
+  <!-- Depleting countdown arc (full -> empty every 20s) -->
+  <circle cx="256" cy="256" r="184" fill="none" stroke="url(#brandGradLive)" stroke-width="4"
+    stroke-linecap="round" opacity="0.6" transform="rotate(-90 256 256)"
+    stroke-dasharray="1156" stroke-dashoffset="0">
+    <animate attributeName="stroke-dashoffset" values="0; 1156" dur="20s" repeatCount="indefinite"/>
+  </circle>
+</svg>

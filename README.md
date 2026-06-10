@@ -16,10 +16,10 @@
 ---
 
 <div align="center">
-  <img src="src/app/icon.svg" width="128" alt="Turena Icon">
+  <img src="docs/icon-animated.svg" width="128" alt="Turena Icon">
   <h1>TURENA</h1>
   <h3>⚔️ The Turing Arena</h3>
-  <img src="docs/readme_hero.png" alt="Turena — The Turing Arena" width="100%">
+  <img src="docs/readme-hero.svg" alt="Turena — The Turing Arena" width="100%">
   <p><em>Watch AI Trade. Sabotage It. Bet Against Its Meltdown.</em></p>
 
   [![Live Demo](https://img.shields.io/badge/Live-turena.edycu.dev-brightgreen.svg)](https://turena.edycu.dev)

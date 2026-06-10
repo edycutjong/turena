@@ -1,4 +1,4 @@
-.PHONY: test test-fe test-be up down build logs prune clean nuke ci
+.PHONY: test test-fe test-be up down build logs prune clean nuke ci deploy-testnet deploy-mainnet
 
 # Load environment variables from .env if it exists
 ifneq (,$(wildcard .env))
@@ -40,6 +40,21 @@ prune:
 
 clean:
 	@echo "Clean completed"
+
+# ── Contract Deployment ─────────────────────────────────────
+# Requires DEPLOYER_PRIVATE_KEY (+ MANTLE_MAINNET_RPC_URL / MANTLESCAN_API_KEY for mainnet)
+# set in backend/.env. Deploys all 3 contracts, mints both agent NFTs, prints env block.
+deploy-testnet:
+	@echo "🚀 Deploying to Mantle Sepolia (chainId 5003)..."
+	cd contracts && npx hardhat run scripts/deploy.ts --network mantleTestnet
+
+deploy-mainnet:
+	@echo "⚠️  MAINNET DEPLOY — real MNT at stake. Ctrl-C within 5s to abort."
+	@sleep 5
+	@echo "🚀 Deploying to Mantle mainnet (chainId 5000)..."
+	cd contracts && npx hardhat run scripts/deploy.ts --network mantleMainnet
+	@echo "👉 Next: verify on Mantlescan, then paste the printed addresses into Vercel + Railway env"
+	@echo "   and set NEXT_PUBLIC_MANTLE_CHAIN_ID=5000"
 
 # ── Advanced Testing & Security ─────────────────────────────
 ci:

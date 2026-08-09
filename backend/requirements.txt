@@ -10,7 +10,7 @@ attrs==26.1.0
 bitarray==3.8.1
 ccxt==4.5.51
 certifi==2026.4.22
-cffi==2.0.0
+cffi==2.1.1
 charset-normalizer==3.4.7
 ckzg==2.1.7
 click==8.3.3

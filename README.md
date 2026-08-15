@@ -1,17 +1,21 @@
 ## 🎯 For Judges — Play Immediately
 
-> **Pre-funded wallet (1,000 MNT) — import this private key into MetaMask to start playing with real testnet MNT:**
+> **Bring your own testnet wallet — takes about a minute:**
 >
 > ```
-> Private Key: a8e6c8dc23e439fc56892c11e1855aa3a9b3449267ef07fa5a5500659d5dcc25
-> Address:     0x1c6C3fF9AE61671e39b92B2867b9cB299267bae2
-> Network:     Mantle Sepolia Testnet (Chain ID: 5003)
-> RPC URL:     https://rpc.sepolia.mantle.xyz
+> Network:  Mantle Sepolia Testnet (Chain ID: 5003)
+> RPC URL:  https://rpc.sepolia.mantle.xyz
+> Faucet:   https://faucet.sepolia.mantle.xyz
 > ```
 >
-> 1. Open MetaMask → Import Account → paste the private key
-> 2. Add Mantle Sepolia (the app will prompt you automatically)
+> 1. Add Mantle Sepolia to MetaMask (the app will prompt you automatically)
+> 2. Claim testnet MNT from the [faucet](https://faucet.sepolia.mantle.xyz)
 > 3. Go to **[turena.edycu.dev/arena](https://turena.edycu.dev/arena)** → Connect Wallet → sabotage the AIs or place a counter-trade bet
+
+<sub>An earlier version of this README shipped a pre-funded wallet's **private key** inline so judges
+could skip the faucet. It was a throwaway testnet key and held nothing of value, but publishing a
+private key is a bad habit regardless of the chain it's on — so it's gone, and the address it
+controlled should be considered burned. Use the faucet.</sub>
 
 ---
 

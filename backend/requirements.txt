@@ -43,7 +43,7 @@ pycares==5.0.1
 pycparser==3.0
 pycryptodome==3.23.0
 pydantic==2.13.3
-pydantic_core==2.46.3
+pydantic_core==2.48.0
 python-dotenv==1.2.2
 pyunormalize==17.0.0
 PyYAML==6.0.3

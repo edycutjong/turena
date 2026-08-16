@@ -12,7 +12,7 @@ ccxt==4.5.51
 certifi==2026.4.22
 cffi==2.0.0
 charset-normalizer==3.4.7
-ckzg==2.1.7
+ckzg==2.1.8
 click==8.4.2
 coincurve==21.0.0
 cryptography==47.0.0

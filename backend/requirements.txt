@@ -55,7 +55,7 @@ starlette==1.4.1
 toolz==1.1.0
 tqdm==4.67.3
 types-requests==2.33.0.20260408
-typing-inspection==0.4.2
+typing-inspection==0.4.4
 typing_extensions==4.15.0
 urllib3==2.7.0
 uvicorn==0.46.0
